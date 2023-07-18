@@ -39,7 +39,7 @@ public class GaddagConverter {
             for (int i = delimiterIndex - 1; i >= 0; i--) {
                 state = addSingleLetter(wordChars[i], state);
             }
-            // add delimiter (except when the delimiter would be the last character of the sequence)
+            // add delimiter if it's not the last character of the sequence
             if (delimiterIndex != wordChars.length) {
                 state = addSingleLetter(delimiter, state);
             }
