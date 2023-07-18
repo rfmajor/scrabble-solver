@@ -5,8 +5,8 @@ import lombok.AllArgsConstructor;
 import java.util.Set;
 
 @AllArgsConstructor
-public class Edge {
-    private char character;
+public class Arc {
+    private char letter;
     private Set<Character> letterSet;
-    private Edge nextEdge;
+    private State destinationState;
 }

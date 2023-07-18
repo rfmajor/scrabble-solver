@@ -6,18 +6,18 @@ import java.util.List;
 
 @Component
 public class GaddagConverter {
-    public Edge convert(List<String> words) {
-        Edge edge = new Edge(' ', null, null);
-        processWords(words, edge);
-        postProcessWords(words, edge);
-        return edge;
+    public State convert(List<String> words) {
+        State parentState = new State();
+        processWords(words, parentState);
+        postProcessWords(words, parentState);
+        return parentState;
     }
 
-    private void processWords(List<String> words, Edge edge) {
+    private void processWords(List<String> words, State state) {
 
     }
 
-    private void postProcessWords(List<String> words, Edge edge) {
+    private void postProcessWords(List<String> words, State state) {
 
     }
 }
