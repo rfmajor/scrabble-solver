@@ -1,11 +1,13 @@
 package com.rfmajor.scrabblesolver.gaddag;
 
+import lombok.Setter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 
 @Component
+@Setter
 public class GaddagConverter {
     @Value("${gaddag.delimiter}")
     private char delimiter;
@@ -33,9 +35,15 @@ public class GaddagConverter {
         int delimiterIndex = 1;
         while (delimiterIndex <= wordChars.length) {
             state = parentState;
+            // add rev(x)
             for (int i = delimiterIndex - 1; i >= 0; i--) {
                 state = addSingleLetter(wordChars[i], state, isLastIteration(i, delimiterIndex, wordChars));
             }
+            // add delimiter (except when the delimiter would be the last character of the sequence)
+            if (delimiterIndex != wordChars.length) {
+                state = addSingleLetter(delimiter, state, false);
+            }
+            // add y
             for (int i = delimiterIndex; i < wordChars.length; i++) {
                 state = addSingleLetter(wordChars[i], state, isLastIteration(i, delimiterIndex, wordChars));
             }

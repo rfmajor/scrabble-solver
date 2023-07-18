@@ -17,4 +17,9 @@ public class Arc {
         this.letter = letter;
         this.letterSet = new HashSet<>();
     }
+
+    @Override
+    public String toString() {
+        return String.valueOf(letter);
+    }
 }
