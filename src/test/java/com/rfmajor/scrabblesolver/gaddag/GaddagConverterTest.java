@@ -27,7 +27,7 @@ class GaddagConverterTest {
 
     private static boolean isSequencePresent(String sequence, State state) {
         for (int i = 0; i < sequence.length(); i++) {
-            if (state == null) {
+            if (state.getOutArcs().isEmpty()) {
                 return false;
             }
             char letter = sequence.charAt(i);

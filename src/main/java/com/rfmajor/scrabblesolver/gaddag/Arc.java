@@ -16,6 +16,7 @@ public class Arc {
     public Arc(char letter) {
         this.letter = letter;
         this.letterSet = new HashSet<>();
+        this.destinationState = new State();
     }
 
     @Override

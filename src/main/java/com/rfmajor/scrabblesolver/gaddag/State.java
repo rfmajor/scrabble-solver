@@ -13,8 +13,8 @@ public class State {
         this.outArcs = new HashMap<>();
     }
 
-    public void addArc(Arc arc) {
-        outArcs.put(arc.getLetter(), arc);
+    public void addArc(char letter) {
+        outArcs.put(letter, new Arc(letter));
     }
 
     public Arc getArc(char letter) {

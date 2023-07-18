@@ -37,26 +37,23 @@ public class GaddagConverter {
             state = parentState;
             // add rev(x)
             for (int i = delimiterIndex - 1; i >= 0; i--) {
-                state = addSingleLetter(wordChars[i], state, isLastIteration(i, delimiterIndex, wordChars));
+                state = addSingleLetter(wordChars[i], state);
             }
             // add delimiter (except when the delimiter would be the last character of the sequence)
             if (delimiterIndex != wordChars.length) {
-                state = addSingleLetter(delimiter, state, false);
+                state = addSingleLetter(delimiter, state);
             }
             // add y
             for (int i = delimiterIndex; i < wordChars.length; i++) {
-                state = addSingleLetter(wordChars[i], state, isLastIteration(i, delimiterIndex, wordChars));
+                state = addSingleLetter(wordChars[i], state);
             }
             delimiterIndex++;
         }
     }
 
-    private State addSingleLetter(char letter, State state, boolean isLastLetter) {
-        Arc arc = new Arc(letter);
-        state.addArc(arc);
-        State newState = isLastLetter ? null : new State();
-        arc.setDestinationState(newState);
-        return newState;
+    private State addSingleLetter(char letter, State state) {
+        state.addArc(letter);
+        return state.getArc(letter).getDestinationState();
     }
 
     private boolean isLastIteration(int index, int delimiterIndex, char[] array) {
