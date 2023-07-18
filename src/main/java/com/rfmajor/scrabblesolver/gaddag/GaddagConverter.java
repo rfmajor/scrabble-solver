@@ -31,28 +31,46 @@ public class GaddagConverter {
 
     private void addSingleWord(String word, State state) {
         State parentState = state;
+        Arc arc = null;
         char[] wordChars = word.toCharArray();
         int delimiterIndex = 1;
         while (delimiterIndex <= wordChars.length) {
             state = parentState;
             // add rev(x)
             for (int i = delimiterIndex - 1; i >= 0; i--) {
-                state = addSingleLetter(wordChars[i], state);
+                arc = addSingleLetter(wordChars[i], arc, state, isLastIteration(i, delimiterIndex, wordChars));
+                state = arc.getDestinationState();
             }
             // add delimiter if it's not the last character of the sequence
             if (delimiterIndex != wordChars.length) {
-                state = addSingleLetter(delimiter, state);
+                arc = addSingleLetter(delimiter, arc, state, false);
+                state = arc.getDestinationState();
             }
             // add y
             for (int i = delimiterIndex; i < wordChars.length; i++) {
-                state = addSingleLetter(wordChars[i], state);
+                arc = addSingleLetter(wordChars[i], arc, state, isLastIteration(i, delimiterIndex, wordChars));
+                state = arc.getDestinationState();
             }
             delimiterIndex++;
         }
     }
 
-    private State addSingleLetter(char letter, State state) {
-        state.addArc(letter);
-        return state.getArc(letter).getDestinationState();
+    private Arc addSingleLetter(char letter, Arc arc, State state, boolean isLastLetter) {
+        if (isLastLetter) {
+            arc.addLetterToSet(letter);
+            return arc;
+        }
+        if (!state.containsArc(letter)) {
+            state.addArc(letter);
+            return state.getArc(letter);
+        }
+        return state.getArc(letter);
+    }
+
+    private boolean isLastIteration(int index, int delimiterIndex, char[] array) {
+        if (delimiterIndex == array.length) {
+            return index == 0;
+        }
+        return index == array.length - 1;
     }
 }

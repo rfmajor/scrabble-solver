@@ -19,6 +19,10 @@ public class Arc {
         this.destinationState = new State();
     }
 
+    public void addLetterToSet(char letter) {
+        letterSet.add(letter);
+    }
+
     @Override
     public String toString() {
         return String.valueOf(letter);

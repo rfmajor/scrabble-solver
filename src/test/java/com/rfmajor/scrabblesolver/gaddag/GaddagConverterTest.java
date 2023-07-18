@@ -18,11 +18,11 @@ class GaddagConverterTest {
     @Test
     void givenSomeWord_whenConvertCalled_thenSequencePresent() {
         State state = gaddagConverter.convert(List.of("care"));
-        assertTrue(isSequencePresent("c#are", state));
-        assertTrue(isSequencePresent("ac#re", state));
-        assertTrue(isSequencePresent("rac#e", state));
-        assertTrue(isSequencePresent("erac", state));
-        assertFalse(isSequencePresent("erac#", state));
+        assertTrue(isSequencePresent("c#ar", state));
+        assertTrue(isSequencePresent("ac#r", state));
+        assertTrue(isSequencePresent("rac#", state));
+        assertTrue(isSequencePresent("era", state));
+        assertFalse(isSequencePresent("era#", state));
     }
 
     private static boolean isSequencePresent(String sequence, State state) {

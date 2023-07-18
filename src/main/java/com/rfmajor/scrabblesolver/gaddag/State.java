@@ -20,4 +20,8 @@ public class State {
     public Arc getArc(char letter) {
         return outArcs.get(letter);
     }
+
+    public boolean containsArc(char letter) {
+        return outArcs.containsKey(letter);
+    }
 }
