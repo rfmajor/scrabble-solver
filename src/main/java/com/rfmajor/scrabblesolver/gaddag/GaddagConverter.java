@@ -55,11 +55,4 @@ public class GaddagConverter {
         state.addArc(letter);
         return state.getArc(letter).getDestinationState();
     }
-
-    private boolean isLastIteration(int index, int delimiterIndex, char[] array) {
-        if (delimiterIndex == array.length) {
-            return index == 0;
-        }
-        return index == array.length - 1;
-    }
 }
