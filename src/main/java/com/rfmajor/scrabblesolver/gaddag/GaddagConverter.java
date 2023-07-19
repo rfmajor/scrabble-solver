@@ -23,8 +23,7 @@ public class GaddagConverter {
 
     private void processWords(List<String> words, State state) {
         for (String word : words) {
-            System.out.println("Processing word: " + word);
-            log.debug("Processing word: {}", word);
+            log.info("Processing word: {}", word);
             addSingleWord(word, state);
         }
     }
