@@ -8,16 +8,19 @@ import org.springframework.stereotype.Component;
 public class MoveGenerator {
     private Board board;
 
-    public void generate(int position, String word, Rack rack, Arc arc) {
-        if (/*a letter, L, is already on this square*/) {
+    /**
+     * Method for left-right move generation
+    **/
+    /*public void generate(int position, String word, Rack rack, Arc arc) {
+        if (*//*a letter, L, is already on this square*//* board.) {
             goOn(position, letter, word, rack, arc.getNextArc(letter), arc);
-        } else if (/*letters remain on the rack*/ !rack.isEmpty()) {
+        } else if (*//*letters remain on the rack*//* !rack.isEmpty()) {
             for (char letter : rack.getLetters()) {
                 goOn(position, letter, word, rack.withRemovedLetter(letter), arc.getNextArc(letter), arc);
             }
             if (rack.contains(Rack.BLANK)) {
-                for (/*for each letter the blank could be, L, allowed on this square*/) {
-                    goOn(position, letter, word, rack.withRemovedLetter(letter), arc.getNextArc(letter), arc);
+                for (*//*for each letter the blank could be, L, allowed on this square*//*) {
+                    goOn(position, letter, word, rack.withRemovedLetter(Rack.BLANK), arc.getNextArc(letter), arc);
                 }
             }
         }
@@ -35,5 +38,5 @@ public class MoveGenerator {
 
     private void recordPlay() {
 
-    }
+    }*/
 }
