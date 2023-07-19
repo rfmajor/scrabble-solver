@@ -17,9 +17,13 @@ public class Rack {
         return letters.isEmpty();
     }
 
-    public Rack removeLetter(char letter) {
+    public void removeLetter(char letter) {
         letters.computeIfPresent(letter, (k, v) -> v > 1 ? v - 1 : null);
         size--;
+    }
+
+    public Rack withRemovedLetter(char letter) {
+        this.removeLetter(letter);
         return this;
     }
 
