@@ -1,6 +1,7 @@
 package com.rfmajor.scrabblesolver.gaddag;
 
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -8,6 +9,7 @@ import java.util.List;
 
 @Component
 @Setter
+@Slf4j
 public class GaddagConverter {
     @Value("${gaddag.delimiter}")
     private char delimiter;
@@ -21,6 +23,8 @@ public class GaddagConverter {
 
     private void processWords(List<String> words, State state) {
         for (String word : words) {
+            System.out.println("Processing word: " + word);
+            log.debug("Processing word: {}", word);
             addSingleWord(word, state);
         }
     }

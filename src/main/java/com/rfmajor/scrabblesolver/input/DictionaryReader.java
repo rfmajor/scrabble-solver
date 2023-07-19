@@ -19,6 +19,8 @@ import java.util.List;
 public class DictionaryReader {
     @Value("${dictionary.filepath}")
     private Resource dictionaryResource;
+    @Value("${gaddag.wordlength.constraint}")
+    private int maxWordLength;
 
     public List<String> readAllWords() {
         List<String> words = new ArrayList<>();
@@ -29,7 +31,9 @@ public class DictionaryReader {
         ) {
             String line;
             while ((line = reader.readLine()) != null) {
-                words.add(line);
+                if (line.length() <= maxWordLength) {
+                    words.add(line);
+                }
             }
         } catch (FileNotFoundException e) {
             log.error("Dictionary file not found, exception is: ", e);

@@ -24,4 +24,11 @@ public class State {
     public boolean containsArc(char letter) {
         return outArcs.containsKey(letter);
     }
+
+    @Override
+    public String toString() {
+        StringBuilder stringBuilder = new StringBuilder();
+        outArcs.keySet().forEach(stringBuilder::append);
+        return stringBuilder.toString();
+    }
 }
