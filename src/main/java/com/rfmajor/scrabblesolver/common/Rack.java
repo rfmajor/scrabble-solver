@@ -21,11 +21,20 @@ public class Rack {
         return this;
     }
 
+    public void addLetter(char letter) {
+        letters.compute(letter, (k, v) -> v == null ? 1 : v + 1);
+    }
+
     public boolean contains(char letter) {
         return letters.containsKey(letter);
     }
 
     public Set<Character> getLetters() {
         return letters.keySet();
+    }
+
+    public int getSize() {
+        return letters.values().stream()
+                .reduce(0, Integer::sum);
     }
 }
