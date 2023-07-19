@@ -23,6 +23,18 @@ public class Arc {
         letterSet.add(letter);
     }
 
+    public Arc getNextArc(char letter) {
+        return this.getDestinationState().getArc(letter);
+    }
+
+    public boolean containsArc(char letter) {
+        return destinationState.containsArc(letter);
+    }
+
+    public boolean containsLetter(char letter) {
+        return letterSet.contains(letter);
+    }
+
     @Override
     public String toString() {
         return String.valueOf(letter);
