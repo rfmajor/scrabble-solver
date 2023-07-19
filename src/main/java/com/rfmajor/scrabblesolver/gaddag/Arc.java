@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Setter
@@ -38,5 +39,9 @@ public class Arc {
     @Override
     public String toString() {
         return String.valueOf(letter);
+    }
+
+    public List<Character> getNextLetters() {
+        return this.getDestinationState().getOutArcs().keySet().stream().toList();
     }
 }
