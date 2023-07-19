@@ -12,15 +12,12 @@ public class MoveGenerator {
         if (/*a letter, L, is already on this square*/) {
             goOn(position, letter, word, rack, arc.getNextArc(letter), arc);
         } else if (/*letters remain on the rack*/ !rack.isEmpty()) {
-            for (int i = 0; i < rack.getLetters().size(); i++) {
-                // TODO: 7/19/23 Change this so it doesn't throw IndexOutOfBoundsException when removing letters
-                char letter = rack.removeLetter(i);
-                goOn(position, letter, word, rack, arc.getNextArc(letter), arc);
+            for (char letter : rack.getLetters()) {
+                goOn(position, letter, word, rack.removeLetter(letter), arc.getNextArc(letter), arc);
             }
             if (rack.contains(Rack.BLANK)) {
                 for (/*for each letter the blank could be, L, allowed on this square*/) {
-                    char letter = rack.removeLetter();
-                    goOn(position, letter, word, rack, arc.getNextArc(letter), arc);
+                    goOn(position, letter, word, rack.removeLetter(letter), arc.getNextArc(letter), arc);
                 }
             }
         }
