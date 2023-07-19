@@ -6,6 +6,7 @@ import java.util.Set;
 
 public class Rack {
     private final Map<Character, Integer> letters;
+    private int size;
     public static final char BLANK = ' ';
 
     public Rack() {
@@ -18,11 +19,13 @@ public class Rack {
 
     public Rack removeLetter(char letter) {
         letters.computeIfPresent(letter, (k, v) -> v > 1 ? v - 1 : null);
+        size--;
         return this;
     }
 
     public void addLetter(char letter) {
         letters.compute(letter, (k, v) -> v == null ? 1 : v + 1);
+        size++;
     }
 
     public boolean contains(char letter) {
@@ -34,7 +37,6 @@ public class Rack {
     }
 
     public int getSize() {
-        return letters.values().stream()
-                .reduce(0, Integer::sum);
+        return size;
     }
 }

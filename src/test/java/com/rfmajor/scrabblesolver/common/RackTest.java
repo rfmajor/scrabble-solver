@@ -102,4 +102,21 @@ class RackTest {
         rack.addLetter('c');
         assertFalse(rack.getLetters().containsAll(Set.of('a', 'b', 'c', 'd')));
     }
+
+    @Test
+    void givenThreeLetters_whenGetSize_thenReturn3() {
+        rack.addLetter('a');
+        rack.addLetter('a');
+        rack.addLetter('c');
+        assertEquals(3, rack.getSize());
+    }
+
+    @Test
+    void givenThreeLettersAndOneRemoval_whenGetSize_thenReturn2() {
+        rack.addLetter('a');
+        rack.addLetter('a');
+        rack.addLetter('c');
+        rack.removeLetter('a');
+        assertEquals(2, rack.getSize());
+    }
 }
