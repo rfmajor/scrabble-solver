@@ -1,7 +1,5 @@
 package com.rfmajor.scrabblesolver.common;
 
-import lombok.Getter;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -24,7 +22,7 @@ public class Rack {
     }
 
     public boolean contains(char letter) {
-        return letters.contains(letter);
+        return letters.containsKey(letter);
     }
 
     public Set<Character> getLetters() {
