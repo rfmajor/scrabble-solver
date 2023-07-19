@@ -27,7 +27,7 @@ public class Arc {
         return this.getDestinationState().getArc(letter);
     }
 
-    public boolean containsArc(char letter) {
+    public boolean hasNextArc(char letter) {
         return destinationState.containsArc(letter);
     }
 
