@@ -104,6 +104,15 @@ class RackTest {
     }
 
     @Test
+    void givenThreeLettersWithDuplicates_whenGetLettersSize_thenReturn3() {
+        rack.addLetter('a');
+        rack.addLetter('b');
+        rack.addLetter('b');
+        assertTrue(rack.getLetters().containsAll(Set.of('a', 'b')));
+        assertEquals(3, rack.getLetters().size());
+    }
+
+    @Test
     void givenThreeLetters_whenGetSize_thenReturn3() {
         rack.addLetter('a');
         rack.addLetter('a');

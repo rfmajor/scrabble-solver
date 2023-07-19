@@ -1,8 +1,9 @@
 package com.rfmajor.scrabblesolver.common;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
+import java.util.stream.Stream;
 
 public class Rack {
     private final Map<Character, Integer> letters;
@@ -36,8 +37,10 @@ public class Rack {
         return letters.containsKey(letter);
     }
 
-    public Set<Character> getLetters() {
-        return letters.keySet();
+    public List<Character> getLetters() {
+        return letters.entrySet().stream()
+                .flatMap(e -> Stream.iterate(e.getKey(), letter -> letter).limit(e.getValue()))
+                .toList();
     }
 
     public int getSize() {
