@@ -19,8 +19,10 @@ public class Rack {
     }
 
     public void removeLetter(char letter) {
-        letters.computeIfPresent(letter, (k, v) -> v > 1 ? v - 1 : null);
-        size--;
+        if (letters.containsKey(letter) {
+            letters.compute(letter, (k, v) -> v > 1 ? v - 1 : null);
+            size--;
+        }
     }
 
     public Rack withRemovedLetter(char letter) {
