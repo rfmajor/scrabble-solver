@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class MoveGenerator {
     private Board board;
+    private AnchorTracker anchorTracker;
     @Value("${gaddag.delimiter}")
     private char delimiter;
 

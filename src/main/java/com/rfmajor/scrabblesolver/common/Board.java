@@ -15,7 +15,7 @@ package com.rfmajor.scrabblesolver.common;
 public class Board {
     private final char[][] fields;
 
-    private static final int DEFAULT_SIZE = 13;
+    public static final int DEFAULT_SIZE = 13;
     private static final char DEFAULT_CHAR = '\u0000';
 
     public Board() {
