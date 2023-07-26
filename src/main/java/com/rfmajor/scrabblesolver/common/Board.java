@@ -13,14 +13,10 @@ package com.rfmajor.scrabblesolver.common;
  */
 
 public class Board {
-    private final char[][] fields;
+    private final char[][] fields = new char[DEFAULT_SIZE][DEFAULT_SIZE];
 
-    public static final int DEFAULT_SIZE = 13;
+    public static final int DEFAULT_SIZE = 15;
     private static final char DEFAULT_CHAR = '\u0000';
-
-    public Board() {
-        this.fields = new char[DEFAULT_SIZE][DEFAULT_SIZE];
-    }
 
     public char getLetter(int x, int y) {
         return fields[x][y];
