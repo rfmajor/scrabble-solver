@@ -8,21 +8,21 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Component
-public class CrossSetMapper {
+public class LetterSetMapper {
     private final Alphabet alphabet;
 
-    public CrossSetMapper(Alphabet alphabet) {
+    public LetterSetMapper(Alphabet alphabet) {
         if (alphabet.size() >= Long.SIZE) {
             throw new AlphabetTooLargeException("The alphabet is too large: " + alphabet.size());
         }
         this.alphabet = alphabet;
     }
 
-    public String mapCrossSetToHexVector(Set<Character> letters) {
-        return Long.toHexString(mapCrossSetToLong(letters)).toUpperCase();
+    public String mapLetterSetToHexVector(Set<Character> letters) {
+        return Long.toHexString(mapLetterSetToLong(letters)).toUpperCase();
     }
 
-    public long mapCrossSetToLong(Set<Character> letters) {
+    public long mapLetterSetToLong(Set<Character> letters) {
         long sum = 0;
         for (char letter : letters) {
             sum += Math.pow(2, alphabet.getIndex(letter));
