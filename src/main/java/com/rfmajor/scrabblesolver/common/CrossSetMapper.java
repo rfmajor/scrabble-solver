@@ -3,6 +3,8 @@ package com.rfmajor.scrabblesolver.common;
 import com.rfmajor.scrabblesolver.common.exceptions.AlphabetTooLargeException;
 import org.springframework.stereotype.Component;
 
+import java.math.BigInteger;
+import java.util.HashSet;
 import java.util.Set;
 
 @Component
@@ -26,5 +28,20 @@ public class CrossSetMapper {
             sum += Math.pow(2, alphabet.getIndex(letter));
         }
         return sum;
+    }
+
+    public Set<Character> mapToSet(String hexVector) {
+        long decoded = new BigInteger(hexVector, 16).longValue();
+        return mapToSet(decoded);
+    }
+
+    public Set<Character> mapToSet(long hexVector) {
+        Set<Character> letterSet = new HashSet<>();
+        for (int i = 0; i < alphabet.size(); i++) {
+            if (((hexVector >> i) & 1) == 1L) {
+                letterSet.add(alphabet.getLetter(i));
+            }
+        }
+        return letterSet;
     }
 }

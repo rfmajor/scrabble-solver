@@ -64,6 +64,42 @@ class CrossSetMapperTest {
         assertThrows(AlphabetLetterNotPresentException.class, () -> crossSetMapper.mapCrossSetToLong(Set.of('v')));
     }
 
+    @Test
+    void given8FsHexVectorWith32LettersInAlphabet_whenMapToSet_thenReturnAllLetters() {
+        Set<Character> mapped = crossSetMapper.mapToSet("FFFFFFFF");
+        assertTrue(mapped.containsAll(mapStringToLettersSet("aąbcćdeęfghijklłmnńoóprsśtuwyzźż")));
+    }
+
+    @Test
+    void given8FsLongWith32LettersInAlphabet_whenMapToSet_thenReturnAllLetters() {
+        Set<Character> mapped = crossSetMapper.mapToSet((long) Math.pow(2, 32) - 1);
+        assertTrue(mapped.containsAll(mapStringToLettersSet("aąbcćdeęfghijklłmnńoóprsśtuwyzźż")));
+    }
+
+    @Test
+    void given0HexVectorWith32LettersInAlphabet_whenMapToSet_thenReturnEmptySet() {
+        Set<Character> mapped = crossSetMapper.mapToSet("0");
+        assertTrue(mapped.isEmpty());
+    }
+
+    @Test
+    void given0LongWith32LettersInAlphabet_whenMapToSet_thenReturnEmptySet() {
+        Set<Character> mapped = crossSetMapper.mapToSet(0L);
+        assertTrue(mapped.isEmpty());
+    }
+
+    @Test
+    void given16DHexVectorWith32LettersInAlphabet_whenMapToSet_thenReturnABCDEF() {
+        Set<Character> mapped = crossSetMapper.mapToSet("16D");
+        assertTrue(mapped.containsAll(mapStringToLettersSet("abcdef")));
+    }
+
+    @Test
+    void given16DLongWith32LettersInAlphabet_whenMapToSet_thenReturnABCDEF() {
+        Set<Character> mapped = crossSetMapper.mapToSet(365L);
+        assertTrue(mapped.containsAll(mapStringToLettersSet("abcdef")));
+    }
+
     private static List<Character> mapStringToLettersList(String letters) {
         return letters.chars().mapToObj(c -> (char) c).toList();
     }
