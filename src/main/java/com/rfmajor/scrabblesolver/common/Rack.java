@@ -19,7 +19,7 @@ public class Rack {
     }
 
     public void removeLetter(char letter) {
-        if (letters.containsKey(letter) {
+        if (letters.containsKey(letter)) {
             letters.compute(letter, (k, v) -> v > 1 ? v - 1 : null);
             size--;
         }

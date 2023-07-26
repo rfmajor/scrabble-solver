@@ -12,13 +12,16 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @Component
 @Slf4j
 public class DictionaryReader {
-    @Value("${dictionary.filepath}")
+    @Value("${dictionary.words.filepath}")
     private Resource dictionaryResource;
+    @Value("${dictionary.alphabet.filepath}")
+    private Resource alphabetResource;
     @Value("${gaddag.wordlength.constraint}")
     private int maxWordLength;
 
@@ -41,5 +44,22 @@ public class DictionaryReader {
             log.error("{}", e.getMessage());
         }
         return words;
+    }
+
+    public List<Character> readAlphabet() {
+        try (
+                FileInputStream fis = new FileInputStream(dictionaryResource.getFile());
+                InputStreamReader isr = new InputStreamReader(fis, StandardCharsets.UTF_8);
+                BufferedReader reader = new BufferedReader(isr)
+        ) {
+            return reader.readLine().chars()
+                    .mapToObj(num -> (char) num)
+                    .toList();
+        } catch (FileNotFoundException e) {
+            log.error("Alphabet file not found, exception is: ", e);
+        } catch (IOException e) {
+            log.error("{}", e.getMessage());
+        }
+        return Collections.emptyList();
     }
 }
