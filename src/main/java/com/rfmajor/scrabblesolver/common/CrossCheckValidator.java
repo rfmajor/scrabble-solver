@@ -24,6 +24,6 @@ public class CrossCheckValidator {
     }
 
     public void computeCrossSets(int row) {
-        
+
     }
 }

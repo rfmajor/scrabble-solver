@@ -12,7 +12,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 @Component
@@ -24,6 +23,11 @@ public class DictionaryReader {
     private Resource alphabetResource;
     @Value("${gaddag.wordlength.constraint}")
     private int maxWordLength;
+
+    private static final int NUM_OF_ALPHABET_LINES = 2;
+    private static final int LETTERS_INDEX = 0;
+    private static final int POINTS_INDEX = 1;
+    private static final int QUANTITIES_INDEX = 2;
 
     public List<String> readAllWords() {
         List<String> words = new ArrayList<>();
@@ -46,20 +50,43 @@ public class DictionaryReader {
         return words;
     }
 
-    public List<Character> readAlphabet() {
+    public String[] readAlphabetLines() {
+        String[] lines = new String[NUM_OF_ALPHABET_LINES];
         try (
                 FileInputStream fis = new FileInputStream(dictionaryResource.getFile());
                 InputStreamReader isr = new InputStreamReader(fis, StandardCharsets.UTF_8);
                 BufferedReader reader = new BufferedReader(isr)
         ) {
-            return reader.readLine().chars()
-                    .mapToObj(num -> (char) num)
-                    .toList();
+            for (int i = 0; i < NUM_OF_ALPHABET_LINES; i++) {
+                lines[i] = reader.readLine();
+            }
         } catch (FileNotFoundException e) {
             log.error("Alphabet file not found, exception is: ", e);
         } catch (IOException e) {
             log.error("{}", e.getMessage());
         }
-        return Collections.emptyList();
+        return lines;
+    }
+
+    public List<Character> getAlphabetLetters(String[] lines) {
+        return lines[LETTERS_INDEX].chars()
+                .mapToObj(num -> (char) num)
+                .toList();
+    }
+
+    public List<Integer> getAlphabetPoints(String[] lines) {
+        return getNumericValues(lines[POINTS_INDEX]);
+    }
+
+    public List<Integer> getAlphabetQuantities(String[] lines) {
+        return getNumericValues(lines[QUANTITIES_INDEX]);
+    }
+
+    private List<Integer> getNumericValues(String line) {
+        List<Integer> points = new ArrayList<>();
+        for (char p : line.toCharArray()) {
+            points.add(Integer.parseInt(String.valueOf(p)));
+        }
+        return points;
     }
 }
