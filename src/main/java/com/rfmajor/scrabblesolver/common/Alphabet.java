@@ -42,4 +42,8 @@ public class Alphabet {
     public int size() {
         return lettersToIndexes.size();
     }
+
+    public boolean containsLetter(char letter) {
+        return lettersToIndexes.containsKey(letter);
+    }
 }

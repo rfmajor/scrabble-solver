@@ -44,4 +44,19 @@ public class LetterSetMapper {
         }
         return letterSet;
     }
+
+    public int addLetterToVector(int vector, char letter) {
+        int index = alphabet.getIndex(letter);
+        return vector | (1 << index);
+    }
+
+    public int removeLetterFromVector(int vector, char letter) {
+        int index = alphabet.getIndex(letter);
+        return vector & ~(1 << index);
+    }
+
+    public boolean containsLetter(int vector, char letter) {
+        int index = alphabet.getIndex(letter);
+        return ((vector >> index) & 1) == 1;
+    }
 }

@@ -12,6 +12,7 @@ import java.util.Set;
 public class Arc {
     private char letter;
     private final Set<Character> letterSet;
+    private int letterBitVector;
     private State destinationState;
 
     public Arc(char letter) {
