@@ -1,28 +1,36 @@
 package com.rfmajor.scrabblesolver.gaddag;
 
+import com.rfmajor.scrabblesolver.common.Alphabet;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 @Setter
 @Getter
 public class Arc {
     private char letter;
-    private final Set<Character> letterSet;
     private int letterBitVector;
     private State destinationState;
 
     public Arc(char letter) {
         this.letter = letter;
-        this.letterSet = new HashSet<>();
         this.destinationState = new State();
     }
 
-    public void addLetterToSet(char letter) {
-        letterSet.add(letter);
+    public void addLetterToSet(char letter, Alphabet alphabet) {
+        int index = alphabet.getIndex(letter);
+        letterBitVector = letterBitVector | (1 << index);
+    }
+
+    public void removeLetterFromSet(char letter, Alphabet alphabet) {
+        int index = alphabet.getIndex(letter);
+        letterBitVector = letterBitVector & ~(1 << index);
+    }
+
+    public boolean containsLetter(char letter, Alphabet alphabet) {
+        int index = alphabet.getIndex(letter);
+        return ((letterBitVector >> index) & 1) == 1;
     }
 
     public Arc getNextArc(char letter) {
@@ -31,10 +39,6 @@ public class Arc {
 
     public boolean hasNextArc(char letter) {
         return destinationState.containsArc(letter);
-    }
-
-    public boolean containsLetter(char letter) {
-        return letterSet.contains(letter);
     }
 
     @Override

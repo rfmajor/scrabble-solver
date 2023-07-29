@@ -1,5 +1,7 @@
 package com.rfmajor.scrabblesolver.gaddag;
 
+import com.rfmajor.scrabblesolver.common.Alphabet;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -9,30 +11,31 @@ import java.util.List;
 
 @Component
 @Setter
+@RequiredArgsConstructor
 @Slf4j
 public class GaddagConverter {
     @Value("${gaddag.delimiter}")
     private char delimiter;
 
-    public State convert(List<String> words) {
+    public State convert(List<String> words, Alphabet alphabet) {
         State parentState = new State();
-        processWords(words, parentState);
-        postProcessWords(words, parentState);
+        processWords(words, parentState, alphabet);
+        postProcessWords(words, parentState, alphabet);
         return parentState;
     }
 
-    private void processWords(List<String> words, State state) {
+    private void processWords(List<String> words, State state, Alphabet alphabet) {
         for (String word : words) {
             log.info("Processing word: {}", word);
-            addSingleWord(word, state);
+            addSingleWord(word, state, alphabet);
         }
     }
 
-    private void postProcessWords(List<String> words, State state) {
+    private void postProcessWords(List<String> words, State state, Alphabet alphabet) {
 
     }
 
-    private void addSingleWord(String word, State state) {
+    private void addSingleWord(String word, State state, Alphabet alphabet) {
         State parentState = state;
         Arc arc = null;
         char[] wordChars = word.toCharArray();
@@ -41,26 +44,26 @@ public class GaddagConverter {
             state = parentState;
             // add rev(x)
             for (int i = delimiterIndex - 1; i >= 0; i--) {
-                arc = addSingleLetter(wordChars[i], arc, state, isLastIteration(i, delimiterIndex, wordChars));
+                arc = addSingleLetter(wordChars[i], arc, state, isLastIteration(i, delimiterIndex, wordChars), alphabet);
                 state = arc.getDestinationState();
             }
             // add delimiter if it's not the last character of the sequence
             if (delimiterIndex != wordChars.length) {
-                arc = addSingleLetter(delimiter, arc, state, false);
+                arc = addSingleLetter(delimiter, arc, state, false, alphabet);
                 state = arc.getDestinationState();
             }
             // add y
             for (int i = delimiterIndex; i < wordChars.length; i++) {
-                arc = addSingleLetter(wordChars[i], arc, state, isLastIteration(i, delimiterIndex, wordChars));
+                arc = addSingleLetter(wordChars[i], arc, state, isLastIteration(i, delimiterIndex, wordChars), alphabet);
                 state = arc.getDestinationState();
             }
             delimiterIndex++;
         }
     }
 
-    private Arc addSingleLetter(char letter, Arc arc, State state, boolean isLastLetter) {
+    private Arc addSingleLetter(char letter, Arc arc, State state, boolean isLastLetter, Alphabet alphabet) {
         if (isLastLetter) {
-            arc.addLetterToSet(letter);
+            arc.addLetterToSet(letter, alphabet);
             return arc;
         }
         if (!state.containsArc(letter)) {

@@ -1,5 +1,6 @@
 package com.rfmajor.scrabblesolver.input;
 
+import com.rfmajor.scrabblesolver.common.Alphabet;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
@@ -24,12 +25,12 @@ public class DictionaryReader {
     @Value("${gaddag.wordlength.constraint}")
     private int maxWordLength;
 
-    private static final int NUM_OF_ALPHABET_LINES = 2;
+    private static final int NUM_OF_ALPHABET_LINES = 3;
     private static final int LETTERS_INDEX = 0;
     private static final int POINTS_INDEX = 1;
     private static final int QUANTITIES_INDEX = 2;
 
-    public List<String> readAllWords() {
+    public List<String> readAllWords(Alphabet alphabet) {
         List<String> words = new ArrayList<>();
         try (
                 FileInputStream fis = new FileInputStream(dictionaryResource.getFile());
@@ -38,7 +39,7 @@ public class DictionaryReader {
         ) {
             String line;
             while ((line = reader.readLine()) != null) {
-                if (line.length() <= maxWordLength) {
+                if (line.length() <= maxWordLength && alphabet.isLegalWord(line)) {
                     words.add(line);
                 }
             }
@@ -53,7 +54,7 @@ public class DictionaryReader {
     public String[] readAlphabetLines() {
         String[] lines = new String[NUM_OF_ALPHABET_LINES];
         try (
-                FileInputStream fis = new FileInputStream(dictionaryResource.getFile());
+                FileInputStream fis = new FileInputStream(alphabetResource.getFile());
                 InputStreamReader isr = new InputStreamReader(fis, StandardCharsets.UTF_8);
                 BufferedReader reader = new BufferedReader(isr)
         ) {

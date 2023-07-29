@@ -5,10 +5,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
-import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
+import static com.rfmajor.scrabblesolver.TestUtils.mapStringToLettersList;
+import static com.rfmajor.scrabblesolver.TestUtils.mapStringToLettersSet;
 import static org.junit.jupiter.api.Assertions.*;
 
 class LetterSetMapperTest {
@@ -113,13 +113,5 @@ class LetterSetMapperTest {
     void given16DLongWith32LettersInAlphabet_whenMapToSet_thenReturnABCDEF() {
         Set<Character> mapped = letterSetMapper.mapToSet(365L, alphabet);
         assertTrue(mapped.containsAll(mapStringToLettersSet("abcdef")));
-    }
-
-    private static List<Character> mapStringToLettersList(String letters) {
-        return letters.chars().mapToObj(c -> (char) c).toList();
-    }
-
-    private static Set<Character> mapStringToLettersSet(String letters) {
-        return letters.chars().mapToObj(c -> (char) c).collect(Collectors.toSet());
     }
 }

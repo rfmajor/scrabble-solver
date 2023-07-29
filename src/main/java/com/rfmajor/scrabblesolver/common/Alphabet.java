@@ -62,4 +62,13 @@ public class Alphabet {
         }
         return lettersToPoints;
     }
+
+    public boolean isLegalWord(String line) {
+        for (int i = 0; i < line.length(); i++) {
+            if (!containsLetter(line.charAt(i))) {
+                return false;
+            }
+        }
+        return true;
+    }
 }

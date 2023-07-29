@@ -1,23 +1,33 @@
 package com.rfmajor.scrabblesolver.gaddag;
 
+import com.rfmajor.scrabblesolver.TestUtils;
+import com.rfmajor.scrabblesolver.common.Alphabet;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.Collections;
 import java.util.List;
+
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class GaddagConverterTest {
     private GaddagConverter gaddagConverter = new GaddagConverter();
+    private Alphabet alphabet;
 
     @BeforeEach
     void setUp() {
         gaddagConverter.setDelimiter('#');
+        alphabet = new Alphabet(
+                TestUtils.mapStringToLettersList("aąbcćdeęfghijklłmnńoóprsśtuwyzźż"),
+                Collections.emptyList(),
+                Collections.emptyList()
+        );
     }
 
     @Test
     void givenSomeWord_whenConvertCalled_thenSequencePresent() {
-        State state = gaddagConverter.convert(List.of("care"));
+        State state = gaddagConverter.convert(List.of("care"), alphabet);
         assertTrue(isSequencePresent("c#ar", state));
         assertTrue(isSequencePresent("ac#r", state));
         assertTrue(isSequencePresent("rac#", state));
