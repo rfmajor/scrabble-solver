@@ -3,14 +3,11 @@ package com.rfmajor.scrabblesolver;
 import com.rfmajor.scrabblesolver.common.Alphabet;
 import com.rfmajor.scrabblesolver.gaddag.Arc;
 import com.rfmajor.scrabblesolver.gaddag.GaddagConverter;
-import com.rfmajor.scrabblesolver.gaddag.State;
 import com.rfmajor.scrabblesolver.input.DictionaryReader;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 @SpringBootApplication
 public class ScrabbleSolverApplication {
@@ -24,7 +21,7 @@ public class ScrabbleSolverApplication {
         List<Integer> alphabetQuantities = dictionaryReader.getAlphabetQuantities(alphabetLines);
         Alphabet alphabet = new Alphabet(alphabetLetters, alphabetPoints, alphabetQuantities);
         List<String> words = dictionaryReader.readAllWords(alphabet);
-        State parentState = ctx.getBean(GaddagConverter.class).convert(words, alphabet);
+        Arc parentArc = ctx.getBean(GaddagConverter.class).convert(words, alphabet);
         // 5073 distinct letter sets -> 13 bits as a representation of the set after compression
 
         System.out.println();

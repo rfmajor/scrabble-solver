@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class TestUtils {
+public final class TestUtils {
     public static List<Character> mapStringToLettersList(String letters) {
         return letters.chars().mapToObj(c -> (char) c).toList();
     }

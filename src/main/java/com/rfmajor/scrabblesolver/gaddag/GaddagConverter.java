@@ -1,6 +1,7 @@
 package com.rfmajor.scrabblesolver.gaddag;
 
 import com.rfmajor.scrabblesolver.common.Alphabet;
+import com.rfmajor.scrabblesolver.common.Board;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -17,11 +18,14 @@ public class GaddagConverter {
     @Value("${gaddag.delimiter}")
     private char delimiter;
 
-    public State convert(List<String> words, Alphabet alphabet) {
+    public Arc convert(List<String> words, Alphabet alphabet) {
+        Arc parentArc = new Arc(Board.EMPTY_CHAR);
         State parentState = new State();
+        parentArc.setDestinationState(parentState);
+
         processWords(words, parentState, alphabet);
         postProcessWords(words, parentState, alphabet);
-        return parentState;
+        return parentArc;
     }
 
     private void processWords(List<String> words, State state, Alphabet alphabet) {

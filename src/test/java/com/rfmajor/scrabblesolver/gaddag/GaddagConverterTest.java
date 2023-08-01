@@ -27,15 +27,16 @@ class GaddagConverterTest {
 
     @Test
     void givenSomeWord_whenConvertCalled_thenSequencePresent() {
-        State state = gaddagConverter.convert(List.of("care"), alphabet);
-        assertTrue(isSequencePresent("c#ar", state));
-        assertTrue(isSequencePresent("ac#r", state));
-        assertTrue(isSequencePresent("rac#", state));
-        assertTrue(isSequencePresent("era", state));
-        assertFalse(isSequencePresent("era#", state));
+        Arc arc = gaddagConverter.convert(List.of("care"), alphabet);
+        assertTrue(isSequencePresent("c#ar", arc));
+        assertTrue(isSequencePresent("ac#r", arc));
+        assertTrue(isSequencePresent("rac#", arc));
+        assertTrue(isSequencePresent("era", arc));
+        assertFalse(isSequencePresent("era#", arc));
     }
 
-    private static boolean isSequencePresent(String sequence, State state) {
+    private static boolean isSequencePresent(String sequence, Arc parentArc) {
+        State state = parentArc.getDestinationState();
         for (int i = 0; i < sequence.length(); i++) {
             if (state.getOutArcs().isEmpty()) {
                 return false;
