@@ -29,6 +29,14 @@ public class Board {
         return fields[x][y] == EMPTY_CHAR;
     }
 
+    public boolean isValid(int x, int y) {
+        return x >= 0 && x < this.length() && y >= 0 && y < this.length();
+    }
+
+    public boolean isPlayable(int x, int y) {
+        return isValid(x, y) && isEmpty(x, y);
+    }
+
     public void addLetter(char letter, int x, int y) {
         if (!isEmpty(x, y)) {
             throw new LetterAlreadyPresentException("Letter %s is already present on field (%d, %d)"

@@ -50,4 +50,10 @@ public class Arc {
     public List<Character> getNextLetters() {
         return this.getDestinationState().getOutArcs().keySet().stream().toList();
     }
+
+    public List<Character> getNextAllowedLetters(int letterSet) {
+        return this.getDestinationState().getOutArcs().keySet().stream()
+                .filter(letter -> BitSetUtils.contains(letterSet, letter))
+                .toList();
+    }
 }

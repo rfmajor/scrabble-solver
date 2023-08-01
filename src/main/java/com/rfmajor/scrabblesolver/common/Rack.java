@@ -1,10 +1,13 @@
 package com.rfmajor.scrabblesolver.common;
 
+import lombok.AllArgsConstructor;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
+@AllArgsConstructor
 public class Rack {
     private final Map<Character, Integer> letters;
     private int size;
@@ -12,6 +15,17 @@ public class Rack {
 
     public Rack() {
         this.letters = new HashMap<>();
+    }
+
+    public Rack(String letters) {
+        this();
+        for (char letter : letters.toCharArray()) {
+            addLetter(letter);
+        }
+    }
+
+    private Rack copy() {
+        return new Rack(new HashMap<>(letters), size);
     }
 
     public boolean isEmpty() {
@@ -26,8 +40,9 @@ public class Rack {
     }
 
     public Rack withRemovedLetter(char letter) {
-        this.removeLetter(letter);
-        return this;
+        Rack rack = this.copy();
+        rack.removeLetter(letter);
+        return rack;
     }
 
     public void addLetter(char letter) {
@@ -42,6 +57,13 @@ public class Rack {
     public List<Character> getLetters() {
         return letters.entrySet().stream()
                 .flatMap(e -> Stream.iterate(e.getKey(), letter -> letter).limit(e.getValue()))
+                .toList();
+    }
+
+    public List<Character> getAllowedLetters(int letterSet, Alphabet alphabet) {
+        return letters.entrySet().stream()
+                .flatMap(e -> Stream.iterate(e.getKey(), letter -> letter).limit(e.getValue()))
+                .filter(letter -> BitSetUtils.contains(letterSet, alphabet.getIndex(letter)))
                 .toList();
     }
 

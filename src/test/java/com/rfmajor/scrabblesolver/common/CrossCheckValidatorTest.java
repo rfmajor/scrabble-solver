@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import java.util.Collections;
 import java.util.List;
 
+import static com.rfmajor.scrabblesolver.TestUtils.addWordToBoardVertically;
 import static org.junit.jupiter.api.Assertions.*;
 
 class CrossCheckValidatorTest {
@@ -91,12 +92,5 @@ class CrossCheckValidatorTest {
         crossCheckValidator.computeCrossSets(ROW - 1);
         int crossSet = crossCheckValidator.getCrossSet(ROW - 1, COLUMN);
         assertEquals(0, crossSet);
-    }
-
-    private static void addWordToBoardVertically(String word, int row, int column, Board board) {
-        for (int i = 0; i < word.length(); i++) {
-            char letter = word.charAt(i);
-            board.addLetter(letter, row + i, column);
-        }
     }
 }

@@ -36,8 +36,14 @@ public class CrossCheckValidator {
 
     public void computeCrossSets(int row) {
         for (int column = 0; column < board.getFields()[row].length; column++) {
+            if (!board.isEmpty(row, column)) {
+                crossSets[row][column] = 0;
+                continue;
+            }
+
             boolean hasLettersAbove = hasLettersAbove(row, column);
             boolean hasLettersBelow = hasLettersBelow(row, column);
+
             if (hasLettersAbove && hasLettersBelow) {
                 String aboveWord = readWordUpwards(row - 1, column);
                 String belowWord = readWordDownwards(row + 1, column, false);
@@ -48,6 +54,8 @@ public class CrossCheckValidator {
             } else if (hasLettersBelow) {
                 String word = readWordDownwards(row + 1, column, true);
                 crossSets[row][column] = gaddag.getOneLetterCompletion(word);
+            } else {
+                crossSets[row][column] = Integer.MAX_VALUE;
             }
         }
     }

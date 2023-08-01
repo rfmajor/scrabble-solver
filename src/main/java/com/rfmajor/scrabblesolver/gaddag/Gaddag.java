@@ -2,9 +2,11 @@ package com.rfmajor.scrabblesolver.gaddag;
 
 import com.rfmajor.scrabblesolver.common.Alphabet;
 import com.rfmajor.scrabblesolver.common.BitSetUtils;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
+@Getter
 public class Gaddag {
     private final Arc parentArc;
     private final Alphabet alphabet;
