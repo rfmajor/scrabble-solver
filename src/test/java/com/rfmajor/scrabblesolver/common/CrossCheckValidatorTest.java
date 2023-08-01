@@ -93,4 +93,29 @@ class CrossCheckValidatorTest {
         int crossSet = crossCheckValidator.getCrossSet(ROW - 1, COLUMN);
         assertEquals(0, crossSet);
     }
+
+    @Test
+    void givenWord_whenComputeAnchors_thenReturnCorrectVerticalAnchors() {
+        String word = "part";
+        addWordToBoardVertically(word, ROW, COLUMN, board);
+        crossCheckValidator.computeAnchors(COLUMN);
+        assertTrue(areAnchorsPresent(word, ROW));
+    }
+
+    @Test
+    void givenWordStartingFrom0Row_whenComputeAnchors_thenReturnCorrectVerticalAnchors() {
+        String word = "part";
+        addWordToBoardVertically(word, 0, COLUMN, board);
+        crossCheckValidator.computeAnchors(COLUMN);
+        assertTrue(areAnchorsPresent(word, 0));
+    }
+
+    private boolean areAnchorsPresent(String word, int row) {
+        for (int i = Math.max(0, row - 1); i < row + word.length() + 1; i++) {
+            if (!crossCheckValidator.isAnchor(i, COLUMN)) {
+                return false;
+            }
+        }
+        return true;
+    }
 }

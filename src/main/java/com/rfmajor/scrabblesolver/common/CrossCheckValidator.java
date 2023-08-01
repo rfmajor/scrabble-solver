@@ -17,17 +17,16 @@ public class CrossCheckValidator {
     @Value("${gaddag.delimiter}")
     private char delimiter;
 
-    public void updateAnchors() {
-
+    public void computeAnchors(int column) {
+        for (int row = 0; row < board.length(); row++) {
+            if (!board.isEmpty(row, column) || hasLettersAbove(row, column) || hasLettersBelow(row, column)) {
+                anchors[row][column] = true;
+            }
+        }
     }
 
     public boolean isAnchor(int x, int y) {
         return anchors[x][y];
-    }
-
-    public boolean containsLetter(long vector, char letter) {
-        int index = alphabet.getIndex(letter);
-        return ((vector >> index) & 1) == 1L;
     }
 
     public int getCrossSet(int row, int column) {
