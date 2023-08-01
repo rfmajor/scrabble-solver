@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -32,6 +33,10 @@ public class Alphabet {
                     String.format("Index %d is not present in the alphabet", index));
         }
         return lettersToIndexes.inverse().get(index);
+    }
+
+    public Set<Character> letterSet() {
+        return lettersToIndexes.keySet();
     }
 
     public int getIndex(char letter) {

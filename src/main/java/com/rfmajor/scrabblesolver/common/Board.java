@@ -1,5 +1,7 @@
 package com.rfmajor.scrabblesolver.common;
 
+import lombok.Getter;
+
 /**
  * Board represented by a 2-dimensional array
  * Indexed by x (row) and y (columns), where x == 0 is the first row from the top and
@@ -12,18 +14,19 @@ package com.rfmajor.scrabblesolver.common;
  * 0 0 0 0 0
  */
 
+@Getter
 public class Board {
     private final char[][] fields = new char[DEFAULT_SIZE][DEFAULT_SIZE];
 
     public static final int DEFAULT_SIZE = 15;
-    private static final char DEFAULT_CHAR = '\u0000';
+    public static final char EMPTY_CHAR = '\u0000';
 
-    public char getLetter(int x, int y) {
+    public char getField(int x, int y) {
         return fields[x][y];
     }
 
     public boolean isEmpty(int x, int y) {
-        return fields[x][y] == DEFAULT_CHAR;
+        return fields[x][y] == EMPTY_CHAR;
     }
 
     public void addLetter(char letter, int x, int y) {
@@ -32,6 +35,10 @@ public class Board {
                     .formatted(letter, x, y));
         }
         fields[x][y] = letter;
+    }
+
+    public int length() {
+        return fields.length;
     }
 
     public static class LetterAlreadyPresentException extends RuntimeException {

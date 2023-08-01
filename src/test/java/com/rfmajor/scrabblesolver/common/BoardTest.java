@@ -28,7 +28,7 @@ class BoardTest {
     @Test
     void givenBoardWithAddedLetter_whenGetLetter_thenLetterPresent() {
         board.addLetter('c', 1, 2);
-        assertEquals('c', board.getLetter(1, 2));
+        assertEquals('c', board.getField(1, 2));
     }
 
     @Test
