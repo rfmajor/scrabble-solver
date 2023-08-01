@@ -2,10 +2,12 @@ package com.rfmajor.scrabblesolver.common;
 
 import com.rfmajor.scrabblesolver.gaddag.Gaddag;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import org.springframework.beans.factory.annotation.Value;
 
 
 @RequiredArgsConstructor
+@Setter
 public class CrossCheckValidator {
     private final Board board;
     private final Alphabet alphabet;
@@ -26,6 +28,10 @@ public class CrossCheckValidator {
     public boolean containsLetter(long vector, char letter) {
         int index = alphabet.getIndex(letter);
         return ((vector >> index) & 1) == 1L;
+    }
+
+    public int getCrossSet(int row, int column) {
+        return crossSets[row][column];
     }
 
     public void computeCrossSets(int row) {
@@ -51,16 +57,17 @@ public class CrossCheckValidator {
         for (int i = row; i >= 0 && board.getField(i, column) != Board.EMPTY_CHAR; i--) {
             stringBuilder.append(board.getField(i, column));
         }
+        stringBuilder.append(delimiter);
         return stringBuilder.toString();
     }
 
-    private String readWordDownwards(int row, int column, boolean includeDelimiter) {
+    private String readWordDownwards(int row, int column, boolean reversed) {
         StringBuilder stringBuilder = new StringBuilder();
         for (int i = row; i < board.length() && board.getField(i, column) != Board.EMPTY_CHAR; i++) {
             stringBuilder.append(board.getField(i, column));
         }
-        if (includeDelimiter) {
-            stringBuilder.insert(1, delimiter);
+        if (reversed) {
+            stringBuilder.reverse();
         }
         return stringBuilder.toString();
     }
