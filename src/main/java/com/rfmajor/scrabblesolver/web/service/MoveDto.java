@@ -1,4 +1,4 @@
-package com.rfmajor.scrabblesolver.service;
+package com.rfmajor.scrabblesolver.web.service;
 
 import lombok.Builder;
 

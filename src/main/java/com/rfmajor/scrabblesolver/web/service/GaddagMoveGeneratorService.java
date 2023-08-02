@@ -1,4 +1,4 @@
-package com.rfmajor.scrabblesolver.service;
+package com.rfmajor.scrabblesolver.web.service;
 
 import com.rfmajor.scrabblesolver.gaddag.MoveGenerator;
 import lombok.RequiredArgsConstructor;
@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-//@Service
+@Service
 @RequiredArgsConstructor
 public class GaddagMoveGeneratorService implements MoveGeneratorService {
     private final MoveGenerator moveGenerator;
