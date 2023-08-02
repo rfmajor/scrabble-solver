@@ -2,9 +2,8 @@ package com.rfmajor.scrabblesolver.gaddag;
 
 import com.rfmajor.scrabblesolver.common.Alphabet;
 import com.rfmajor.scrabblesolver.common.Board;
-import com.rfmajor.scrabblesolver.common.CrossCheckValidator;
+import com.rfmajor.scrabblesolver.common.CrossSetCalculator;
 import com.rfmajor.scrabblesolver.common.Rack;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.springframework.beans.factory.annotation.Value;
@@ -18,7 +17,7 @@ import java.util.List;
 @Setter
 public class MoveGenerator {
     private final Board board;
-    private final CrossCheckValidator crossCheckValidator;
+    private final CrossSetCalculator crossSetCalculator;
     private final Alphabet alphabet;
     private final Gaddag gaddag;
     @Value("${gaddag.delimiter}")
@@ -40,11 +39,11 @@ public class MoveGenerator {
             goOn(offset, row, column, letter, word, rack, arc.getNextArc(letter), arc, moves);
         }
         else if (!rack.isEmpty()) {
-            for (char letter : rack.getAllowedLetters(crossCheckValidator.getCrossSet(row, column + offset), alphabet)) {
+            for (char letter : rack.getAllowedLetters(crossSetCalculator.getCrossSet(row, column + offset), alphabet)) {
                 goOn(offset, row, column, letter, word, rack.withRemovedLetter(letter), arc.getNextArc(letter), arc, moves);
             }
             if (rack.contains(Rack.BLANK)) {
-                for (char letter : arc.getNextAllowedLetters(crossCheckValidator.getCrossSet(row, column + offset))) {
+                for (char letter : arc.getNextAllowedLetters(crossSetCalculator.getCrossSet(row, column + offset))) {
                     goOn(offset, row, column, letter, word, rack.withRemovedLetter(Rack.BLANK), arc.getNextArc(letter), arc, moves);
                 }
             }

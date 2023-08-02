@@ -8,7 +8,7 @@ import org.springframework.beans.factory.annotation.Value;
 
 @RequiredArgsConstructor
 @Setter
-public class CrossCheckValidator {
+public class CrossSetCalculator {
     private final Board board;
     private final Alphabet alphabet;
     private final Gaddag gaddag;

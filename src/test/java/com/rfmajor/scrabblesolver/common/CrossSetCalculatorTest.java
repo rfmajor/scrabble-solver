@@ -13,12 +13,12 @@ import java.util.List;
 import static com.rfmajor.scrabblesolver.TestUtils.addWordToBoardVertically;
 import static org.junit.jupiter.api.Assertions.*;
 
-class CrossCheckValidatorTest {
+class CrossSetCalculatorTest {
     private Gaddag gaddag;
     private GaddagConverter gaddagConverter;
     private Alphabet alphabet;
     private Board board;
-    private CrossCheckValidator crossCheckValidator;
+    private CrossSetCalculator crossSetCalculator;
     private boolean initialized;
 
     private static final int ROW = 1;
@@ -39,8 +39,8 @@ class CrossCheckValidatorTest {
                     List.of("pa", "able", "payable", "parable", "pay", "par", "part", "park", "cable"),
                     alphabet);
             gaddag = new Gaddag(parentArc, alphabet);
-            crossCheckValidator = new CrossCheckValidator(board, alphabet, gaddag);
-            crossCheckValidator.setDelimiter('#');
+            crossSetCalculator = new CrossSetCalculator(board, alphabet, gaddag);
+            crossSetCalculator.setDelimiter('#');
             initialized = true;
         }
     }
@@ -51,8 +51,8 @@ class CrossCheckValidatorTest {
         int column = 3;
         String word = "par";
         addWordToBoardVertically(word, row, column, board);
-        crossCheckValidator.computeCrossSets(row + word.length());
-        int crossSet = crossCheckValidator.getCrossSet(row + word.length(), column);
+        crossSetCalculator.computeCrossSets(row + word.length());
+        int crossSet = crossSetCalculator.getCrossSet(row + word.length(), column);
         assertTrue(BitSetUtils.containsOnly(crossSet, alphabet.getIndex('k'), alphabet.getIndex('t')));
     }
 
@@ -60,8 +60,8 @@ class CrossCheckValidatorTest {
     void givenWord_whenComputeCrossSetsAbove_thenReturnCorrectCrossSet() {
         String word = "able";
         addWordToBoardVertically(word, ROW, COLUMN, board);
-        crossCheckValidator.computeCrossSets(ROW - 1);
-        int crossSet = crossCheckValidator.getCrossSet(ROW - 1, COLUMN);
+        crossSetCalculator.computeCrossSets(ROW - 1);
+        int crossSet = crossSetCalculator.getCrossSet(ROW - 1, COLUMN);
         assertTrue(BitSetUtils.containsOnly(crossSet, alphabet.getIndex('c')));
     }
 
@@ -71,8 +71,8 @@ class CrossCheckValidatorTest {
         String secondWord = "able";
         addWordToBoardVertically(firstWord, ROW, COLUMN, board);
         addWordToBoardVertically(secondWord, ROW + firstWord.length() + 1, COLUMN, board);
-        crossCheckValidator.computeCrossSets(ROW + firstWord.length());
-        int crossSet = crossCheckValidator.getCrossSet(ROW + firstWord.length(), COLUMN);
+        crossSetCalculator.computeCrossSets(ROW + firstWord.length());
+        int crossSet = crossSetCalculator.getCrossSet(ROW + firstWord.length(), COLUMN);
         assertTrue(BitSetUtils.containsOnly(crossSet, alphabet.getIndex('y'), alphabet.getIndex('r')));
     }
 
@@ -80,8 +80,8 @@ class CrossCheckValidatorTest {
     void givenNonCompletableWord_whenComputeCrossSetsBelow_thenReturn0() {
         String word = "payable";
         addWordToBoardVertically(word, ROW, COLUMN, board);
-        crossCheckValidator.computeCrossSets(ROW + word.length());
-        int crossSet = crossCheckValidator.getCrossSet(ROW + word.length(), COLUMN);
+        crossSetCalculator.computeCrossSets(ROW + word.length());
+        int crossSet = crossSetCalculator.getCrossSet(ROW + word.length(), COLUMN);
         assertEquals(0, crossSet);
     }
 
@@ -89,8 +89,8 @@ class CrossCheckValidatorTest {
     void givenNonCompletableWord_whenComputeCrossSetsAbove_thenReturn0() {
         String word = "part";
         addWordToBoardVertically(word, ROW, COLUMN, board);
-        crossCheckValidator.computeCrossSets(ROW - 1);
-        int crossSet = crossCheckValidator.getCrossSet(ROW - 1, COLUMN);
+        crossSetCalculator.computeCrossSets(ROW - 1);
+        int crossSet = crossSetCalculator.getCrossSet(ROW - 1, COLUMN);
         assertEquals(0, crossSet);
     }
 
@@ -98,7 +98,7 @@ class CrossCheckValidatorTest {
     void givenWord_whenComputeAnchors_thenReturnCorrectVerticalAnchors() {
         String word = "part";
         addWordToBoardVertically(word, ROW, COLUMN, board);
-        crossCheckValidator.computeAnchors(COLUMN);
+        crossSetCalculator.computeAnchors(COLUMN);
         assertTrue(areAnchorsPresent(word, ROW));
     }
 
@@ -106,13 +106,13 @@ class CrossCheckValidatorTest {
     void givenWordStartingFrom0Row_whenComputeAnchors_thenReturnCorrectVerticalAnchors() {
         String word = "part";
         addWordToBoardVertically(word, 0, COLUMN, board);
-        crossCheckValidator.computeAnchors(COLUMN);
+        crossSetCalculator.computeAnchors(COLUMN);
         assertTrue(areAnchorsPresent(word, 0));
     }
 
     private boolean areAnchorsPresent(String word, int row) {
         for (int i = Math.max(0, row - 1); i < row + word.length() + 1; i++) {
-            if (!crossCheckValidator.isAnchor(i, COLUMN)) {
+            if (!crossSetCalculator.isAnchor(i, COLUMN)) {
                 return false;
             }
         }
