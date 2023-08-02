@@ -32,7 +32,7 @@ public class MoveGenerator {
      * 'offset' is an offset from the anchor square
     **/
     private void generate(int offset, int row, int column, String word, Rack rack, Arc arc, List<Move> moves) {
-        if (!board.isEmpty(row, column + offset)) {
+        if (board.isOccupiedByLetter(row, column + offset)) {
             char letter = board.getField(row, column + offset);
             goOn(offset, row, column, letter, word, rack, arc.getNextArc(letter), arc, moves);
         }

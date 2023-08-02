@@ -45,6 +45,9 @@ public class CrossSetCalculator {
     }
 
     public int getCrossSet(int row, int column) {
+        if (row < 0 || row >= board.length() || column < 0 || column >= board.length()) {
+            return 0;
+        }
         return crossSets[row][column];
     }
 

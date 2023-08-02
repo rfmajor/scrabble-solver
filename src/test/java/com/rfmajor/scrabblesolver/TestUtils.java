@@ -21,4 +21,11 @@ public final class TestUtils {
             board.addLetter(letter, row + i, column);
         }
     }
+
+    public static void addWordToBoardHorizontally(String word, int row, int column, Board board) {
+        for (int i = 0; i < word.length(); i++) {
+            char letter = word.charAt(i);
+            board.addLetter(letter, row, column + i);
+        }
+    }
 }
