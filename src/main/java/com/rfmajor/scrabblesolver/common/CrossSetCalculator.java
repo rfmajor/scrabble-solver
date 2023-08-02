@@ -11,17 +11,18 @@ import java.util.Set;
 @Setter
 public class CrossSetCalculator {
     private final Board board;
-    private final Alphabet alphabet;
     private final Gaddag gaddag;
-    private final boolean[][] anchors = new boolean[Board.DEFAULT_SIZE][Board.DEFAULT_SIZE];
-    private final Set<Point> anchorsSet = new HashSet<>();
-    private final int[][] crossSets = new int[Board.DEFAULT_SIZE][Board.DEFAULT_SIZE];
+    private final boolean[][] anchors;
+    private final Set<Point> anchorsSet;
+    private final int[][] crossSets;
     @Value("${gaddag.delimiter}")
     private char delimiter;
 
-    public CrossSetCalculator(Board board, Alphabet alphabet, Gaddag gaddag) {
+    public CrossSetCalculator(Board board, Gaddag gaddag) {
         this.board = board;
-        this.alphabet = alphabet;
+        this.crossSets = new int[board.length()][board.length()];
+        this.anchors = new boolean[board.length()][board.length()];
+        this.anchorsSet = new HashSet<>();
         this.gaddag = gaddag;
         addAnchor(board.length() / 2,board.length() / 2);
     }
@@ -79,7 +80,7 @@ public class CrossSetCalculator {
 
     private String readWordUpwards(int row, int column) {
         StringBuilder stringBuilder = new StringBuilder();
-        for (int i = row; i >= 0 && board.getField(i, column) != Board.EMPTY_CHAR; i--) {
+        for (int i = row; i >= 0 && board.getField(i, column) != board.getEmptyChar(); i--) {
             stringBuilder.append(board.getField(i, column));
         }
         stringBuilder.append(delimiter);
@@ -88,7 +89,7 @@ public class CrossSetCalculator {
 
     private String readWordDownwards(int row, int column, boolean reversed) {
         StringBuilder stringBuilder = new StringBuilder();
-        for (int i = row; i < board.length() && board.getField(i, column) != Board.EMPTY_CHAR; i++) {
+        for (int i = row; i < board.length() && board.getField(i, column) != board.getEmptyChar(); i++) {
             stringBuilder.append(board.getField(i, column));
         }
         if (reversed) {
@@ -98,11 +99,11 @@ public class CrossSetCalculator {
     }
 
     private boolean hasLettersAbove(int row, int column) {
-        return row > 0 && board.getField(row - 1, column) != Board.EMPTY_CHAR;
+        return row > 0 && board.getField(row - 1, column) != board.getEmptyChar();
     }
 
     private boolean hasLettersBelow(int row, int column) {
-        return row < board.length() - 1 && board.getField(row + 1, column) != Board.EMPTY_CHAR;
+        return row < board.length() - 1 && board.getField(row + 1, column) != board.getEmptyChar();
     }
 
     private void addAnchor(int row, int column) {

@@ -15,7 +15,6 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-@Component
 public class Alphabet {
     private final BiMap<Character, Integer> lettersToIndexes;
     private final Map<Character, Integer> lettersToPoints;

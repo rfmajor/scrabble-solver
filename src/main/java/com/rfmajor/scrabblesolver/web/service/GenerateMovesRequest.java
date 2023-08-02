@@ -1,11 +1,12 @@
 package com.rfmajor.scrabblesolver.web.service;
 
-import com.rfmajor.scrabblesolver.common.Board;
 import lombok.Builder;
+import lombok.Data;
 
 @Builder
+@Data
 public class GenerateMovesRequest {
-    private Board board;
+    private BoardDto board;
     private int[][] crossSets;
     private boolean[][] anchors;
     private String rackLetters;

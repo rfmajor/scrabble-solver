@@ -3,12 +3,14 @@ package com.rfmajor.scrabblesolver.gaddag;
 import com.rfmajor.scrabblesolver.common.Alphabet;
 import com.rfmajor.scrabblesolver.common.BitSetUtils;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.List;
 
 @Setter
 @Getter
+@NoArgsConstructor
 public class Arc {
     private char letter;
     private int letterBitVector;

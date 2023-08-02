@@ -1,16 +1,13 @@
 package com.rfmajor.scrabblesolver.gaddag;
 
 import com.rfmajor.scrabblesolver.common.Alphabet;
-import com.rfmajor.scrabblesolver.common.Board;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
 
 import java.util.List;
 
-@Component
 @Setter
 @RequiredArgsConstructor
 @Slf4j
@@ -19,7 +16,7 @@ public class GaddagConverter {
     private char delimiter;
 
     public Arc convert(List<String> words, Alphabet alphabet) {
-        Arc parentArc = new Arc(Board.EMPTY_CHAR);
+        Arc parentArc = new Arc();
         State parentState = new State();
         parentArc.setDestinationState(parentState);
 

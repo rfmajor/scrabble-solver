@@ -16,10 +16,26 @@ import lombok.Getter;
 
 @Getter
 public class Board {
-    private final char[][] fields = new char[DEFAULT_SIZE][DEFAULT_SIZE];
+    private final char[][] fields;
+    private final char emptyChar;
+
+    public Board() {
+        this.fields = new char[DEFAULT_SIZE][DEFAULT_SIZE];
+        this.emptyChar = EMPTY_CHAR;
+    }
+
+    public Board(int size, char emptyChar) {
+        this.fields = new char[size][size];
+        this.emptyChar = emptyChar;
+    }
+
+    public Board(char[][] fields, char emptyChar) {
+        this.fields = fields;
+        this.emptyChar = emptyChar;
+    }
 
     public static final int DEFAULT_SIZE = 15;
-    public static final char EMPTY_CHAR = '\u0000';
+    private static final char EMPTY_CHAR = '\u0000';
 
     public char getField(int x, int y) {
         return fields[x][y];

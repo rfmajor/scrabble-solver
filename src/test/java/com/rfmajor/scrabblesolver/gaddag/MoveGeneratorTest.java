@@ -41,7 +41,7 @@ class MoveGeneratorTest {
                     List.of("able", "cable", "care", "abler", "ar", "be"),
                     alphabet);
             gaddag = new Gaddag(parentArc, alphabet);
-            crossSetCalculator = new CrossSetCalculator(board, alphabet, gaddag);
+            crossSetCalculator = new CrossSetCalculator(board, gaddag);
             crossSetCalculator.setDelimiter('#');
             moveGenerator = new MoveGenerator(board, crossSetCalculator, alphabet, gaddag);
             moveGenerator.setDelimiter('#');

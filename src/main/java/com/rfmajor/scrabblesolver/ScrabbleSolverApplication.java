@@ -21,7 +21,7 @@ public class ScrabbleSolverApplication {
 
     public static void main(String[] args) {
         var ctx = SpringApplication.run(ScrabbleSolverApplication.class, args);
-        var dictionaryReader = ctx.getBean(DictionaryReader.class);
+        /*var dictionaryReader = ctx.getBean(DictionaryReader.class);
         String[] alphabetLines = dictionaryReader.readAlphabetLines();
         List<Character> alphabetLetters = dictionaryReader.getAlphabetLetters(alphabetLines);
         List<Integer> alphabetPoints = dictionaryReader.getAlphabetPoints(alphabetLines);
@@ -43,7 +43,7 @@ public class ScrabbleSolverApplication {
 
         // 5073 distinct letter sets -> 13 bits as a representation of the set after compression
 
-        System.out.println();
+        System.out.println();*/
     }
 
 }

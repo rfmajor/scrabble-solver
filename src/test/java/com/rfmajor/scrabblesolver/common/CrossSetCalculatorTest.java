@@ -39,7 +39,7 @@ class CrossSetCalculatorTest {
                     List.of("pa", "able", "payable", "parable", "pay", "par", "part", "park", "cable"),
                     alphabet);
             gaddag = new Gaddag(parentArc, alphabet);
-            crossSetCalculator = new CrossSetCalculator(board, alphabet, gaddag);
+            crossSetCalculator = new CrossSetCalculator(board, gaddag);
             crossSetCalculator.setDelimiter('#');
             initialized = true;
         }
