@@ -25,16 +25,25 @@ public class Board {
         return fields[x][y];
     }
 
+    /**
+     * Check if the field is empty without validating indices
+     */
     public boolean isEmpty(int x, int y) {
         return fields[x][y] == EMPTY_CHAR;
     }
 
+    /**
+     * Check if the field is valid
+     */
     public boolean isValid(int x, int y) {
         return x >= 0 && x < this.length() && y >= 0 && y < this.length();
     }
 
-    public boolean isPlayable(int x, int y) {
-        return isValid(x, y) && isEmpty(x, y);
+    /**
+     * Check if the field has a letter on it regardless whether it's valid or not
+     */
+    public boolean isOccupiedByLetter(int x, int y) {
+        return isValid(x, y) && !isEmpty(x, y);
     }
 
     public void addLetter(char letter, int x, int y) {

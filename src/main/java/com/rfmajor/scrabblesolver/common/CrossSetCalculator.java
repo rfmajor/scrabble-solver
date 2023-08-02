@@ -1,28 +1,43 @@
 package com.rfmajor.scrabblesolver.common;
 
 import com.rfmajor.scrabblesolver.gaddag.Gaddag;
-import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.springframework.beans.factory.annotation.Value;
 
+import java.util.HashSet;
+import java.util.Set;
 
-@RequiredArgsConstructor
+
 @Setter
 public class CrossSetCalculator {
     private final Board board;
     private final Alphabet alphabet;
     private final Gaddag gaddag;
     private final boolean[][] anchors = new boolean[Board.DEFAULT_SIZE][Board.DEFAULT_SIZE];
+    private final Set<Point> anchorsSet = new HashSet<>();
     private final int[][] crossSets = new int[Board.DEFAULT_SIZE][Board.DEFAULT_SIZE];
     @Value("${gaddag.delimiter}")
     private char delimiter;
 
+    public CrossSetCalculator(Board board, Alphabet alphabet, Gaddag gaddag) {
+        this.board = board;
+        this.alphabet = alphabet;
+        this.gaddag = gaddag;
+        addAnchor(board.length() / 2,board.length() / 2);
+    }
+
     public void computeAnchors(int column) {
         for (int row = 0; row < board.length(); row++) {
             if (!board.isEmpty(row, column) || hasLettersAbove(row, column) || hasLettersBelow(row, column)) {
-                anchors[row][column] = true;
+                addAnchor(row, column);
+            } else {
+                removeAnchor(row, column);
             }
         }
+    }
+
+    public Set<Point> getAnchors() {
+        return new HashSet<>(anchorsSet);
     }
 
     public boolean isAnchor(int x, int y) {
@@ -85,5 +100,15 @@ public class CrossSetCalculator {
 
     private boolean hasLettersBelow(int row, int column) {
         return row < board.length() - 1 && board.getField(row + 1, column) != Board.EMPTY_CHAR;
+    }
+
+    private void addAnchor(int row, int column) {
+        anchors[row][column] = true;
+        anchorsSet.add(new Point(row, column));
+    }
+
+    private void removeAnchor(int row, int column) {
+        anchors[row][column] = false;
+        anchorsSet.remove(new Point(row, column));
     }
 }

@@ -7,12 +7,10 @@ import com.rfmajor.scrabblesolver.common.Rack;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@Component
 @RequiredArgsConstructor
 @Setter
 public class MoveGenerator {
@@ -53,7 +51,7 @@ public class MoveGenerator {
     private void goOn(int offset, int row, int column, char letter, String word, Rack rack, Arc newArc, Arc oldArc, List<Move> moves) {
         if (offset <= 0) {
             word = letter + word;
-            if (oldArc.containsLetter(letter, alphabet) && board.isPlayable(row, column + offset - 1)) {
+            if (oldArc.containsLetter(letter, alphabet) && !board.isOccupiedByLetter(row, column + offset - 1)) {
                 recordPlay(word, row, column + offset, moves);
             }
             if (newArc != null) {
@@ -62,14 +60,14 @@ public class MoveGenerator {
                 }
                 newArc = newArc.getNextArc(delimiter);
                 // if newArc != 0 && no letter directly left && room to the right
-                if (newArc != null && board.isPlayable(row, column + offset - 1) && board.isValid(row, column + 1)) {
+                if (newArc != null && !board.isOccupiedByLetter(row, column + offset - 1) && board.isValid(row, column + 1)) {
                     generate(1, row, column, word, rack, newArc, moves);
                 }
             }
         } else {
             word = word + letter;
             // oldArc.getLetter() == letter && no letter directly right
-            if (oldArc.containsLetter(letter, alphabet) && board.isPlayable(row, column + offset + 1)) {
+            if (oldArc.containsLetter(letter, alphabet) && !board.isOccupiedByLetter(row, column + offset + 1)) {
                 recordPlay(word, row,column + offset + 1 - word.length(), moves);
             }
             // newArc != 0 && room to the right

@@ -6,6 +6,7 @@ import com.rfmajor.scrabblesolver.common.Board;
 import com.rfmajor.scrabblesolver.common.CrossSetCalculator;
 import com.rfmajor.scrabblesolver.common.Rack;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
@@ -55,9 +56,17 @@ class MoveGeneratorTest {
             crossSetCalculator.computeCrossSets(i);
         }
         List<Move> moves = moveGenerator.generate(row, 4, new Rack("care"));
-        assertEquals(expectedSize, moves.size());
-        System.out.println("==================");
-        System.out.println("ROW " + row);
         moves.forEach(move -> System.out.println(move.toString()));
+        assertEquals(expectedSize, moves.size());
+    }
+
+    @Test
+    void givenEmptyBoard_whenGenerate_thenReturnAllPossibleMoves() {
+        for (int i = 0; i < board.length(); i++) {
+            crossSetCalculator.computeCrossSets(i);
+        }
+        List<Move> moves = moveGenerator.generate(board.length() / 2, board.length() / 2, new Rack("care"));
+        moves.forEach(move -> System.out.println(move.toString()));
+        assertEquals(6, moves.size());
     }
 }
