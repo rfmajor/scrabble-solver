@@ -1,4 +1,4 @@
-package com.rfmajor.scrabblesolver.gaddag;
+package com.rfmajor.scrabblesolver.common.game;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

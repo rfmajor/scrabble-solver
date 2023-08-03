@@ -1,5 +1,6 @@
-package com.rfmajor.scrabblesolver.common;
+package com.rfmajor.scrabblesolver.common.game;
 
+import com.rfmajor.scrabblesolver.common.BitSetUtils;
 import lombok.AllArgsConstructor;
 
 import java.util.HashMap;

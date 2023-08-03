@@ -1,5 +1,6 @@
 package com.rfmajor.scrabblesolver.common;
 
+import com.rfmajor.scrabblesolver.common.game.Board;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

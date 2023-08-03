@@ -1,20 +1,7 @@
 package com.rfmajor.scrabblesolver;
 
-import com.rfmajor.scrabblesolver.common.Alphabet;
-import com.rfmajor.scrabblesolver.common.Board;
-import com.rfmajor.scrabblesolver.common.CrossSetCalculator;
-import com.rfmajor.scrabblesolver.common.Point;
-import com.rfmajor.scrabblesolver.common.Rack;
-import com.rfmajor.scrabblesolver.gaddag.Arc;
-import com.rfmajor.scrabblesolver.gaddag.Gaddag;
-import com.rfmajor.scrabblesolver.gaddag.GaddagConverter;
-import com.rfmajor.scrabblesolver.gaddag.Move;
-import com.rfmajor.scrabblesolver.gaddag.MoveGenerator;
-import com.rfmajor.scrabblesolver.input.DictionaryReader;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-
-import java.util.List;
 
 @SpringBootApplication
 public class ScrabbleSolverApplication {

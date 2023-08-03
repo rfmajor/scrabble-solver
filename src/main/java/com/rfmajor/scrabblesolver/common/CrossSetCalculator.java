@@ -1,5 +1,7 @@
 package com.rfmajor.scrabblesolver.common;
 
+import com.rfmajor.scrabblesolver.common.game.Board;
+import com.rfmajor.scrabblesolver.common.game.Field;
 import com.rfmajor.scrabblesolver.gaddag.Gaddag;
 import lombok.Setter;
 
@@ -12,7 +14,7 @@ public class CrossSetCalculator {
     private final Board board;
     private final Gaddag gaddag;
     private final boolean[][] anchors;
-    private final Set<Point> anchorsSet;
+    private final Set<Field> anchorsSet;
     private final int[][] crossSets;
     private char delimiter;
 
@@ -36,7 +38,7 @@ public class CrossSetCalculator {
         }
     }
 
-    public Set<Point> getAnchors() {
+    public Set<Field> getAnchors() {
         return new HashSet<>(anchorsSet);
     }
 
@@ -107,12 +109,12 @@ public class CrossSetCalculator {
 
     private void addAnchor(int row, int column) {
         anchors[row][column] = true;
-        anchorsSet.add(new Point(row, column));
+        anchorsSet.add(new Field(row, column));
     }
 
     private void removeAnchor(int row, int column) {
         anchors[row][column] = false;
-        anchorsSet.remove(new Point(row, column));
+        anchorsSet.remove(new Field(row, column));
     }
 
     private void initialize() {

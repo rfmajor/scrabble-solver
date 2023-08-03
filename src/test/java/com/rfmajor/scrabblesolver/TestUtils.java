@@ -1,6 +1,6 @@
 package com.rfmajor.scrabblesolver;
 
-import com.rfmajor.scrabblesolver.common.Board;
+import com.rfmajor.scrabblesolver.common.game.Board;
 
 import java.util.List;
 import java.util.Set;

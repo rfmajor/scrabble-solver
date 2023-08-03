@@ -1,4 +1,4 @@
-package com.rfmajor.scrabblesolver.common;
+package com.rfmajor.scrabblesolver.common.game;
 
 import lombok.Data;
 

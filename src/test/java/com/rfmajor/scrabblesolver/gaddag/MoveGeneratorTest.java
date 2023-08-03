@@ -1,10 +1,11 @@
 package com.rfmajor.scrabblesolver.gaddag;
 
 import com.rfmajor.scrabblesolver.TestUtils;
-import com.rfmajor.scrabblesolver.common.Alphabet;
-import com.rfmajor.scrabblesolver.common.Board;
+import com.rfmajor.scrabblesolver.common.game.Alphabet;
+import com.rfmajor.scrabblesolver.common.game.Board;
 import com.rfmajor.scrabblesolver.common.CrossSetCalculator;
-import com.rfmajor.scrabblesolver.common.Rack;
+import com.rfmajor.scrabblesolver.common.game.Move;
+import com.rfmajor.scrabblesolver.common.game.Rack;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;

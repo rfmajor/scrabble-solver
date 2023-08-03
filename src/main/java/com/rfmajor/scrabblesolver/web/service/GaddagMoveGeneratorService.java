@@ -1,9 +1,9 @@
 package com.rfmajor.scrabblesolver.web.service;
 
 import com.rfmajor.scrabblesolver.common.CrossSetCalculator;
-import com.rfmajor.scrabblesolver.common.Point;
-import com.rfmajor.scrabblesolver.common.Rack;
-import com.rfmajor.scrabblesolver.gaddag.Move;
+import com.rfmajor.scrabblesolver.common.game.Field;
+import com.rfmajor.scrabblesolver.common.game.Rack;
+import com.rfmajor.scrabblesolver.common.game.Move;
 import com.rfmajor.scrabblesolver.gaddag.MoveGenerator;
 import com.rfmajor.scrabblesolver.web.mapper.MoveMapper;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +25,7 @@ public class GaddagMoveGeneratorService implements MoveGeneratorService {
         Rack rack = new Rack(request.getRackLetters());
         CrossSetCalculator crossSetCalculator = moveGenerator.getCrossSetCalculator();
         Set<MoveDto> moveDtos = new HashSet<>();
-        for (Point anchor : crossSetCalculator.getAnchors()) {
+        for (Field anchor : crossSetCalculator.getAnchors()) {
             List<Move> moves = moveGenerator.generate(anchor.getRow(), anchor.getColumn(), rack);
             moves.stream()
                     .map(moveMapper::toDto)

@@ -1,7 +1,7 @@
 package com.rfmajor.scrabblesolver.web.service;
 
-import com.rfmajor.scrabblesolver.common.Alphabet;
-import com.rfmajor.scrabblesolver.common.Board;
+import com.rfmajor.scrabblesolver.common.game.Alphabet;
+import com.rfmajor.scrabblesolver.common.game.Board;
 import com.rfmajor.scrabblesolver.common.CrossSetCalculator;
 import com.rfmajor.scrabblesolver.gaddag.Gaddag;
 import com.rfmajor.scrabblesolver.gaddag.MoveGenerator;

@@ -1,7 +1,7 @@
 package com.rfmajor.scrabblesolver.gaddag;
 
 import com.rfmajor.scrabblesolver.TestUtils;
-import com.rfmajor.scrabblesolver.common.Alphabet;
+import com.rfmajor.scrabblesolver.common.game.Alphabet;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

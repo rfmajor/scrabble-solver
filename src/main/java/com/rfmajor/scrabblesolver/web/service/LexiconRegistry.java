@@ -1,6 +1,6 @@
 package com.rfmajor.scrabblesolver.web.service;
 
-import com.rfmajor.scrabblesolver.common.Alphabet;
+import com.rfmajor.scrabblesolver.common.game.Alphabet;
 import com.rfmajor.scrabblesolver.gaddag.Arc;
 import com.rfmajor.scrabblesolver.gaddag.Gaddag;
 import com.rfmajor.scrabblesolver.gaddag.GaddagConverter;
