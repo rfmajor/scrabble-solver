@@ -5,7 +5,6 @@ import com.google.common.collect.ImmutableBiMap;
 import com.google.common.collect.ImmutableMap;
 import com.rfmajor.scrabblesolver.common.exceptions.AlphabetIndexNotPresentException;
 import com.rfmajor.scrabblesolver.common.exceptions.AlphabetLetterNotPresentException;
-import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
 import java.util.List;

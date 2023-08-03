@@ -5,9 +5,10 @@ import com.rfmajor.scrabblesolver.web.service.GenerateMovesRequest;
 import com.rfmajor.scrabblesolver.web.service.MoveDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequiredArgsConstructor
@@ -15,7 +16,7 @@ public class GaddagController {
     private final GaddagMoveGeneratorService moveGeneratorService;
 
     @PostMapping("/generate")
-    public List<MoveDto> generate(GenerateMovesRequest request) {
+    public Set<MoveDto> generate(@RequestBody GenerateMovesRequest request) {
         return moveGeneratorService.generateMoves(request);
     }
 }

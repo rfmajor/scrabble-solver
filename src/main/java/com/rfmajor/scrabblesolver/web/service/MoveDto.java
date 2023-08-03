@@ -1,11 +1,14 @@
 package com.rfmajor.scrabblesolver.web.service;
 
-import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-@Builder
+@Data
+@NoArgsConstructor
 public class MoveDto {
     private String word;
     private int points;
-    private int[][] beginningField;
+    private int x;
+    private int y;
     private Direction direction;
 }

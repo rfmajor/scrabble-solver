@@ -4,22 +4,28 @@ import com.rfmajor.scrabblesolver.common.Alphabet;
 import com.rfmajor.scrabblesolver.common.Board;
 import com.rfmajor.scrabblesolver.common.CrossSetCalculator;
 import com.rfmajor.scrabblesolver.common.Rack;
-import lombok.RequiredArgsConstructor;
+import lombok.Getter;
 import lombok.Setter;
-import org.springframework.beans.factory.annotation.Value;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@RequiredArgsConstructor
 @Setter
+@Getter
 public class MoveGenerator {
     private final Board board;
     private final CrossSetCalculator crossSetCalculator;
     private final Alphabet alphabet;
     private final Gaddag gaddag;
-    @Value("${gaddag.delimiter}")
     private char delimiter;
+
+    public MoveGenerator(Board board, CrossSetCalculator crossSetCalculator, Alphabet alphabet, Gaddag gaddag) {
+        this.board = board;
+        this.crossSetCalculator = crossSetCalculator;
+        this.alphabet = alphabet;
+        this.gaddag = gaddag;
+        this.delimiter = gaddag.getDelimiter();
+    }
 
     public List<Move> generate(int row, int column, Rack rack) {
         List<Move> moves = new ArrayList<>();

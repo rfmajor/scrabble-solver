@@ -1,6 +1,7 @@
 package com.rfmajor.scrabblesolver.web.service;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * Arguments:
@@ -19,5 +20,5 @@ import java.util.List;
  */
 
 public interface MoveGeneratorService {
-    List<MoveDto> generateMoves(GenerateMovesRequest request);
+    Set<MoveDto> generateMoves(GenerateMovesRequest request);
 }

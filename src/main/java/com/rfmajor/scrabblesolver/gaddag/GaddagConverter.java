@@ -1,6 +1,7 @@
 package com.rfmajor.scrabblesolver.gaddag;
 
 import com.rfmajor.scrabblesolver.common.Alphabet;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -9,6 +10,7 @@ import org.springframework.beans.factory.annotation.Value;
 import java.util.List;
 
 @Setter
+@Getter
 @RequiredArgsConstructor
 @Slf4j
 public class GaddagConverter {

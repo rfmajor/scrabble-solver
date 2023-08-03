@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 public class Gaddag {
     private final Arc parentArc;
     private final Alphabet alphabet;
+    private final char delimiter;
 
     public int getOneLetterCompletion(String word) {
         char[] letters = word.toCharArray();

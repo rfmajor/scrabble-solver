@@ -2,7 +2,6 @@ package com.rfmajor.scrabblesolver.common;
 
 import com.rfmajor.scrabblesolver.gaddag.Gaddag;
 import lombok.Setter;
-import org.springframework.beans.factory.annotation.Value;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -15,7 +14,6 @@ public class CrossSetCalculator {
     private final boolean[][] anchors;
     private final Set<Point> anchorsSet;
     private final int[][] crossSets;
-    @Value("${gaddag.delimiter}")
     private char delimiter;
 
     public CrossSetCalculator(Board board, Gaddag gaddag) {
@@ -24,7 +22,8 @@ public class CrossSetCalculator {
         this.anchors = new boolean[board.length()][board.length()];
         this.anchorsSet = new HashSet<>();
         this.gaddag = gaddag;
-        addAnchor(board.length() / 2,board.length() / 2);
+        this.delimiter = gaddag.getDelimiter();
+        initialize();
     }
 
     public void computeAnchors(int column) {
@@ -73,7 +72,7 @@ public class CrossSetCalculator {
                 String word = readWordDownwards(row + 1, column, true);
                 crossSets[row][column] = gaddag.getOneLetterCompletion(word);
             } else {
-                crossSets[row][column] = Integer.MAX_VALUE;
+                crossSets[row][column] = -1;
             }
         }
     }
@@ -114,5 +113,16 @@ public class CrossSetCalculator {
     private void removeAnchor(int row, int column) {
         anchors[row][column] = false;
         anchorsSet.remove(new Point(row, column));
+    }
+
+    private void initialize() {
+        if (board.isEmpty()) {
+            addAnchor(board.length() / 2, board.length() / 2);
+        } else {
+            for (int i = 0; i < board.length(); i++) {
+                computeAnchors(i);
+                computeCrossSets(i);
+            }
+        }
     }
 }

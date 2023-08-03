@@ -55,19 +55,24 @@ public class Rack {
     }
 
     public List<Character> getLetters() {
-        return letters.entrySet().stream()
-                .flatMap(e -> Stream.iterate(e.getKey(), letter -> letter).limit(e.getValue()))
-                .toList();
+        return getLettersStream().toList();
     }
 
     public List<Character> getAllowedLetters(int letterSet, Alphabet alphabet) {
-        return letters.entrySet().stream()
-                .flatMap(e -> Stream.iterate(e.getKey(), letter -> letter).limit(e.getValue()))
+        return getLettersStream()
                 .filter(letter -> BitSetUtils.contains(letterSet, alphabet.getIndex(letter)))
                 .toList();
     }
 
     public int getSize() {
         return size;
+    }
+
+    private Stream<Character> getLettersStream() {
+        return letters.entrySet().stream()
+                .flatMap(e ->
+                        Stream.iterate(e.getKey(), letter -> letter)
+                                .limit(e.getValue())
+                );
     }
 }

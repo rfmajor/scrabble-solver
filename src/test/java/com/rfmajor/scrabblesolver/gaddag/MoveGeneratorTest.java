@@ -40,11 +40,9 @@ class MoveGeneratorTest {
             Arc parentArc = gaddagConverter.convert(
                     List.of("able", "cable", "care", "abler", "ar", "be"),
                     alphabet);
-            gaddag = new Gaddag(parentArc, alphabet);
+            gaddag = new Gaddag(parentArc, alphabet, gaddagConverter.getDelimiter());
             crossSetCalculator = new CrossSetCalculator(board, gaddag);
-            crossSetCalculator.setDelimiter('#');
             moveGenerator = new MoveGenerator(board, crossSetCalculator, alphabet, gaddag);
-            moveGenerator.setDelimiter('#');
             initialized = true;
         }
     }

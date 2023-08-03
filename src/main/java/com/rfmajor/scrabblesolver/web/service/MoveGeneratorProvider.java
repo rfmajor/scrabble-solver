@@ -9,16 +9,14 @@ import com.rfmajor.scrabblesolver.web.mapper.BoardMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
-import java.util.Map;
-
 @Component
 @RequiredArgsConstructor
 public class MoveGeneratorProvider {
-    private final Map<String, Gaddag> lexicons;
+    private final LexiconRegistry lexiconRegistry;
     private final BoardMapper boardMapper;
 
     public MoveGenerator getMoveGenerator(GenerateMovesRequest request) {
-        if (!lexicons.containsKey(request.getAlphabetLanguage())) {
+        if (!lexiconRegistry.hasLexicon(request.getAlphabetLanguage())) {
             return null;
         }
         Board board = getBoard(request);
@@ -33,7 +31,7 @@ public class MoveGeneratorProvider {
     }
 
     private Gaddag getGaddag(GenerateMovesRequest request) {
-        return lexicons.get(request.getAlphabetLanguage());
+        return lexiconRegistry.getLexicon(request.getAlphabetLanguage());
     }
 
     private CrossSetCalculator getCrossSetCalculator(Board board, Gaddag gaddag) {

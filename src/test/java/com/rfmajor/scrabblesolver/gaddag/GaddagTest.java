@@ -32,7 +32,7 @@ class GaddagTest {
             Arc parentArc = gaddagConverter.convert(
                     List.of("pa", "able", "payable", "parable", "pay", "par", "part", "park"),
                     alphabet);
-            gaddag = new Gaddag(parentArc, alphabet);
+            gaddag = new Gaddag(parentArc, alphabet, gaddagConverter.getDelimiter());
             initialized = true;
         }
     }
