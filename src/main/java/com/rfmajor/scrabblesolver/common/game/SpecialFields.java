@@ -1,15 +1,15 @@
 package com.rfmajor.scrabblesolver.common.game;
 
+import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.util.List;
 
 @Data
-@NoArgsConstructor
+@Builder
 public class SpecialFields {
-    private List<Field> doubleLetterFields;
-    private List<Field> tripleLetterFields;
-    private List<Field> doubleWordFields;
-    private List<Field> tripleWordFields;
+    private final List<Field> doubleLetterFields;
+    private final List<Field> tripleLetterFields;
+    private final List<Field> doubleWordFields;
+    private final List<Field> tripleWordFields;
 }

@@ -25,12 +25,12 @@ public class SpecialFieldsReader {
     public SpecialFields read() throws IOException {
         File jsonFile = resourceFile.getFile();
         SpecialFieldsUnparsed specialFieldsUnparsed = objectMapper.readValue(jsonFile, SpecialFieldsUnparsed.class);
-        SpecialFields specialFields = new SpecialFields();
-        specialFields.setDoubleLetterFields(mapFields(specialFieldsUnparsed.getDoubleLetterFields()));
-        specialFields.setTripleLetterFields(mapFields(specialFieldsUnparsed.getTripleLetterFields()));
-        specialFields.setDoubleWordFields(mapFields(specialFieldsUnparsed.getDoubleWordFields()));
-        specialFields.setTripleWordFields(mapFields(specialFieldsUnparsed.getTripleWordFields()));
-        return specialFields;
+        return SpecialFields.builder()
+                .doubleLetterFields(mapFields(specialFieldsUnparsed.getDoubleLetterFields()))
+                .tripleLetterFields(mapFields(specialFieldsUnparsed.getTripleLetterFields()))
+                .doubleWordFields(mapFields(specialFieldsUnparsed.getDoubleWordFields()))
+                .tripleWordFields(mapFields(specialFieldsUnparsed.getTripleWordFields()))
+                .build();
     }
 
     @Data
