@@ -14,6 +14,8 @@ import org.springframework.stereotype.Component;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
@@ -50,9 +52,9 @@ public class SpecialFieldsReader {
         return new Field(field[0], field[1]);
     }
 
-    private List<Field> mapFields(List<int[]> fields) {
+    private Set<Field> mapFields(List<int[]> fields) {
         return fields.stream()
                 .map(this::mapField)
-                .toList();
+                .collect(Collectors.toSet());
     }
 }

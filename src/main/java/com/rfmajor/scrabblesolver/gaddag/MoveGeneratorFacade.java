@@ -33,6 +33,18 @@ public class MoveGeneratorFacade {
         return moves;
     }
 
+    public Board getBoard() {
+        return moveGenerator.getBoard();
+    }
+
+    public Board getTransposedBoard() {
+        return transposedMoveGenerator.getBoard();
+    }
+
+    public Alphabet getAlphabet() {
+        return moveGenerator.getAlphabet();
+    }
+
     private void generateMoves(Set<Move> moves, MoveGenerator moveGenerator, Rack rack) {
         CrossSetCalculator crossSetCalculator = moveGenerator.getCrossSetCalculator();
         for (Field anchor : crossSetCalculator.getAnchors()) {

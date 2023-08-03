@@ -74,6 +74,52 @@ public class Board {
         return true;
     }
 
+    public boolean hasLettersAbove(int row, int column) {
+        return row > 0 && fields[row - 1][column] != emptyChar;
+    }
+
+    public boolean hasLettersBelow(int row, int column) {
+        return row < length() - 1 && fields[row + 1][column] != emptyChar;
+    }
+
+    public String readWordUpwards(int row, int column) {
+        return readWordUpwards(row, column, false, '0', true);
+    }
+
+    public String readWordUpwards(int row, int column, char delimiter) {
+        return readWordUpwards(row, column, true, delimiter, true);
+    }
+
+    public String readWordUpwards(int row, int column, boolean reversed) {
+        return readWordUpwards(row, column, false, '0', reversed);
+    }
+
+    private String readWordUpwards(int row, int column, boolean appendDelimiter, char delimiter, boolean reversed) {
+        StringBuilder stringBuilder = new StringBuilder();
+        for (; row >= 0 && fields[row][column] != emptyChar; row--) {
+            stringBuilder.append(fields[row][column]);
+        }
+        if (appendDelimiter) {
+            stringBuilder.append(delimiter);
+        }
+        if (!reversed) {
+            stringBuilder.reverse();
+        }
+
+        return stringBuilder.toString();
+    }
+
+    public String readWordDownwards(int row, int column, boolean reversed) {
+        StringBuilder stringBuilder = new StringBuilder();
+        for (; row < length() && fields[row][column] != emptyChar; row++) {
+            stringBuilder.append(fields[row][column]);
+        }
+        if (reversed) {
+            stringBuilder.reverse();
+        }
+        return stringBuilder.toString();
+    }
+
     public void addLetter(char letter, int x, int y) {
         if (!isEmpty(x, y)) {
             throw new LetterAlreadyPresentException("Letter %s is already present on field (%d, %d)"

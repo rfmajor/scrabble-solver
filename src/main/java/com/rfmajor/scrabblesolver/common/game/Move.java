@@ -10,4 +10,5 @@ public class Move {
     private Direction direction;
     private int x;
     private int y;
+    private int points;
 }

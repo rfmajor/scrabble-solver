@@ -90,10 +90,10 @@ public class MoveGenerator {
 
     private void recordPlay(String word, int x, int y, List<Move> moves) {
         if (moveDirection == Direction.ACROSS) {
-            moves.add(new Move(word, moveDirection, x, y));
+            moves.add(new Move(word, moveDirection, x, y, 0));
         }
         else if (moveDirection == Direction.DOWN) {
-            moves.add(new Move(word, moveDirection, y, x));
+            moves.add(new Move(word, moveDirection, y, x, 0));
         }
     }
 }

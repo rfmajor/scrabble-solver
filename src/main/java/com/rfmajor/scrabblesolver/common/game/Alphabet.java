@@ -33,6 +33,10 @@ public class Alphabet {
         return lettersToIndexes.inverse().get(index);
     }
 
+    public int getPoints(char letter) {
+        return lettersToPoints.get(letter);
+    }
+
     public Set<Character> letterSet() {
         return lettersToIndexes.keySet();
     }

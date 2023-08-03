@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Set;
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -16,7 +16,7 @@ public class GaddagController {
     private final GaddagMoveGeneratorService moveGeneratorService;
 
     @PostMapping("/generate")
-    public Set<MoveDto> generate(@RequestBody GenerateMovesRequest request) {
+    public List<MoveDto> generate(@RequestBody GenerateMovesRequest request) {
         return moveGeneratorService.generateMoves(request);
     }
 }
