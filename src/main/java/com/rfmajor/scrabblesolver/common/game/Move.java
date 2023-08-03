@@ -7,6 +7,7 @@ import lombok.Data;
 @Data
 public class Move {
     private String word;
+    private Direction direction;
     private int x;
     private int y;
 }

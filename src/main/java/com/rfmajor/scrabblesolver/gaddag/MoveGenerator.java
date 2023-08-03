@@ -3,6 +3,7 @@ package com.rfmajor.scrabblesolver.gaddag;
 import com.rfmajor.scrabblesolver.common.game.Alphabet;
 import com.rfmajor.scrabblesolver.common.game.Board;
 import com.rfmajor.scrabblesolver.common.CrossSetCalculator;
+import com.rfmajor.scrabblesolver.common.game.Direction;
 import com.rfmajor.scrabblesolver.common.game.Move;
 import com.rfmajor.scrabblesolver.common.game.Rack;
 import lombok.Getter;
@@ -19,13 +20,16 @@ public class MoveGenerator {
     private final Alphabet alphabet;
     private final Gaddag gaddag;
     private char delimiter;
+    private Direction moveDirection;
 
-    public MoveGenerator(Board board, CrossSetCalculator crossSetCalculator, Alphabet alphabet, Gaddag gaddag) {
+    public MoveGenerator(Board board, CrossSetCalculator crossSetCalculator,
+                         Alphabet alphabet, Gaddag gaddag, Direction moveDirection) {
         this.board = board;
         this.crossSetCalculator = crossSetCalculator;
         this.alphabet = alphabet;
         this.gaddag = gaddag;
         this.delimiter = gaddag.getDelimiter();
+        this.moveDirection = moveDirection;
     }
 
     public List<Move> generate(int row, int column, Rack rack) {
@@ -85,6 +89,11 @@ public class MoveGenerator {
     }
 
     private void recordPlay(String word, int x, int y, List<Move> moves) {
-        moves.add(new Move(word, x, y));
+        if (moveDirection == Direction.ACROSS) {
+            moves.add(new Move(word, moveDirection, x, y));
+        }
+        else if (moveDirection == Direction.DOWN) {
+            moves.add(new Move(word, moveDirection, y, x));
+        }
     }
 }

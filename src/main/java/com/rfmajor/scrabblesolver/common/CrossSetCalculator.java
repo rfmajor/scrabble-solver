@@ -79,6 +79,10 @@ public class CrossSetCalculator {
         }
     }
 
+    public CrossSetCalculator withBoard(Board board) {
+        return new CrossSetCalculator(board, this.gaddag);
+    }
+
     private String readWordUpwards(int row, int column) {
         StringBuilder stringBuilder = new StringBuilder();
         for (int i = row; i >= 0 && board.getField(i, column) != board.getEmptyChar(); i--) {

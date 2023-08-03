@@ -86,6 +86,16 @@ public class Board {
         return fields.length;
     }
 
+    public Board transpose() {
+        char[][] transposedFields = new char[length()][length()];
+        for (int i = 0; i < length(); i++) {
+            for (int j = 0; j < length(); j++) {
+                transposedFields[j][i] = fields[i][j];
+            }
+        }
+        return new Board(transposedFields, emptyChar);
+    }
+
     public static class LetterAlreadyPresentException extends RuntimeException {
         public LetterAlreadyPresentException(String message) {
             super(message);

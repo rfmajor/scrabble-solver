@@ -4,6 +4,7 @@ import com.rfmajor.scrabblesolver.TestUtils;
 import com.rfmajor.scrabblesolver.common.game.Alphabet;
 import com.rfmajor.scrabblesolver.common.game.Board;
 import com.rfmajor.scrabblesolver.common.CrossSetCalculator;
+import com.rfmajor.scrabblesolver.common.game.Direction;
 import com.rfmajor.scrabblesolver.common.game.Move;
 import com.rfmajor.scrabblesolver.common.game.Rack;
 import org.junit.jupiter.api.BeforeEach;
@@ -43,7 +44,7 @@ class MoveGeneratorTest {
                     alphabet);
             gaddag = new Gaddag(parentArc, alphabet, gaddagConverter.getDelimiter());
             crossSetCalculator = new CrossSetCalculator(board, gaddag);
-            moveGenerator = new MoveGenerator(board, crossSetCalculator, alphabet, gaddag);
+            moveGenerator = new MoveGenerator(board, crossSetCalculator, alphabet, gaddag, Direction.ACROSS);
             initialized = true;
         }
     }

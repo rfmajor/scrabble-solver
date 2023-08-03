@@ -1,5 +1,6 @@
 package com.rfmajor.scrabblesolver.web.service;
 
+import com.rfmajor.scrabblesolver.common.game.Direction;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
