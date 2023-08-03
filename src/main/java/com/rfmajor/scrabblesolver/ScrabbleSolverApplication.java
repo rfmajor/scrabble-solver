@@ -1,5 +1,6 @@
 package com.rfmajor.scrabblesolver;
 
+import com.rfmajor.scrabblesolver.common.game.SpecialFields;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
@@ -8,6 +9,8 @@ public class ScrabbleSolverApplication {
 
     public static void main(String[] args) {
         var ctx = SpringApplication.run(ScrabbleSolverApplication.class, args);
+        SpecialFields specialFields = ctx.getBean(SpecialFields.class);
+        System.out.println();
         /*var dictionaryReader = ctx.getBean(DictionaryReader.class);
         String[] alphabetLines = dictionaryReader.readAlphabetLines();
         List<Character> alphabetLetters = dictionaryReader.getAlphabetLetters(alphabetLines);
