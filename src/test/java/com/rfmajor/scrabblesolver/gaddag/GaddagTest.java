@@ -30,7 +30,7 @@ class GaddagTest {
             gaddagConverter = new GaddagConverter();
             gaddagConverter.setDelimiter('#');
             Arc parentArc = gaddagConverter.convert(
-                    List.of("pa", "able", "payable", "parable", "pay", "par", "part", "park"),
+                    List.of("pa", "pi", "op", "able", "payable", "parable", "pay", "par", "part", "park"),
                     alphabet);
             gaddag = new Gaddag(parentArc, alphabet, gaddagConverter.getDelimiter());
             initialized = true;
@@ -42,6 +42,12 @@ class GaddagTest {
     void givenWord_whenGetOneLetterCompletion_thenReturnCompletion(String word) {
         int bitSet = gaddag.getOneLetterCompletion(word);
         assertTrue(BitSetUtils.containsOnly(bitSet, alphabet.getIndex('t'), alphabet.getIndex('k')));
+    }
+
+    @Test
+    void givenOneLetter_whenGetOneLetterCompletion_thenReturnCompletion() {
+        int bitSet = gaddag.getOneLetterCompletion("p");
+        assertTrue(BitSetUtils.containsOnly(bitSet, alphabet.getIndex('o')));
     }
 
     @Test

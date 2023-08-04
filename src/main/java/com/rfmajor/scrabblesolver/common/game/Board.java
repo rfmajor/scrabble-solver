@@ -63,6 +63,10 @@ public class Board {
         return isValid(x, y) && !isEmpty(x, y);
     }
 
+    public boolean isValidAndEmpty(int x, int y) {
+        return isValid(x, y) && isEmpty(x, y);
+    }
+
     public boolean isEmpty() {
         for (int i = 0; i < length(); i++) {
             for (int j = 0; j < length(); j++) {
@@ -83,7 +87,7 @@ public class Board {
     }
 
     public String readWordUpwards(int row, int column) {
-        return readWordUpwards(row, column, false, '0', true);
+        return readWordUpwards(row, column, true, '0', true);
     }
 
     public String readWordUpwards(int row, int column, char delimiter) {

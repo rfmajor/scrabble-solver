@@ -3,6 +3,7 @@ package com.rfmajor.scrabblesolver.common.game;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.ImmutableBiMap;
 import com.google.common.collect.ImmutableMap;
+import com.rfmajor.scrabblesolver.common.BitSetUtils;
 import com.rfmajor.scrabblesolver.common.exceptions.AlphabetIndexNotPresentException;
 import com.rfmajor.scrabblesolver.common.exceptions.AlphabetLetterNotPresentException;
 
@@ -77,5 +78,11 @@ public class Alphabet {
             }
         }
         return true;
+    }
+
+    public List<Character> getAllowedLetters(int letterSet) {
+        return lettersToIndexes.keySet().stream()
+                .filter(letter -> BitSetUtils.contains(letterSet, getIndex(letter)))
+                .toList();
     }
 }

@@ -53,8 +53,9 @@ public class Arc {
         return this.getDestinationState().getOutArcs().keySet().stream().toList();
     }
 
-    public List<Character> getNextAllowedLetters(int letterSet) {
+    public List<Character> getNextAllowedLetters(int letterSet, char delimiter) {
         return this.getDestinationState().getOutArcs().keySet().stream()
+                .filter(letter -> letter != delimiter)
                 .filter(letter -> BitSetUtils.contains(letterSet, letter))
                 .toList();
     }

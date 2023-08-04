@@ -52,7 +52,7 @@ public class MoveGenerator {
                 goOn(offset, row, column, letter, word, rack.withRemovedLetter(letter), arc.getNextArc(letter), arc, moves);
             }
             if (rack.contains(Rack.BLANK)) {
-                for (char letter : arc.getNextAllowedLetters(crossSetCalculator.getCrossSet(row, column + offset))) {
+                for (char letter : alphabet.getAllowedLetters(crossSetCalculator.getCrossSet(row, column + offset))) {
                     goOn(offset, row, column, letter, word, rack.withRemovedLetter(Rack.BLANK), arc.getNextArc(letter), arc, moves);
                 }
             }
@@ -62,7 +62,8 @@ public class MoveGenerator {
     private void goOn(int offset, int row, int column, char letter, String word, Rack rack, Arc newArc, Arc oldArc, List<Move> moves) {
         if (offset <= 0) {
             word = letter + word;
-            if (oldArc.containsLetter(letter, alphabet) && !board.isOccupiedByLetter(row, column + offset - 1)) {
+            if (oldArc.containsLetter(letter, alphabet) && !board.isOccupiedByLetter(row, column + offset - 1)
+                    && !board.isOccupiedByLetter(row, column + offset + word.length())) {
                 recordPlay(word, row, column + offset, moves);
             }
             if (newArc != null) {
@@ -82,7 +83,7 @@ public class MoveGenerator {
                 recordPlay(word, row,column + offset + 1 - word.length(), moves);
             }
             // newArc != 0 && room to the right
-            if (newArc != null ) {
+            if (newArc != null && board.isValid(row, column + offset + 1)) {
                 generate(offset + 1, row, column, word, rack, newArc, moves);
             }
         }

@@ -61,6 +61,7 @@ public class Rack {
 
     public List<Character> getAllowedLetters(int letterSet, Alphabet alphabet) {
         return getLettersStream()
+                .filter(letter -> letter != Rack.BLANK)
                 .filter(letter -> BitSetUtils.contains(letterSet, alphabet.getIndex(letter)))
                 .toList();
     }

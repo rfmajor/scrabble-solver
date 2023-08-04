@@ -9,6 +9,7 @@ import com.rfmajor.scrabblesolver.gaddag.MoveGeneratorFacade;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.util.HashSet;
 import java.util.Set;
 
 @RequiredArgsConstructor
@@ -19,15 +20,18 @@ public class PointCalculator {
     public static final int FULL_RACK_BONUS = 50;
 
     public void calculatePoints(Set<Move> moves, MoveGeneratorFacade moveGenerator, int maxRackLetters) {
+        Set<Move> invalidMoves = new HashSet<>();
         moves.forEach(move -> calculatePoints(
                 move, moveGenerator.getBoard(),
                 moveGenerator.getTransposedBoard(),
                 moveGenerator.getAlphabet(),
-                maxRackLetters
+                maxRackLetters, invalidMoves
         ));
+        moves.removeAll(invalidMoves);
     }
 
-    private void calculatePoints(Move move, Board board, Board transposedBoard, Alphabet alphabet, int maxRackLetters) {
+    private void calculatePoints(Move move, Board board, Board transposedBoard, Alphabet alphabet, int maxRackLetters,
+                                 Set<Move> invalidMoves) {
         if (move.getDirection() == Direction.DOWN) {
             board = transposedBoard;
         }
@@ -60,6 +64,10 @@ public class PointCalculator {
             wordPoints += letterPoints;
 
         }
+        if (newlyPopulatedFields == 0) {
+            invalidMoves.add(move);
+            return;
+        }
         points += wordPoints * wordMultiplier;
         if (newlyPopulatedFields >= maxRackLetters) {
             points += FULL_RACK_BONUS;
@@ -72,21 +80,21 @@ public class PointCalculator {
         int crossWordPoints = 0;
         if (board.hasLettersAbove(x, y) && board.hasLettersBelow(x, y)) {
             crossWordPoints += letterPoints;
-            String aboveWord = board.readWordUpwards(x, y, false);
-            String belowWord = board.readWordDownwards(x, y, false);
+            String aboveWord = board.readWordUpwards(x - 1, y, false);
+            String belowWord = board.readWordDownwards(x + 1, y, false);
             crossWordPoints += calculateRawPoints(aboveWord, alphabet);
             crossWordPoints += calculateRawPoints(belowWord, alphabet);
             crossWordPoints *= crossWordMultiplier;
         }
         else if (board.hasLettersAbove(x, y)) {
             crossWordPoints += letterPoints;
-            String aboveWord = board.readWordUpwards(x, y, false);
+            String aboveWord = board.readWordUpwards(x - 1, y, false);
             crossWordPoints += calculateRawPoints(aboveWord, alphabet);
             crossWordPoints *= crossWordMultiplier;
         }
         else if (board.hasLettersBelow(x, y)) {
             crossWordPoints += letterPoints;
-            String belowWord = board.readWordDownwards(x, y, false);
+            String belowWord = board.readWordDownwards(x + 1, y, false);
             crossWordPoints += calculateRawPoints(belowWord, alphabet);
             crossWordPoints *= crossWordMultiplier;
         }

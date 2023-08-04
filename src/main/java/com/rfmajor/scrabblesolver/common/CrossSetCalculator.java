@@ -64,13 +64,17 @@ public class CrossSetCalculator {
             boolean hasLettersBelow = board.hasLettersBelow(row, column);
 
             if (hasLettersAbove && hasLettersBelow) {
+                // result - reversed word with delimiter at the tail
                 String aboveWord = board.readWordUpwards(row - 1, column, delimiter);
+                // result - word WITHOUT delimiter at the tail
                 String belowWord = board.readWordDownwards(row + 1, column, false);
                 crossSets[row][column] = gaddag.getOneLetterCompletion(aboveWord, belowWord);
             } else if (hasLettersAbove) {
-                String word = board.readWordUpwards(row - 1, column);
+                // result - reversed word with delimiter at the tail
+                String word = board.readWordUpwards(row - 1, column, delimiter);
                 crossSets[row][column] = gaddag.getOneLetterCompletion(word);
             } else if (hasLettersBelow) {
+                // result - reversed word WITHOUT delimiter at the tail
                 String word = board.readWordDownwards(row + 1, column, true);
                 crossSets[row][column] = gaddag.getOneLetterCompletion(word);
             } else {
@@ -92,6 +96,7 @@ public class CrossSetCalculator {
     private void initialize() {
         if (board.isEmpty()) {
             addAnchor(board.length() / 2, board.length() / 2);
+            computeCrossSets(board.length() / 2);
         } else {
             for (int i = 0; i < board.length(); i++) {
                 computeAnchors(i);
