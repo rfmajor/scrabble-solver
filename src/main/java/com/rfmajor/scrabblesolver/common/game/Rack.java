@@ -2,6 +2,7 @@ package com.rfmajor.scrabblesolver.common.game;
 
 import com.rfmajor.scrabblesolver.common.BitSetUtils;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 
 import java.util.HashMap;
 import java.util.List;
@@ -12,10 +13,14 @@ import java.util.stream.Stream;
 public class Rack {
     private final Map<Character, Integer> letters;
     private int size;
+    @Getter
+    private int maxSize;
     public static final char BLANK = ' ';
+    public static final int DEFAULT_MAX_SIZE = 7;
 
     public Rack() {
         this.letters = new HashMap<>();
+        this.maxSize = DEFAULT_MAX_SIZE;
     }
 
     public Rack(String letters) {
@@ -26,7 +31,7 @@ public class Rack {
     }
 
     private Rack copy() {
-        return new Rack(new HashMap<>(letters), size);
+        return new Rack(new HashMap<>(letters), size, maxSize);
     }
 
     public boolean isEmpty() {

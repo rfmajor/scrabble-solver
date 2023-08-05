@@ -11,4 +11,5 @@ public class Move {
     private int x;
     private int y;
     private int points;
+    private int blanks;
 }

@@ -34,7 +34,7 @@ public class MoveGenerator {
 
     public List<Move> generate(int row, int column, Rack rack) {
         List<Move> moves = new ArrayList<>();
-        generate(0, row, column, "", rack, gaddag.getParentArc(), moves);
+        generate(0, row, column, "", rack, gaddag.getParentArc(), moves, 0);
         return moves;
     }
 
@@ -42,59 +42,61 @@ public class MoveGenerator {
      * Method for left-right move generation
      * 'offset' is an offset from the anchor square
     **/
-    private void generate(int offset, int row, int column, String word, Rack rack, Arc arc, List<Move> moves) {
+    private void generate(int offset, int row, int column, String word,
+                          Rack rack, Arc arc, List<Move> moves, int numberOfBlanks) {
         if (board.isOccupiedByLetter(row, column + offset)) {
             char letter = board.getField(row, column + offset);
-            goOn(offset, row, column, letter, word, rack, arc.getNextArc(letter), arc, moves);
+            goOn(offset, row, column, letter, word, rack, arc.getNextArc(letter), arc, moves, numberOfBlanks);
         }
         else if (!rack.isEmpty()) {
             for (char letter : rack.getAllowedLetters(crossSetCalculator.getCrossSet(row, column + offset), alphabet)) {
-                goOn(offset, row, column, letter, word, rack.withRemovedLetter(letter), arc.getNextArc(letter), arc, moves);
+                goOn(offset, row, column, letter, word, rack.withRemovedLetter(letter), arc.getNextArc(letter), arc, moves, numberOfBlanks);
             }
             if (rack.contains(Rack.BLANK)) {
                 for (char letter : alphabet.getAllowedLetters(crossSetCalculator.getCrossSet(row, column + offset))) {
-                    goOn(offset, row, column, letter, word, rack.withRemovedLetter(Rack.BLANK), arc.getNextArc(letter), arc, moves);
+                    goOn(offset, row, column, letter, word, rack.withRemovedLetter(Rack.BLANK), arc.getNextArc(letter), arc, moves, numberOfBlanks + 1);
                 }
             }
         }
     }
 
-    private void goOn(int offset, int row, int column, char letter, String word, Rack rack, Arc newArc, Arc oldArc, List<Move> moves) {
+    private void goOn(int offset, int row, int column, char letter, String word, Rack rack,
+                      Arc newArc, Arc oldArc, List<Move> moves, int numberOfBlanks) {
         if (offset <= 0) {
             word = letter + word;
             if (oldArc.containsLetter(letter, alphabet) && !board.isOccupiedByLetter(row, column + offset - 1)
                     && !board.isOccupiedByLetter(row, column + offset + word.length())) {
-                recordPlay(word, row, column + offset, moves);
+                recordPlay(word, row, column + offset, moves, numberOfBlanks);
             }
             if (newArc != null) {
                 if (/*if room to the left*/ board.isValid(row, column + offset - 1)) {
-                    generate(offset - 1, row, column, word, rack, newArc, moves);
+                    generate(offset - 1, row, column, word, rack, newArc, moves, numberOfBlanks);
                 }
                 newArc = newArc.getNextArc(delimiter);
                 // if newArc != 0 && no letter directly left && room to the right
                 if (newArc != null && !board.isOccupiedByLetter(row, column + offset - 1) && board.isValid(row, column + 1)) {
-                    generate(1, row, column, word, rack, newArc, moves);
+                    generate(1, row, column, word, rack, newArc, moves, numberOfBlanks);
                 }
             }
         } else {
             word = word + letter;
             // oldArc.getLetter() == letter && no letter directly right
             if (oldArc.containsLetter(letter, alphabet) && !board.isOccupiedByLetter(row, column + offset + 1)) {
-                recordPlay(word, row,column + offset + 1 - word.length(), moves);
+                recordPlay(word, row,column + offset + 1 - word.length(), moves, numberOfBlanks);
             }
             // newArc != 0 && room to the right
             if (newArc != null && board.isValid(row, column + offset + 1)) {
-                generate(offset + 1, row, column, word, rack, newArc, moves);
+                generate(offset + 1, row, column, word, rack, newArc, moves, numberOfBlanks);
             }
         }
     }
 
-    private void recordPlay(String word, int x, int y, List<Move> moves) {
+    private void recordPlay(String word, int x, int y, List<Move> moves, int numberOfBlanks) {
         if (moveDirection == Direction.ACROSS) {
-            moves.add(new Move(word, moveDirection, x, y, 0));
+            moves.add(new Move(word, moveDirection, x, y, 0, numberOfBlanks));
         }
         else if (moveDirection == Direction.DOWN) {
-            moves.add(new Move(word, moveDirection, y, x, 0));
+            moves.add(new Move(word, moveDirection, y, x, 0, numberOfBlanks));
         }
     }
 }

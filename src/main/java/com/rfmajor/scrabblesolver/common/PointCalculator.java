@@ -4,6 +4,7 @@ import com.rfmajor.scrabblesolver.common.game.Alphabet;
 import com.rfmajor.scrabblesolver.common.game.Board;
 import com.rfmajor.scrabblesolver.common.game.Direction;
 import com.rfmajor.scrabblesolver.common.game.Move;
+import com.rfmajor.scrabblesolver.common.game.Rack;
 import com.rfmajor.scrabblesolver.common.game.SpecialFields;
 import com.rfmajor.scrabblesolver.gaddag.MoveGeneratorFacade;
 import lombok.RequiredArgsConstructor;
@@ -19,19 +20,19 @@ public class PointCalculator {
 
     public static final int FULL_RACK_BONUS = 50;
 
-    public void calculatePoints(Set<Move> moves, MoveGeneratorFacade moveGenerator, int maxRackLetters) {
+    public void calculatePoints(Set<Move> moves, MoveGeneratorFacade moveGenerator, Rack rack) {
         Set<Move> invalidMoves = new HashSet<>();
         moves.forEach(move -> calculatePoints(
                 move, moveGenerator.getBoard(),
                 moveGenerator.getTransposedBoard(),
                 moveGenerator.getAlphabet(),
-                maxRackLetters, invalidMoves
+                rack, invalidMoves
         ));
         moves.removeAll(invalidMoves);
     }
 
-    private void calculatePoints(Move move, Board board, Board transposedBoard, Alphabet alphabet, int maxRackLetters,
-                                 Set<Move> invalidMoves) {
+    private void calculatePoints(Move move, Board board, Board transposedBoard, Alphabet alphabet,
+                                 Rack rack, Set<Move> invalidMoves) {
         if (move.getDirection() == Direction.DOWN) {
             board = transposedBoard;
         }
@@ -69,7 +70,7 @@ public class PointCalculator {
             return;
         }
         points += wordPoints * wordMultiplier;
-        if (newlyPopulatedFields >= maxRackLetters) {
+        if (newlyPopulatedFields >= rack.getMaxSize()) {
             points += FULL_RACK_BONUS;
         }
         move.setPoints(points);

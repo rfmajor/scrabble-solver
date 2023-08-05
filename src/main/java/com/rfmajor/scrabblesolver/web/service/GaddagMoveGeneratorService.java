@@ -24,7 +24,7 @@ public class GaddagMoveGeneratorService implements MoveGeneratorService {
         MoveGeneratorFacade moveGenerator = moveGeneratorProvider.getMoveGenerator(request);
         Rack rack = new Rack(request.getRackLetters());
         Set<Move> moves = moveGenerator.generate(rack);
-        pointCalculator.calculatePoints(moves, moveGenerator, 7);
+        pointCalculator.calculatePoints(moves, moveGenerator, rack);
 
         return moves.stream()
                 .map(moveMapper::toDto)

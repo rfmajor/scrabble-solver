@@ -12,4 +12,5 @@ public class MoveDto {
     private int x;
     private int y;
     private Direction direction;
+    private int blanks;
 }
