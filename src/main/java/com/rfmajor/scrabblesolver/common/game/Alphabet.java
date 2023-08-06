@@ -35,7 +35,7 @@ public class Alphabet {
     }
 
     public int getPoints(char letter) {
-        return lettersToPoints.get(letter);
+        return lettersToPoints.getOrDefault(letter, 0);
     }
 
     public Set<Character> letterSet() {

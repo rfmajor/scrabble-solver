@@ -86,10 +86,6 @@ public class Board {
         return row < length() - 1 && fields[row + 1][column] != emptyChar;
     }
 
-    public String readWordUpwards(int row, int column) {
-        return readWordUpwards(row, column, true, '0', true);
-    }
-
     public String readWordUpwards(int row, int column, char delimiter) {
         return readWordUpwards(row, column, true, delimiter, true);
     }

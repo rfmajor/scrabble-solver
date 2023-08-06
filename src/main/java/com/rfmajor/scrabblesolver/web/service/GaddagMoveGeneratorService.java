@@ -1,6 +1,7 @@
 package com.rfmajor.scrabblesolver.web.service;
 
 import com.rfmajor.scrabblesolver.common.PointCalculator;
+import com.rfmajor.scrabblesolver.common.game.Field;
 import com.rfmajor.scrabblesolver.common.game.Move;
 import com.rfmajor.scrabblesolver.common.game.Rack;
 import com.rfmajor.scrabblesolver.gaddag.MoveGeneratorFacade;
@@ -9,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -24,11 +26,19 @@ public class GaddagMoveGeneratorService implements MoveGeneratorService {
         MoveGeneratorFacade moveGenerator = moveGeneratorProvider.getMoveGenerator(request);
         Rack rack = new Rack(request.getRackLetters());
         Set<Move> moves = moveGenerator.generate(rack);
-        pointCalculator.calculatePoints(moves, moveGenerator, rack);
+        pointCalculator.calculatePoints(moves, moveGenerator, rack, mapIntArraysToFieldSet(request.getBlankFields()));
 
         return moves.stream()
                 .map(moveMapper::toDto)
                 .sorted(Comparator.comparingInt(MoveDto::getPoints).reversed())
                 .toList();
+    }
+
+    private Set<Field> mapIntArraysToFieldSet(Set<int[]> fields) {
+        Set<Field> mappedFields = new HashSet<>();
+        for (int[] field : fields) {
+            mappedFields.add(new Field(field[0], field[1]));
+        }
+        return mappedFields;
     }
 }
