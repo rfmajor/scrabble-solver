@@ -15,6 +15,7 @@ public class MoveDto {
     private int points;
     private int x;
     private int y;
+    private String position;
     private Direction direction;
     private List<int[]> newBlankFields;
 }

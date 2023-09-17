@@ -3,8 +3,10 @@ package com.rfmajor.scrabblesolver.web.mapper;
 import com.rfmajor.scrabblesolver.common.game.Field;
 import com.rfmajor.scrabblesolver.common.game.Move;
 import com.rfmajor.scrabblesolver.web.service.MoveDto;
+import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
 import org.mapstruct.Named;
 
 import java.util.ArrayList;
@@ -23,5 +25,13 @@ public interface MoveMapper {
             mappedFields.add(new int[]{field.getRow(), field.getColumn()});
         }
         return mappedFields;
+    }
+
+    @AfterMapping
+    static void positionToStringPosition(@MappingTarget MoveDto moveDto) {
+        char xCoord = 'A';
+        xCoord += moveDto.getX();
+        int yCoord = moveDto.getY() + 1;
+        moveDto.setPosition("" + xCoord + yCoord);
     }
 }

@@ -6,7 +6,9 @@ import com.google.common.collect.ImmutableMap;
 import com.rfmajor.scrabblesolver.common.BitSetUtils;
 import com.rfmajor.scrabblesolver.common.exceptions.AlphabetIndexNotPresentException;
 import com.rfmajor.scrabblesolver.common.exceptions.AlphabetLetterNotPresentException;
+import lombok.Getter;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -84,5 +86,9 @@ public class Alphabet {
         return lettersToIndexes.keySet().stream()
                 .filter(letter -> BitSetUtils.contains(letterSet, getIndex(letter)))
                 .toList();
+    }
+
+    public Map<Character, Integer> getLettersToQuantities() {
+        return new HashMap<>(lettersToQuantities);
     }
 }
