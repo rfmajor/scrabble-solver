@@ -46,7 +46,7 @@ cv2.setTrackbarPos('VMax', 'image', 255)
 hMin = sMin = vMin = hMax = sMax = vMax = 0
 phMin = psMin = pvMin = phMax = psMax = pvMax = 0
 
-img = cv2.imread('dataset/g (1).jpg')
+img = cv2.imread('board_warped.png')
 img = image_resize(img, width=400)
 output = img
 waitTime = 33

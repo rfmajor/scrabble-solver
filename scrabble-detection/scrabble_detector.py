@@ -5,79 +5,8 @@ import numpy as np
 from scipy import ndimage
 from scipy.spatial import distance
 
-
-def show_image(img):
-    img = image_resize(img, width=600)
-    cv2.imshow('', img)
-    cv2.waitKey(0)
-
-
-def show_image_with_written_text(img, *texts):
-    font = cv2.FONT_HERSHEY_SIMPLEX
-    font_scale = 0.5
-    thickness = 1
-
-    img = img.copy()
-    h, w = img.shape[:2]
-    text_h = int((h - 20) / len(texts))
-    for i in range(len(texts)):
-        text, font_color = texts[i]
-        cv2.putText(img, text, (0, 20 + text_h * i), font, font_scale, font_color, thickness, cv2.LINE_AA)
-    show_image(img)
-
-
-def show_image_with_contours(img, contours, thickness=3):
-    img = img.copy()
-    if img.ndim <= 2:
-        img = cv2.cvtColor(img, cv2.COLOR_GRAY2RGB)
-    if len(contours) > 0:
-        cv2.drawContours(img, contours, -1, (0, 255, 0), thickness)
-    show_image(img)
-
-
-def show_image_with_contour_rectangles(img, contours, thickness=3):
-    img = img.copy()
-    if img.ndim <= 2:
-        img = cv2.cvtColor(img, cv2.COLOR_GRAY2RGB)
-    if len(contours) > 0:
-        for contour in contours:
-            x, y, w, h = cv2.boundingRect(contour)
-            cv2.rectangle(img, (x, y), (x + w, y + h), (0, 255, 0), thickness=thickness)
-    show_image(img)
-
-
-def show_image_with_points(img, points):
-    img = img.copy()
-    for x, y in points:
-        img = cv2.circle(img, (x, y), radius=4, color=(0, 0, 255), thickness=-1)
-    show_image(img)
-
-
-def show_image_with_bounding_rect(img, contour):
-    img = img.copy()
-    img = cv2.cvtColor(img, cv2.COLOR_GRAY2RGB)
-    x, y, w, h = cv2.boundingRect(contour)
-    cv2.rectangle(img, (x, y), (x + w, y + h), (0, 0, 255), 3)
-    show_image(img)
-
-
-def image_resize(image, width=None, height=None, inter=cv2.INTER_AREA):
-    dim = None
-    (h, w) = image.shape[:2]
-
-    if width is None and height is None:
-        return image
-
-    if width is None:
-        r = height / float(h)
-        dim = (int(w * r), height)
-    else:
-        r = width / float(w)
-        dim = (width, int(h * r))
-
-    resized = cv2.resize(image, dim, interpolation=inter)
-
-    return resized
+from utils import *
+import train
 
 
 def find_main_contours(img, number=2):
@@ -260,8 +189,10 @@ def detect_board_cells(img):
     contours = find_main_contours(thresh)
 
     show_image_with_contours(thresh, contours)
-    square = warp_perspective(img, contours, 900)
+    square = warp_perspective(img, contours, 1800)
     show_image(square)
+    # cv2.imwrite('board_warped2.png', square)
+
     rois = get_squares_rois(square, overflow_percent=0.1)
     rois = filter_letters_by_color(rois, multiplier=1.25, r_g_min_ratio=0.7, r_g_max_ratio=1.3)
     for coords, roi in rois:
@@ -280,9 +211,11 @@ def detect_board_cells(img):
             mask = cv2.inRange(hsv, lower, upper)
             show_image(mask)
             letter = get_roi_enclosed_by_contour(filtered, roi_c[0])
-            padding = add_padding(letter, target_size=60)
+            padding = add_padding(letter, target_size=120)
             result.append((coords, padding))
-            # show_image(padding)
+            show_image(padding)
+            prediction = train.predict_img(img)
+            print(prediction)
         else:
             result.append((coords, '#'))
     return result
@@ -416,7 +349,7 @@ def trim(img):
 
 def main():
     img = cv2.imread('board7.jpg')
-    img = image_resize(image=img, width=960)
+    # img = image_resize(image=img, width=960)
     show_image(img)
 
     detect_board_cells(img)

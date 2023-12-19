@@ -8,7 +8,7 @@ from sklearn.metrics import accuracy_score
 from sklearn.preprocessing import LabelEncoder
 from sklearn.preprocessing import StandardScaler
 import joblib
-from dataset_converter import preprocess_image_for_prediction
+from utils import preprocess_image_for_prediction
 
 
 letters = np.array(['a', 'a_alt', 'b', 'c', 'c_alt', 'd', 'e', 'e_alt', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n',
@@ -69,18 +69,23 @@ def predict(img, classifier, scaler, le):
     img = scaler.transform(img)
     prediction = classifier.predict(img)
     result = le.inverse_transform(prediction)
-    print(result)
     return result
 
 
+def predict_img(img):
+    img = cv2.resize(img, (60, 60), interpolation=cv2.INTER_AREA)
+    classifier, scaler, le = load_model("knn_model.joblib")
+    return predict(img, classifier, scaler, le)
+
+
 def main():
-    filename = "knn_model.joblib"
+    filename = "knn_model2.joblib"
     if os.path.isfile(filename):
         classifier, scaler, le = load_model(filename)
     else:
         images, labels = load_images()
         classifier, scaler, le = train(images, labels)
-        save_model(classifier, scaler, le)
+        save_model(classifier, scaler, le, filename)
 
     img = cv2.imread('preprocessed_dataset/g (3).png')
     result = predict(img, classifier, scaler, le)

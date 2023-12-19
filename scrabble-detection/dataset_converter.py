@@ -1,7 +1,7 @@
 import cv2
 import numpy as np
 
-from scrabble_detector import image_resize
+from utils import image_resize
 
 
 letters_with_alt = 'acenosyz'
@@ -71,13 +71,6 @@ def warp_perspective(img, max_c, size=60):
     matrix = cv2.getPerspectiveTransform(box, pts)
     result = cv2.warpPerspective(img, matrix, (size, size))
     return result
-
-
-def preprocess_image_for_prediction(img):
-    img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    img = img.flatten()
-    img = (img / 255).astype(int)
-    return img
 
 
 def main():
