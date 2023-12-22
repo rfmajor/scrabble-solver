@@ -4,9 +4,11 @@ import cv2
 import numpy as np
 from scipy import ndimage
 from scipy.spatial import distance
+from utils import show_image, show_image_with_contours, show_image_with_points, image_resize, predict_img, rotate_image, \
+    KNN, add_padding
 
-from utils import *
-import train
+
+knn = None
 
 
 def find_main_contours(img, number=2):
@@ -144,19 +146,6 @@ def get_roi_enclosed_by_contour(img, contour, top_pad=0.0, rescale=None):
     return image_resize(img, width=rescale, height=rescale)
 
 
-def add_padding(img, target_size):
-    h, w = img.shape[:2]
-    w_padding = target_size - w
-    h_padding = target_size - h
-
-    p_left = int(w_padding / 2)
-    p_right = p_left if w_padding % 2 == 0 else p_left + 1
-    p_top = int(h_padding / 2)
-    p_bottom = p_top if h_padding % 2 == 0 else p_top + 1
-
-    return cv2.copyMakeBorder(img, p_top, p_bottom, p_left, p_right, cv2.BORDER_CONSTANT, 0)
-
-
 def has_upper_letter_extensions(img, contour, width_percent, height_percent):
     x, y, w, h = cv2.boundingRect(contour)
     roi_w = int(width_percent * w)
@@ -214,7 +203,18 @@ def detect_board_cells(img):
             padding = add_padding(letter, target_size=120)
             result.append((coords, padding))
             show_image(padding)
-            prediction = train.predict_img(img)
+
+            rect = cv2.minAreaRect(roi_c[0])
+            angle = rect[2]
+            print(angle)
+            if angle != 90:
+                if 45 < angle < 90:
+                    angle = angle - 90
+            else:
+                angle = 0
+            rotated = rotate_image(mask, angle)
+            show_image(rotated)
+            prediction = knn.predict(padding)
             print(prediction)
         else:
             result.append((coords, '#'))
@@ -348,6 +348,8 @@ def trim(img):
 
 
 def main():
+    global knn
+    knn = KNN.load()
     img = cv2.imread('board7.jpg')
     # img = image_resize(image=img, width=960)
     show_image(img)

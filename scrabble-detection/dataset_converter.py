@@ -1,7 +1,7 @@
 import cv2
 import numpy as np
 
-from utils import image_resize
+from utils import image_resize, warp_perspective
 
 
 letters_with_alt = 'acenosyz'
@@ -51,26 +51,6 @@ def remove_edges_and_noise(img):
         cv2.floodFill(img, None, points, (0, 0, 0))
     img = add_1px_border(img)
     return img
-
-
-def warp_perspective(img, max_c, size=60):
-    rect = cv2.minAreaRect(max_c)
-    box = cv2.boxPoints(rect)
-    angle = rect[2]
-    # ul, ur, lr, ll for left tilt and no tilt (45 < angle <= 90)
-    # ll, ul, ur, lr for right tilt (0 < angle <= 45)
-
-    # determine rotation:
-    if 45 < angle <= 90:
-        pts = np.float32([(0, 0), (size, 0), (size, size), (0, size)])
-    elif 0 <= angle <= 45:
-        pts = np.float32([(0, size), (0, 0), (size, 0), (size, size)])
-    else:
-        raise Exception("Bad tilt!")
-    box = np.float32(box)
-    matrix = cv2.getPerspectiveTransform(box, pts)
-    result = cv2.warpPerspective(img, matrix, (size, size))
-    return result
 
 
 def main():

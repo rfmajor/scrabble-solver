@@ -1,4 +1,33 @@
 import cv2
+import joblib
+import numpy as np
+import sklearn.neighbors
+
+
+class KNN:
+    def __init__(self, classifier, scaler, le) -> None:
+        self.classifier = classifier
+        self.scaler = scaler
+        self.le = le
+        super().__init__()
+
+    @staticmethod
+    def load():
+        classifier, scaler, le = load_model("knn_model4.joblib")
+        return KNN(classifier, scaler, le)
+
+    def predict(self, img):
+        return predict(img, self.classifier, self.scaler, self.le)
+
+    def predict_3_labels(self, img):
+        img = preprocess_image_for_prediction(img)
+        img = np.array([img])
+        img = self.scaler.transform(img)
+        distances, values = self.classifier.kneighbors(img, n_neighbors=3)
+        result = []
+        for i in range(min(len(distances), len(values))):
+            result.append((distances[0][i], self.le.inverse_transform([values[0][i]])))
+        return result
 
 
 def image_resize(image, width=None, height=None, inter=cv2.INTER_AREA):
@@ -75,8 +104,88 @@ def show_image_with_bounding_rect(img, contour):
     show_image(img)
 
 
-def preprocess_image_for_prediction(img):
-    img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+def warp_perspective(img, max_c, size=60):
+    rect = cv2.minAreaRect(max_c)
+    box = cv2.boxPoints(rect)
+    angle = rect[2]
+    # ul, ur, lr, ll for left tilt and no tilt (45 < angle <= 90)
+    # ll, ul, ur, lr for right tilt (0 <= angle <= 45)
+
+    # determine rotation:
+    if 45 < angle <= 90:
+        pts = np.float32([(0, 0), (size, 0), (size, size), (0, size)])
+    elif 0 <= angle <= 45:
+        pts = np.float32([(0, size), (0, 0), (size, 0), (size, size)])
+    else:
+        raise Exception("Bad tilt!")
+    box = np.float32(box)
+    matrix = cv2.getPerspectiveTransform(box, pts)
+    result = cv2.warpPerspective(img, matrix, (size, size))
+    return result
+
+
+def preprocess_image_for_prediction(img, filename=None):
+    # if img.ndim > 2:
+    #     img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    # contours = find_main_contours(img, 1)
+    # x, y, w, h = cv2.boundingRect(contours[0])
+    # img = img[0:y + h, x:x + w]
+    # while len(img) > 0 and np.sum(img[0]) == 0:
+    #     img = img[1:]
+    #
+    # img = cv2.resize(img, (60, 60))
+    # _, img = cv2.threshold(img, 1, 255, cv2.THRESH_BINARY)
+    # if filename is not None:
+    #     cv2.imwrite(filename, img)
     img = img.flatten()
     img = (img / 255).astype(int)
     return img
+
+
+def predict_img(img):
+    img = cv2.resize(img, (60, 60), interpolation=cv2.INTER_AREA)
+    classifier, scaler, le = load_model("knn_model.joblib")
+    return predict(img, classifier, scaler, le)
+
+
+# input: 60x60 image
+def predict(img, classifier, scaler, le):
+    img = preprocess_image_for_prediction(img)
+    img = np.array([img])
+    img = scaler.transform(img)
+    prediction = classifier.predict(img)
+    result = le.inverse_transform(prediction)
+    return result
+
+
+def load_model(filename="knn_model.joblib"):
+    classifier, scaler, le = joblib.load(filename)
+    print(f"Model objects loaded from {filename}")
+
+    return classifier, scaler, le
+
+
+def rotate_image(img, angle):
+    image_center = tuple(np.array(img.shape[1::-1]) / 2)
+    rot_mat = cv2.getRotationMatrix2D(image_center, angle, 1.0)
+    result = cv2.warpAffine(img, rot_mat, img.shape[1::-1], flags=cv2.INTER_LINEAR)
+    return result
+
+
+def find_main_contours(img, number=2):
+    contours, _ = cv2.findContours(img, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+    contours = sorted(contours, reverse=True, key=lambda c: cv2.contourArea(c))
+    return contours[:number]
+
+
+def add_padding(img, target_size):
+    h, w = img.shape[:2]
+    w_padding = target_size - w
+    h_padding = target_size - h
+
+    p_left = int(w_padding / 2)
+    p_right = p_left if w_padding % 2 == 0 else p_left + 1
+    p_top = int(h_padding / 2)
+    p_bottom = p_top if h_padding % 2 == 0 else p_top + 1
+
+    return cv2.copyMakeBorder(img, p_top, p_bottom, p_left, p_right, cv2.BORDER_CONSTANT, 0)
