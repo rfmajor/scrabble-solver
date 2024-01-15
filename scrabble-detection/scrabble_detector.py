@@ -5,7 +5,7 @@ import numpy as np
 from scipy import ndimage
 from scipy.spatial import distance
 from utils import show_image, show_image_with_contours, show_image_with_points, image_resize, predict_img, rotate_image, \
-    KNN, add_padding
+    KNN, add_padding, draw_grid
 
 
 knn = None
@@ -44,13 +44,15 @@ def get_contour_closest_to_point(contours, point):
 
 
 def get_contour_center(contour):
-    m = cv2.moments(contour)
-
-    if m["m00"] == 0.0:
-        return None
-    c_x_center = int(m["m10"] / m["m00"])
-    c_y_center = int(m["m01"] / m["m00"])
-    return c_y_center, c_x_center
+    # m = cv2.moments(contour)
+    #
+    # if m["m00"] == 0.0:
+    #     return None
+    # c_x_center = int(m["m10"] / m["m00"])
+    # c_y_center = int(m["m01"] / m["m00"])
+    # return c_y_center, c_x_center
+    x, y, w, h = cv2.boundingRect(contour)
+    return int(y + h / 2), int(x + w / 2)
 
 
 def warp_perspective(img, contours, size):
@@ -67,23 +69,6 @@ def warp_perspective(img, contours, size):
     matrix = cv2.getPerspectiveTransform(pts1, pts2)
     result = cv2.warpPerspective(img, matrix, (size, size))
     return result
-
-
-def draw_grid(img, grid_shape=(15, 15), color=(0, 255, 0), thickness=1):
-    img = img.copy()
-    h, w = img.shape[:2]
-    rows, cols = grid_shape
-    dy, dx = h / rows, w / cols
-
-    for x in np.linspace(start=dx, stop=w-dx, num=cols-1):
-        x = int(round(x))
-        cv2.line(img, (x, 0), (x, h), color=color, thickness=thickness)
-
-    for y in np.linspace(start=dy, stop=h-dy, num=rows-1):
-        y = int(round(y))
-        cv2.line(img, (0, y), (w, y), color=color, thickness=thickness)
-
-    return img
 
 
 def get_squares_rois(img, grid_shape=(15, 15), overflow_percent=0.0):
@@ -241,8 +226,8 @@ def filter_letter_contours_by_position_from_center(img, contours, max_x_shift=1.
     result = []
     for c in contours:
         c_center = get_contour_center(c)
-        if c_center[0] - img_center[0] < max_x_shift * img_center[0] and \
-            c_center[1] - img_center[1] < max_y_shift * img_center[1]:
+        if abs(c_center[0] - img_center[0]) < abs(max_y_shift * h) and \
+            abs(c_center[1] - img_center[1]) < abs(max_x_shift * w):
             result.append(c)
     return result
 
