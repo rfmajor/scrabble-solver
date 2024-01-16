@@ -369,7 +369,7 @@ def map_prediction(letter):
 def main():
     global knn
     knn = KNN.load()
-    board_name = 'board6'
+    board_name = 'board14'
     img = cv2.imread(f'{board_name}.png')
     show_image(img)
     cells, board = detect_board_cells(img)
