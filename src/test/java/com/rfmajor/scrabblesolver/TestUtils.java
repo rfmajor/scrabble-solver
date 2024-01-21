@@ -28,4 +28,7 @@ public final class TestUtils {
             board.addLetter(letter, row, column + i);
         }
     }
+
+    private TestUtils() {
+    }
 }

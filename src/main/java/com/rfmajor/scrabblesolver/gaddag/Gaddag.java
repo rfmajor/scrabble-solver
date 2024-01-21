@@ -1,43 +1,59 @@
 package com.rfmajor.scrabblesolver.gaddag;
 
-import com.rfmajor.scrabblesolver.common.game.Alphabet;
 import com.rfmajor.scrabblesolver.common.BitSetUtils;
+import com.rfmajor.scrabblesolver.common.game.Alphabet;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 
-@RequiredArgsConstructor
 @Getter
-public class Gaddag {
-    private final Arc parentArc;
-    private final Alphabet alphabet;
-    private final char delimiter;
+public abstract class Gaddag<A> {
+    protected final A parentArc;
+    protected final Alphabet alphabet;
+    protected final char delimiter;
+
+    protected Gaddag(A parentArc, Alphabet alphabet, char delimiter) {
+        this.parentArc = parentArc;
+        this.alphabet = alphabet;
+        this.delimiter = delimiter;
+    }
+
+    public abstract A findNextArc(A arc, char letter);
+    public abstract boolean hasNextArc(A arc, char letter);
+    public abstract boolean containsLetter(A arc, char letter);
+    public abstract int getLetterIndicesBitMap(A arc);
 
     public int getOneLetterCompletion(String word) {
         char[] letters = word.toCharArray();
-        Arc arc = parentArc;
+        A arc = parentArc;
         for (char letter : letters) {
-            if (!arc.hasNextArc(letter)) {
+            if (!hasNextArc(arc, letter)) {
                 return 0;
             }
-            arc = arc.getNextArc(letter);
+            arc = findNextArc(arc, letter);
         }
-        return arc.getLetterBitVector();
+        return getLetterIndicesBitMap(arc);
     }
 
+    /**
+     * Calculates the set of indices of letters which, when inserted between 2 word parts passed as arguments,
+     * form a valid word.
+     * @param firstWord First part of the word to complete
+     * @param secondWord Second part of the word to complete
+     * @return An indices' set being represented by a bit map encoded in a 32-bit integer
+     */
     public int getOneLetterCompletion(String firstWord, String secondWord) {
         char[] firstWordLetters = firstWord.toCharArray();
         int vector = 0;
 
-        Arc arc = parentArc;
+        A arc = parentArc;
         for (char letter : firstWordLetters) {
-            if (!arc.hasNextArc(letter)) {
+            if (!hasNextArc(arc, letter)) {
                 return 0;
             }
-            arc = arc.getNextArc(letter);
+            arc = findNextArc(arc, letter);
         }
 
         for (char letter : alphabet.letterSet()) {
-            if (arc.hasNextArc(letter) && hasWordCompletion(arc.getNextArc(letter), secondWord)) {
+            if (hasNextArc(arc, letter) && hasWordCompletion(findNextArc(arc, letter), secondWord)) {
                 int index = alphabet.getIndex(letter);
                 vector = BitSetUtils.addToSet(vector, index);
             }
@@ -46,15 +62,15 @@ public class Gaddag {
         return vector;
     }
 
-    private boolean hasWordCompletion(Arc arc, String word) {
+    private boolean hasWordCompletion(A arc, String word) {
         char[] letters = word.toCharArray();
         for (int i = 0; i < letters.length - 1; i++) {
             char letter = letters[i];
-            if (!arc.hasNextArc(letter)) {
+            if (!hasNextArc(arc, letter)) {
                 return false;
             }
-            arc = arc.getNextArc(letter);
+            arc = findNextArc(arc, letter);
         }
-        return arc.containsLetter(letters[letters.length - 1], alphabet);
+        return containsLetter(arc, letters[letters.length - 1]);
     }
 }

@@ -3,7 +3,7 @@ package com.rfmajor.scrabblesolver.web.config;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.rfmajor.scrabblesolver.common.game.SpecialFields;
-import com.rfmajor.scrabblesolver.gaddag.GaddagConverter;
+import com.rfmajor.scrabblesolver.gaddag.GaddagObjectConverter;
 import com.rfmajor.scrabblesolver.input.SpecialFieldsReader;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,8 +13,8 @@ import java.io.IOException;
 @Configuration
 public class BeanConfig {
     @Bean
-    public GaddagConverter gaddagConverter() {
-        return new GaddagConverter();
+    public GaddagObjectConverter gaddagConverter() {
+        return new GaddagObjectConverter();
     }
 
     @Bean

@@ -12,13 +12,13 @@ import java.util.Set;
 @Setter
 public class CrossSetCalculator {
     private final Board board;
-    private final Gaddag gaddag;
+    private final Gaddag<?> gaddag;
     private final boolean[][] anchors;
     private final Set<Field> anchorsSet;
     private final int[][] crossSets;
     private char delimiter;
 
-    public CrossSetCalculator(Board board, Gaddag gaddag) {
+    public CrossSetCalculator(Board board, Gaddag<?> gaddag) {
         this.board = board;
         this.crossSets = new int[board.length()][board.length()];
         this.anchors = new boolean[board.length()][board.length()];

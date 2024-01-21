@@ -31,9 +31,9 @@ public final class BitSetUtils {
         return set;
     }
 
-    public static boolean containsOnly(int bitSet, int... indexes) {
+    public static boolean containsOnly(int bitSet, int... indices) {
         int testSet = 0;
-        for (int index : indexes) {
+        for (int index : indices) {
             testSet = addToSet(testSet, index);
         }
         return bitSet == testSet;

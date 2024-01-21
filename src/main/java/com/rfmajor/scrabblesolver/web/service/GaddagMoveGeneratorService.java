@@ -17,13 +17,14 @@ import java.util.Set;
 @Service
 @RequiredArgsConstructor
 public class GaddagMoveGeneratorService implements MoveGeneratorService {
-    private final MoveGeneratorProvider moveGeneratorProvider;
+    private final MoveGeneratorFactory<?> moveGeneratorFactory;
     private final MoveMapper moveMapper;
     private final PointCalculator pointCalculator;
 
     @Override
     public List<MoveDto> generateMoves(GenerateMovesRequest request) {
-        MoveGeneratorFacade moveGenerator = moveGeneratorProvider.getMoveGenerator(request);
+        MoveGeneratorFacade<?> moveGenerator = moveGeneratorFactory.getMoveGenerator(
+                request.getAlphabetLanguage(), request.getBoard());
         Rack rack = new Rack(request.getRackLetters());
         Set<Move> moves = moveGenerator.generate(rack);
         pointCalculator.calculatePoints(moves, moveGenerator, rack, mapIntArraysToFieldSet(request.getBlankFields()));

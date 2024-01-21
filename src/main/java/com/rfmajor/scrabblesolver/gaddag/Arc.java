@@ -1,6 +1,5 @@
 package com.rfmajor.scrabblesolver.gaddag;
 
-import com.rfmajor.scrabblesolver.common.game.Alphabet;
 import com.rfmajor.scrabblesolver.common.BitSetUtils;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -13,7 +12,7 @@ import java.util.List;
 @NoArgsConstructor
 public class Arc {
     private char letter;
-    private int letterBitVector;
+    private int letterIndicesBitMap;
     private State destinationState;
 
     public Arc(char letter) {
@@ -21,19 +20,16 @@ public class Arc {
         this.destinationState = new State();
     }
 
-    public void addLetterToSet(char letter, Alphabet alphabet) {
-        int index = alphabet.getIndex(letter);
-        letterBitVector = BitSetUtils.addToSet(letterBitVector, index);
+    public void addLetterIndexToSet(int index) {
+        letterIndicesBitMap = BitSetUtils.addToSet(letterIndicesBitMap, index);
     }
 
-    public void removeLetterFromSet(char letter, Alphabet alphabet) {
-        int index = alphabet.getIndex(letter);
-        letterBitVector = BitSetUtils.removeFromSet(letterBitVector, index);
+    public void removeLetterIndexFromSet(int index) {
+        letterIndicesBitMap = BitSetUtils.removeFromSet(letterIndicesBitMap, index);
     }
 
-    public boolean containsLetter(char letter, Alphabet alphabet) {
-        int index = alphabet.getIndex(letter);
-        return BitSetUtils.contains(letterBitVector, index);
+    public boolean containsLetterIndex(int index) {
+        return BitSetUtils.contains(letterIndicesBitMap, index);
     }
 
     public Arc getNextArc(char letter) {

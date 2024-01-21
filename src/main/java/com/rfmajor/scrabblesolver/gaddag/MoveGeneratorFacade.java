@@ -14,16 +14,13 @@ import java.util.List;
 import java.util.Set;
 
 @RequiredArgsConstructor
-public class MoveGeneratorFacade {
-    private final MoveGenerator moveGenerator;
-    private final MoveGenerator transposedMoveGenerator;
+public class MoveGeneratorFacade<A> {
+    private final MoveGenerator<A> moveGenerator;
+    private final MoveGenerator<A> transposedMoveGenerator;
 
-    public MoveGeneratorFacade(Board board, Alphabet alphabet, Gaddag gaddag) {
-        this.moveGenerator = new MoveGenerator(
-                board, new CrossSetCalculator(board, gaddag), alphabet, gaddag, Direction.ACROSS);
-        Board transposedBoard = board.transpose();
-        this.transposedMoveGenerator = new MoveGenerator(
-                transposedBoard, new CrossSetCalculator(transposedBoard, gaddag), alphabet, gaddag, Direction.DOWN);
+    public MoveGeneratorFacade(Board board, Gaddag<A> gaddag) {
+        this.moveGenerator = new MoveGenerator<>(board, gaddag, Direction.ACROSS);
+        this.transposedMoveGenerator = new MoveGenerator<>(board.transpose(), gaddag, Direction.DOWN);
     }
 
     public Set<Move> generate(Rack rack) {
@@ -45,7 +42,7 @@ public class MoveGeneratorFacade {
         return moveGenerator.getAlphabet();
     }
 
-    private void generateMoves(Set<Move> moves, MoveGenerator moveGenerator, Rack rack) {
+    private void generateMoves(Set<Move> moves, MoveGenerator<A> moveGenerator, Rack rack) {
         CrossSetCalculator crossSetCalculator = moveGenerator.getCrossSetCalculator();
         for (Field anchor : crossSetCalculator.getAnchors()) {
             List<Move> result = moveGenerator.generate(anchor.getRow(), anchor.getColumn(), rack);

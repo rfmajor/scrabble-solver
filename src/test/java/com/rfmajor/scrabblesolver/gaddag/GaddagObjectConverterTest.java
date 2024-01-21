@@ -11,13 +11,13 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class GaddagConverterTest {
-    private GaddagConverter gaddagConverter = new GaddagConverter();
+class GaddagObjectConverterTest {
+    private GaddagObjectConverter gaddagObjectConverter = new GaddagObjectConverter();
     private Alphabet alphabet;
 
     @BeforeEach
     void setUp() {
-        gaddagConverter.setDelimiter('#');
+        gaddagObjectConverter.setDelimiter('#');
         alphabet = new Alphabet(
                 TestUtils.mapStringToLettersList("aąbcćdeęfghijklłmnńoóprsśtuwyzźż"),
                 Collections.emptyList(),
@@ -27,7 +27,7 @@ class GaddagConverterTest {
 
     @Test
     void givenSomeWord_whenConvertCalled_thenSequencePresent() {
-        Arc arc = gaddagConverter.convert(List.of("care"), alphabet);
+        Arc arc = gaddagObjectConverter.convert(List.of("care"), alphabet);
         assertTrue(isSequencePresent("c#ar", arc));
         assertTrue(isSequencePresent("ac#r", arc));
         assertTrue(isSequencePresent("rac#", arc));

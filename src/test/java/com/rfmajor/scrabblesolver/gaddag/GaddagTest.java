@@ -14,8 +14,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 class GaddagTest {
-    private Gaddag gaddag;
-    private GaddagConverter gaddagConverter;
+    private Gaddag<Arc> gaddag;
     private Alphabet alphabet;
     private boolean initialized;
 
@@ -27,12 +26,12 @@ class GaddagTest {
                     Collections.emptyList(),
                     Collections.emptyList()
             );
-            gaddagConverter = new GaddagConverter();
-            gaddagConverter.setDelimiter('#');
-            Arc parentArc = gaddagConverter.convert(
+            GaddagConverter<Arc> gaddagObjectConverter = new GaddagObjectConverter();
+            gaddagObjectConverter.setDelimiter('#');
+            Arc parentArc = gaddagObjectConverter.convert(
                     List.of("pa", "pi", "op", "able", "payable", "parable", "pay", "par", "part", "park"),
                     alphabet);
-            gaddag = new Gaddag(parentArc, alphabet, gaddagConverter.getDelimiter());
+            gaddag = new SimpleGaddag(parentArc, alphabet, gaddagObjectConverter.getDelimiter());
             initialized = true;
         }
     }
