@@ -13,25 +13,25 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class GaddagTest {
-    private Gaddag<Arc> gaddag;
-    private Alphabet alphabet;
-    private boolean initialized;
+abstract class GaddagTest<A> {
+    protected Gaddag<A> gaddag;
+    protected Alphabet alphabet;
+    protected boolean initialized;
+
+    protected abstract GaddagConverter<A> createConverter();
 
     @BeforeEach
     void setUp() {
         if (!initialized) {
             alphabet = new Alphabet(
-                    TestUtils.mapStringToLettersList("abcdefghijklmnopqrstuvwxyz"),
+                    TestUtils.mapStringToLettersList("abcdefghijklmnopqrstuvwxyz#"),
                     Collections.emptyList(),
                     Collections.emptyList()
             );
-            GaddagConverter<Arc> gaddagObjectConverter = new GaddagObjectConverter();
-            gaddagObjectConverter.setDelimiter('#');
-            Arc parentArc = gaddagObjectConverter.convert(
+            GaddagConverter<A> gaddagConverter = createConverter();
+            gaddag = gaddagConverter.convert(
                     List.of("pa", "pi", "op", "able", "payable", "parable", "pay", "par", "part", "park"),
                     alphabet);
-            gaddag = new SimpleGaddag(parentArc, alphabet, gaddagObjectConverter.getDelimiter());
             initialized = true;
         }
     }
@@ -57,4 +57,14 @@ class GaddagTest {
         assertTrue(BitSetUtils.containsOnly(bitSet, alphabet.getIndex('r'), alphabet.getIndex('y')));
     }
 
+    @Test
+    void name() {
+        GaddagConverter<A> gaddagConverter = createConverter();
+        gaddag = gaddagConverter.convert(
+                List.of("part", "park"),
+                alphabet);
+        String word = "p#ar";
+        int bitSet = gaddag.getOneLetterCompletion(word);
+        assertTrue(BitSetUtils.containsOnly(bitSet, alphabet.getIndex('t'), alphabet.getIndex('k')));
+    }
 }

@@ -16,22 +16,30 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class Alphabet {
-    private final BiMap<Character, Integer> lettersToIndexes;
+    private final BiMap<Character, Integer> lettersToIndices;
     private final Map<Character, Integer> lettersToPoints;
     private final Map<Character, Integer> lettersToQuantities;
 
     public Alphabet(List<Character> letters, List<Integer> points, List<Integer> quantities) {
-        this.lettersToIndexes = ImmutableBiMap.copyOf(mapLettersToIndexes(letters));
+        this.lettersToIndices = ImmutableBiMap.copyOf(mapLettersToIndices(letters));
         this.lettersToPoints = ImmutableMap.copyOf(mapLettersToNumericValues(letters, points));
         this.lettersToQuantities = ImmutableMap.copyOf(mapLettersToNumericValues(letters, quantities));
     }
 
+    public int getDelimiterIndex() {
+        return lettersToIndices.size() - 1;
+    }
+
+    public char getDelimiter() {
+        return lettersToIndices.inverse().get(getDelimiterIndex());
+    }
+
     public char getLetter(int index) {
-        if (!lettersToIndexes.containsValue(index)) {
+        if (!lettersToIndices.containsValue(index)) {
             throw new AlphabetIndexNotPresentException(
                     String.format("Index %d is not present in the alphabet", index));
         }
-        return lettersToIndexes.inverse().get(index);
+        return lettersToIndices.inverse().get(index);
     }
 
     public int getPoints(char letter) {
@@ -39,26 +47,26 @@ public class Alphabet {
     }
 
     public Set<Character> letterSet() {
-        return lettersToIndexes.keySet();
+        return lettersToIndices.keySet();
     }
 
     public int getIndex(char letter) {
-        if (!lettersToIndexes.containsKey(letter)) {
+        if (!lettersToIndices.containsKey(letter)) {
             throw new AlphabetLetterNotPresentException(
                     String.format("The letter %s is not present in the alphabet", letter));
         }
-        return lettersToIndexes.get(letter);
+        return lettersToIndices.get(letter);
     }
 
     public int size() {
-        return lettersToIndexes.size();
+        return lettersToIndices.size();
     }
 
     public boolean containsLetter(char letter) {
-        return lettersToIndexes.containsKey(letter);
+        return lettersToIndices.containsKey(letter);
     }
 
-    private static Map<Character, Integer> mapLettersToIndexes(List<Character> letters) {
+    private static Map<Character, Integer> mapLettersToIndices(List<Character> letters) {
         return Stream.iterate(0, i -> i < letters.size(), i -> i + 1)
                         .collect(Collectors.toMap(letters::get, Function.identity()));
     }
@@ -81,7 +89,7 @@ public class Alphabet {
     }
 
     public List<Character> getAllowedLetters(int letterSet) {
-        return lettersToIndexes.keySet().stream()
+        return lettersToIndices.keySet().stream()
                 .filter(letter -> BitSetUtils.contains(letterSet, getIndex(letter)))
                 .toList();
     }

@@ -1,6 +1,7 @@
 package com.rfmajor.scrabblesolver;
 
 import com.rfmajor.scrabblesolver.common.game.Board;
+import com.rfmajor.scrabblesolver.gaddag.Gaddag;
 
 import java.util.List;
 import java.util.Set;
@@ -27,6 +28,23 @@ public final class TestUtils {
             char letter = word.charAt(i);
             board.addLetter(letter, row, column + i);
         }
+    }
+
+    public static <A> boolean isSequencePresent(String sequence, Gaddag<A> gaddag) {
+        A arc = gaddag.getParentArc();
+        for (int i = 0; i < sequence.length(); i++) {
+            if (!gaddag.hasAnyNextArcs(arc)) {
+                return false;
+            }
+            char letter = sequence.charAt(i);
+            A nextArc = gaddag.findNextArc(arc, letter);
+            if (!gaddag.isPresent(nextArc)) {
+                return false;
+            }
+
+            arc = nextArc;
+        }
+        return true;
     }
 
     private TestUtils() {

@@ -3,34 +3,20 @@ package com.rfmajor.scrabblesolver.gaddag;
 import com.rfmajor.scrabblesolver.common.game.Alphabet;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 
 import java.util.List;
 
 @RequiredArgsConstructor
 @Slf4j
-public class GaddagObjectConverter implements GaddagConverter<Arc> {
-    @Value("${gaddag.delimiter}")
-    private char delimiter;
-
+public class SimpleGaddagConverter implements GaddagConverter<Arc> {
     @Override
-    public Arc convert(List<String> words, Alphabet alphabet) {
+    public Gaddag<Arc> convert(List<String> words, Alphabet alphabet) {
         Arc parentArc = new Arc();
         State parentState = new State();
         parentArc.setDestinationState(parentState);
 
         processWords(words, parentState, alphabet);
-        return parentArc;
-    }
-
-    @Override
-    public char getDelimiter() {
-        return delimiter;
-    }
-
-    @Override
-    public void setDelimiter(char delimiter) {
-        this.delimiter = delimiter;
+        return new SimpleGaddag(parentArc, alphabet, alphabet.getDelimiter());
     }
 
     private void processWords(List<String> words, State state, Alphabet alphabet) {
@@ -54,7 +40,7 @@ public class GaddagObjectConverter implements GaddagConverter<Arc> {
             }
             // add delimiter if it's not the last character of the sequence
             if (delimiterIndex != wordChars.length) {
-                arc = addSingleLetter(delimiter, arc, state, false, alphabet);
+                arc = addSingleLetter(alphabet.getDelimiter(), arc, state, false, alphabet);
                 state = arc.getDestinationState();
             }
             // add y

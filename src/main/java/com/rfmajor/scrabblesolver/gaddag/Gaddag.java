@@ -20,6 +20,8 @@ public abstract class Gaddag<A> {
     public abstract boolean hasNextArc(A arc, char letter);
     public abstract boolean containsLetter(A arc, char letter);
     public abstract int getLetterIndicesBitMap(A arc);
+    public abstract boolean hasAnyNextArcs(A arc);
+    public abstract boolean isPresent(A arc);
 
     public int getOneLetterCompletion(String word) {
         char[] letters = word.toCharArray();

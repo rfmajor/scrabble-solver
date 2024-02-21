@@ -6,8 +6,7 @@ import com.rfmajor.scrabblesolver.common.game.Board;
 import com.rfmajor.scrabblesolver.gaddag.Arc;
 import com.rfmajor.scrabblesolver.gaddag.Gaddag;
 import com.rfmajor.scrabblesolver.gaddag.GaddagConverter;
-import com.rfmajor.scrabblesolver.gaddag.GaddagObjectConverter;
-import com.rfmajor.scrabblesolver.gaddag.SimpleGaddag;
+import com.rfmajor.scrabblesolver.gaddag.SimpleGaddagConverter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -15,7 +14,8 @@ import java.util.Collections;
 import java.util.List;
 
 import static com.rfmajor.scrabblesolver.TestUtils.addWordToBoardVertically;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class CrossSetCalculatorTest {
     private Gaddag<Arc> gaddag;
@@ -32,16 +32,14 @@ class CrossSetCalculatorTest {
         board = new Board();
         if (!initialized) {
             alphabet = new Alphabet(
-                    TestUtils.mapStringToLettersList("abcdefghijklmnopqrstuvwxyz"),
+                    TestUtils.mapStringToLettersList("abcdefghijklmnopqrstuvwxyz#"),
                     Collections.emptyList(),
                     Collections.emptyList()
             );
-            GaddagConverter<Arc> gaddagObjectConverter = new GaddagObjectConverter();
-            gaddagObjectConverter.setDelimiter('#');
-            Arc parentArc = gaddagObjectConverter.convert(
+            GaddagConverter<Arc> gaddagObjectConverter = new SimpleGaddagConverter();
+            gaddag = gaddagObjectConverter.convert(
                     List.of("pa", "able", "payable", "parable", "pay", "par", "part", "park", "cable"),
                     alphabet);
-            gaddag = new SimpleGaddag(parentArc, alphabet, gaddagObjectConverter.getDelimiter());
             crossSetCalculator = new CrossSetCalculator(board, gaddag);
             initialized = true;
         }

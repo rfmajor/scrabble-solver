@@ -77,13 +77,13 @@ public class MoveGenerator<A> {
                     && !board.isOccupiedByLetter(row, column + offset + word.length())) {
                 recordPlay(word, row, column + offset, moves, numberOfBlanks);
             }
-            if (newArc != null) {
+            if (gaddag.isPresent(newArc)) {
                 if (/*if room to the left*/ board.isValid(row, column + offset - 1)) {
                     generate(offset - 1, row, column, word, rack, newArc, moves, numberOfBlanks);
                 }
                 newArc = gaddag.findNextArc(newArc, delimiter);
                 // if newArc != 0 && no letter directly left && room to the right
-                if (newArc != null && !board.isOccupiedByLetter(row, column + offset - 1) && board.isValid(row, column + 1)) {
+                if (gaddag.isPresent(newArc) && !board.isOccupiedByLetter(row, column + offset - 1) && board.isValid(row, column + 1)) {
                     generate(1, row, column, word, rack, newArc, moves, numberOfBlanks);
                 }
             }
@@ -94,7 +94,7 @@ public class MoveGenerator<A> {
                 recordPlay(word, row,column + offset + 1 - word.length(), moves, numberOfBlanks);
             }
             // newArc != 0 && room to the right
-            if (newArc != null && board.isValid(row, column + offset + 1)) {
+            if (gaddag.isPresent(newArc) && board.isValid(row, column + offset + 1)) {
                 generate(offset + 1, row, column, word, rack, newArc, moves, numberOfBlanks);
             }
         }
@@ -134,13 +134,13 @@ public class MoveGenerator<A> {
                     && !board.isOccupiedByLetter(row, column + offset + word.length())) {
                 recordPlay(word, row, column + offset, moves);
             }
-            if (newArc != null) {
+            if (gaddag.isPresent(newArc)) {
                 if (/*if room to the left*/ board.isValid(row, column + offset - 1)) {
                     generate(offset - 1, row, column, word, rack, newArc, moves);
                 }
                 newArc = gaddag.findNextArc(newArc, delimiter);
                 // if newArc != 0 && no letter directly left && room to the right
-                if (newArc != null && !board.isOccupiedByLetter(row, column + offset - 1) && board.isValid(row, column + 1)) {
+                if (gaddag.isPresent(newArc) && !board.isOccupiedByLetter(row, column + offset - 1) && board.isValid(row, column + 1)) {
                     generate(1, row, column, word, rack, newArc, moves);
                 }
             }
@@ -151,7 +151,7 @@ public class MoveGenerator<A> {
                 recordPlay(word, row,column + offset + 1 - word.length(), moves);
             }
             // newArc != 0 && room to the right
-            if (newArc != null && board.isValid(row, column + offset + 1)) {
+            if (gaddag.isPresent(newArc) && board.isValid(row, column + offset + 1)) {
                 generate(offset + 1, row, column, word, rack, newArc, moves);
             }
         }

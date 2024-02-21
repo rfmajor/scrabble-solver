@@ -26,4 +26,14 @@ public class SimpleGaddag extends Gaddag<Arc> {
     public int getLetterIndicesBitMap(Arc arc) {
         return arc.getLetterIndicesBitMap();
     }
+
+    @Override
+    public boolean hasAnyNextArcs(Arc arc) {
+        return !arc.getDestinationState().getOutArcs().isEmpty();
+    }
+
+    @Override
+    public boolean isPresent(Arc arc) {
+        return arc != null;
+    }
 }

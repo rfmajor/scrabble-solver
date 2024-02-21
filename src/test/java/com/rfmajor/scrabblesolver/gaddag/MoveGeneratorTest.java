@@ -20,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class MoveGeneratorTest {
     private Board board;
-    private MoveGenerator<Arc> moveGenerator;
+    private MoveGenerator<Long> moveGenerator;
     private boolean initialized;
 
     @BeforeEach
@@ -28,17 +28,18 @@ class MoveGeneratorTest {
         board = new Board();
         if (!initialized) {
             Alphabet alphabet = new Alphabet(
-                    TestUtils.mapStringToLettersList("abcdefghijklmnopqrstuvwxyz"),
+                    TestUtils.mapStringToLettersList("abcdefghijklmnopqrstuvwxyz#"),
                     Collections.emptyList(),
                     Collections.emptyList()
             );
-            GaddagConverter<Arc> gaddagObjectConverter = new GaddagObjectConverter();
-            gaddagObjectConverter.setDelimiter('#');
-            Arc parentArc = gaddagObjectConverter.convert(
-                    List.of("able", "cable", "care", "abler", "ar", "be"),
-                    alphabet);
-            Gaddag<Arc> gaddag = new SimpleGaddag(parentArc, alphabet, gaddagObjectConverter.getDelimiter());
-            moveGenerator = new MoveGenerator<>(board, gaddag, Direction.ACROSS);
+            List<String> words = List.of("able", "cable", "care", "abler", "ar", "be");
+            GaddagConverter<Arc> simpleGaddagConverter = new SimpleGaddagConverter();
+            ExpandedGaddagConverter expandedGaddagConverter = new ExpandedGaddagConverter();
+            expandedGaddagConverter.setMaxNumberOfAllocatedStates(100);
+
+            Gaddag<Arc> simpleGaddag = simpleGaddagConverter.convert(words, alphabet);
+            Gaddag<Long> expandedGaddag = expandedGaddagConverter.convert(words, alphabet);
+            moveGenerator = new MoveGenerator<>(board, expandedGaddag, Direction.ACROSS);
             initialized = true;
         }
     }
