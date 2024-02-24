@@ -7,7 +7,9 @@ import com.rfmajor.scrabblesolver.common.game.Alphabet;
 import lombok.Setter;
 
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import static com.rfmajor.scrabblesolver.gaddag.ExpandedGaddagUtils.getDestinationStateId;
 import static com.rfmajor.scrabblesolver.gaddag.ExpandedGaddagUtils.getLetterBitMapId;
@@ -33,6 +35,7 @@ public class ExpandedGaddagConverter implements GaddagConverter<Long> {
         private int nextLetterSetId;
         private int currentLetterSetId;
         private int forceLetterSetId;
+        private Set<Integer> initializedStates;
 
         public Converter(Alphabet alphabet) {
             this.nextStateId = 2;
@@ -42,6 +45,7 @@ public class ExpandedGaddagConverter implements GaddagConverter<Long> {
             this.nextLetterSetId = 1;
             this.currentLetterSetId = 0;
             this.forceLetterSetId = 0;
+            this.initializedStates = new HashSet<>(Set.of(1));
         }
 
         public Gaddag<Long> convert(List<String> words) {
@@ -67,7 +71,7 @@ public class ExpandedGaddagConverter implements GaddagConverter<Long> {
                         addArcIfNoneExists(alphabet.getIndex(word.charAt(i)));
                     }
                     addArcIfNoneExists(alphabet.getDelimiterIndex());
-                    forceArc(alphabet.getIndex(word.charAt(m + 1)));
+                    forceArc(alphabet.getIndex(word.charAt(m + 1)), alphabet.getIndex(word.charAt(m + 2)));
                 }
             }
             // just set to some non-zero value as only the state id (1) matters
@@ -80,22 +84,27 @@ public class ExpandedGaddagConverter implements GaddagConverter<Long> {
             return Arrays.copyOf(arcs, nextStateId);
         }
 
-        private void forceArc(int letterId) {
+        private void forceArc(int letterId, int letterIdToAdd) {
 //            setSourceStateId(currentStateId, letterId, currentStateId, arcs);
             int currentDestinationStateId = getDestinationStateId(arcs[currentStateId][letterId]);
             if (currentDestinationStateId == 0) {
                 setDestinationStateId(currentStateId, letterId, forceStateId, arcs);
                 setLetterBitMapId(currentStateId, letterId, forceLetterSetId, arcs);
             } else {
-                System.out.println("Error");
+                addLetterToSet(currentStateId, letterId, letterIdToAdd);
             }
         }
 
         private void addFinalArcIfNoneExists(final int letterId, int letterIdToAdd) {
             if (arcs[currentStateId][letterId] == 0L) {
+                boolean incrementNextStateId = !isStateInitialized(nextStateId);
 //                setSourceStateId(currentStateId, letterId, currentStateId, arcs);
                 setDestinationStateId(currentStateId, letterId, nextStateId, arcs);
-                ++nextStateId;
+                initializedStates.add(nextStateId);
+
+                if (incrementNextStateId) {
+                    ++nextStateId;
+                }
             }
             addLetterToSet(currentStateId, letterId, letterIdToAdd);
             currentLetterSetId = getLetterBitMapId(arcs[currentStateId][letterId]);
@@ -104,15 +113,24 @@ public class ExpandedGaddagConverter implements GaddagConverter<Long> {
 
         private void addArcIfNoneExists(final int letterId) {
             if (arcs[currentStateId][letterId] == 0L) {
+                boolean incrementNextStateId = !isStateInitialized(nextStateId);
 //                setSourceStateId(currentStateId, letterId, currentStateId, arcs);
                 setDestinationStateId(currentStateId, letterId, nextStateId, arcs);
-                ++nextStateId;
+                initializedStates.add(nextStateId);
+
+                if (incrementNextStateId) {
+                    ++nextStateId;
+                }
             }
             currentLetterSetId = getLetterBitMapId(arcs[currentStateId][letterId]);
             currentStateId = getDestinationStateId(arcs[currentStateId][letterId]);
         }
 
-        private void addLetterToSet(final int stateId, final int letterId, int letterIdToAdd) {
+        private boolean isStateInitialized(int stateId) {
+            return initializedStates.contains(stateId);
+        }
+
+        private int addLetterToSet(final int stateId, final int letterId, int letterIdToAdd) {
             int letterSetId = getLetterBitMapId(arcs[stateId][letterId]);
             int letterSet = letterSets.getOrDefault(letterSetId, 0);
             letterSet = BitSetUtils.addToSet(letterSet, letterIdToAdd);
@@ -124,6 +142,8 @@ public class ExpandedGaddagConverter implements GaddagConverter<Long> {
                 letterSets.put(letterSetId, letterSet);
             }
             setLetterBitMapId(stateId, letterId, letterSetId, arcs);
+
+            return letterSetId;
         }
     }
 }

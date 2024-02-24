@@ -1,6 +1,6 @@
 package com.rfmajor.scrabblesolver.gaddag;
 
-import com.rfmajor.scrabblesolver.TestUtils;
+import com.rfmajor.scrabblesolver.utils.TestUtils;
 import com.rfmajor.scrabblesolver.common.game.Alphabet;
 import com.rfmajor.scrabblesolver.common.game.Board;
 import com.rfmajor.scrabblesolver.common.game.Direction;
@@ -14,8 +14,8 @@ import org.junit.jupiter.params.provider.CsvSource;
 import java.util.Collections;
 import java.util.List;
 
-import static com.rfmajor.scrabblesolver.TestUtils.addWordToBoardHorizontally;
-import static com.rfmajor.scrabblesolver.TestUtils.addWordToBoardVertically;
+import static com.rfmajor.scrabblesolver.utils.TestUtils.addWordToBoardHorizontally;
+import static com.rfmajor.scrabblesolver.utils.TestUtils.addWordToBoardVertically;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class MoveGeneratorTest {

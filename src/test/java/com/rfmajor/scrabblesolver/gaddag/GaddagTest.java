@@ -1,6 +1,6 @@
 package com.rfmajor.scrabblesolver.gaddag;
 
-import com.rfmajor.scrabblesolver.TestUtils;
+import com.rfmajor.scrabblesolver.utils.TestUtils;
 import com.rfmajor.scrabblesolver.common.game.Alphabet;
 import com.rfmajor.scrabblesolver.common.BitSetUtils;
 import org.junit.jupiter.api.BeforeEach;
@@ -61,10 +61,10 @@ abstract class GaddagTest<A> {
     void name() {
         GaddagConverter<A> gaddagConverter = createConverter();
         gaddag = gaddagConverter.convert(
-                List.of("part", "park"),
+                List.of("park", "part"),
                 alphabet);
         String word = "p#ar";
         int bitSet = gaddag.getOneLetterCompletion(word);
-        assertTrue(BitSetUtils.containsOnly(bitSet, alphabet.getIndex('t'), alphabet.getIndex('k')));
+        assertTrue(BitSetUtils.containsOnly(bitSet, alphabet.getIndex('k'), alphabet.getIndex('t')));
     }
 }

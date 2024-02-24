@@ -1,6 +1,6 @@
 package com.rfmajor.scrabblesolver.common;
 
-import com.rfmajor.scrabblesolver.TestUtils;
+import com.rfmajor.scrabblesolver.utils.TestUtils;
 import com.rfmajor.scrabblesolver.common.game.Alphabet;
 import com.rfmajor.scrabblesolver.common.game.Board;
 import com.rfmajor.scrabblesolver.gaddag.Arc;
@@ -13,7 +13,7 @@ import org.junit.jupiter.api.Test;
 import java.util.Collections;
 import java.util.List;
 
-import static com.rfmajor.scrabblesolver.TestUtils.addWordToBoardVertically;
+import static com.rfmajor.scrabblesolver.utils.TestUtils.addWordToBoardVertically;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 

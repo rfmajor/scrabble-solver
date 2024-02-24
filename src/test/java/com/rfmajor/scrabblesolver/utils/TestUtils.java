@@ -1,4 +1,4 @@
-package com.rfmajor.scrabblesolver;
+package com.rfmajor.scrabblesolver.utils;
 
 import com.rfmajor.scrabblesolver.common.game.Board;
 import com.rfmajor.scrabblesolver.gaddag.Gaddag;

@@ -1,6 +1,6 @@
 package com.rfmajor.scrabblesolver.gaddag;
 
-import com.rfmajor.scrabblesolver.TestUtils;
+import com.rfmajor.scrabblesolver.utils.TestUtils;
 import com.rfmajor.scrabblesolver.common.game.Alphabet;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -9,7 +9,7 @@ import org.junit.jupiter.params.provider.CsvSource;
 import java.util.Collections;
 import java.util.List;
 
-import static com.rfmajor.scrabblesolver.TestUtils.isSequencePresent;
+import static com.rfmajor.scrabblesolver.utils.TestUtils.isSequencePresent;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class ExpandedGaddagConverterTest {
