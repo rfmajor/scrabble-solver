@@ -1,7 +1,7 @@
 import cv2
 import numpy as np
 
-from utils import image_resize, warp_perspective
+from utils import image_resize, warp_perspective_for_preprocessing
 
 
 letters_with_alt = 'acenosyz'
@@ -24,7 +24,7 @@ def detect_letter(img):
     contours, _ = cv2.findContours(opening, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
     max_c = max(contours, key=cv2.contourArea)
 
-    roi = warp_perspective(img, max_c, size=60)
+    roi = warp_perspective_for_preprocessing(img, max_c, size=60)
 
     gray = cv2.cvtColor(roi, cv2.COLOR_BGR2GRAY)
     _, thresh = cv2.threshold(gray, 127, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)
@@ -56,16 +56,10 @@ def remove_edges_and_noise(img):
 def main():
     for c in letters:
         for i in range(10):
-            name = f'{c} ({i + 1})'
+            name = f'{c}{"_alt" if c in letters_with_alt else ""} ({i + 1})'
             img = read(name)
             img = detect_letter(img)
             cv2.imwrite(f'preprocessed_dataset/{name}.png', img)
-        if c in letters_with_alt:
-            for i in range(10):
-                name = f'{c}_alt ({i + 1})'
-                img = read(name)
-                img = detect_letter(img)
-                cv2.imwrite(f'preprocessed_dataset/{name}.png', img)
 
 
 if __name__ == '__main__':

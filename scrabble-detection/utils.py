@@ -1,9 +1,7 @@
 import cv2
 import joblib
 import numpy as np
-import sklearn.neighbors
 import json
-import re
 
 
 class KNN:
@@ -14,8 +12,8 @@ class KNN:
         super().__init__()
 
     @staticmethod
-    def load():
-        classifier, scaler, le = load_model("knn_model4.joblib")
+    def load(model_name="knn_model4.joblib"):
+        classifier, scaler, le = load_model(model_name)
         return KNN(classifier, scaler, le)
 
     def predict(self, img):
@@ -151,7 +149,7 @@ def draw_grid(img, grid_shape=(15, 15), color=(0, 255, 0), thickness=1):
     return img
 
 
-def warp_perspective(img, max_c, size=60):
+def warp_perspective_for_preprocessing(img, max_c, size=60):
     rect = cv2.minAreaRect(max_c)
     box = cv2.boxPoints(rect)
     angle = rect[2]
@@ -171,28 +169,24 @@ def warp_perspective(img, max_c, size=60):
     return result
 
 
-def preprocess_image_for_prediction(img, filename=None):
-    # if img.ndim > 2:
-    #     img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    # contours = find_main_contours(img, 1)
-    # x, y, w, h = cv2.boundingRect(contours[0])
-    # img = img[0:y + h, x:x + w]
-    # while len(img) > 0 and np.sum(img[0]) == 0:
-    #     img = img[1:]
-    #
-    # img = cv2.resize(img, (60, 60))
-    # _, img = cv2.threshold(img, 1, 255, cv2.THRESH_BINARY)
-    # if filename is not None:
-    #     cv2.imwrite(filename, img)
+def preprocess_image_for_prediction(img, train=False, filename=None):
+    if train:
+        if img.ndim > 2:
+            img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        contours = find_main_contours(img, 1)
+        x, y, w, h = cv2.boundingRect(contours[0])
+        img = img[0:y + h, x:x + w]
+        while len(img) > 0 and np.sum(img[0]) == 0:
+            img = img[1:]
+
+        img = cv2.resize(img, (60, 60))
+        _, img = cv2.threshold(img, 1, 255, cv2.THRESH_BINARY)
+        if filename is not None:
+            cv2.imwrite(filename, img)
+
     img = img.flatten()
     img = (img / 255).astype(int)
     return img
-
-
-def predict_img(img):
-    img = cv2.resize(img, (60, 60), interpolation=cv2.INTER_AREA)
-    classifier, scaler, le = load_model("knn_model.joblib")
-    return predict(img, classifier, scaler, le)
 
 
 # input: 60x60 image

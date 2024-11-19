@@ -8,7 +8,7 @@ from sklearn.metrics import accuracy_score
 from sklearn.preprocessing import LabelEncoder
 from sklearn.preprocessing import StandardScaler
 import joblib
-from utils import preprocess_image_for_prediction, predict, load_model, find_main_contours, show_image
+from utils import preprocess_image_for_prediction, predict, load_model
 
 letters = np.array(['a', 'a_alt', 'b', 'c', 'c_alt', 'd', 'e', 'e_alt', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n',
                     'n_alt', 'o', 'o_alt', 'p', 'r', 's', 's_alt', 't', 'u', 'w', 'y', 'y_alt', 'z', 'z_alt'])
@@ -25,7 +25,7 @@ def load_images():
     for letter in letters:
         for i in range(10):
             img = cv2.imread(f'preprocessed_dataset/{letter} ({i + 1}).png')
-            img = preprocess_image_for_prediction(img, filename=f'train4/{letter} ({i + 1}).png')
+            img = preprocess_image_for_prediction(img, train=True, filename=f'train4/{letter} ({i + 1}).png')
             images.append(img)
             labels.append(letter)
     return images, labels
