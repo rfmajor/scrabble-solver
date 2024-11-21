@@ -48,10 +48,14 @@ def compare(expected_filename, predictions):
 def _load_board(filename):
     if not os.path.isfile(filename):
         raise FileNotFoundError('Expected file not found')
+    result = []
     with open(filename, 'r', encoding='utf-8') as file:
-        json_str = file.read()
-        board = json.loads(json_str)
-        return np.array(board)
+        for line in file:
+            row = []
+            for char in line.strip():
+                row.append(char)
+            result.append(row)
+    return np.array(result)
 
 
 def _convert_predictions(predictions):
@@ -88,7 +92,7 @@ def _compare(expected, actual):
 
 
 lookup_dir = 'tests'
-parameters = [('6', 0.84), ('7', 0.86), ('9', 0.93)]
+parameters = [('6', 0.84), ('7', 0.86), ('8', 0.84), ('9', 0.93)]
 
 
 @pytest.fixture(scope='session', autouse=True)
@@ -98,7 +102,7 @@ def knn_model():
 
 @pytest.mark.parametrize("number, expected_accuracy", parameters)
 def test_boards_fulfill_conditions(knn_model, number, expected_accuracy):
-    board_path = f'{lookup_dir}/board{number}.json'
+    board_path = f'{lookup_dir}/board{number}.txt'
     img_path = f'{lookup_dir}/board{number}.png'
     assert os.path.isfile(board_path) and os.path.isfile(img_path)
 
