@@ -1,6 +1,6 @@
 import cv2
 import numpy as np
-from utils import load_model, preprocess_image_for_prediction, rotate_image
+from utils import load_model, preprocess_image_for_prediction, rotate_image, dump_image, get_image_with_contours
 
 
 alt_letters = {
@@ -28,8 +28,8 @@ class KNN:
         classifier, scaler, le = load_model(model_name)
         return KNN(classifier, scaler, le)
 
-    def do_predict(self, img):
-        img = preprocess_image_for_prediction(img)
+    def do_predict(self, img, report_dir=None):
+        img = preprocess_image_for_prediction(img, report_dir=report_dir)
         img = np.array([img])
         img = self.scaler.transform(img)
         prediction = self.classifier.predict(img)
@@ -47,18 +47,23 @@ class KNN:
         return result
 
 
-def detect_board_cells(img):
+def detect_board_cells(img, report_dir=None):
+    dump_image(img, '0_original', report_dir)
     result = []
     # convert the image to greyscale
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    dump_image(gray, '1_grey-board', report_dir)
     # get the threshold
     _, thresh = cv2.threshold(gray, 127, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)
+    dump_image(thresh, '2_thresh', report_dir)
 
     # calculate the main contour which encloses the board area
     contours = find_main_contours(thresh)
+    dump_image(get_image_with_contours(thresh, contours), '3_contoured', report_dir)
 
     # transform the image to a 1800x1800 square
     square = warp_perspective(img, contours, 1800)
+    dump_image(square, '4_warped', report_dir)
 
     # get the array of image parts (ROIs)
     rois = get_squares_rois_v2(square, overflow_percent=0.1)
@@ -338,13 +343,13 @@ def filter_letter_contours_by_size(img, contours, x_upper_bound, y_upper_bound, 
     return result
 
 
-def predict_board_cells(cells, knn):
+def predict_board_cells(cells, knn, report_dir=None):
     result = []
     for coords, img in cells:
         if type(img) == str:
             result.append((coords, img))
         else:
-            prediction = knn.do_predict(img)
+            prediction = knn.do_predict(img, report_dir=report_dir)
             result.append((coords, map_prediction(prediction[0])))
     return result
 

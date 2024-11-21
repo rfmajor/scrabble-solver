@@ -43,13 +43,17 @@ def show_image_with_written_text(img, *texts):
     show_image(img)
 
 
-def show_image_with_contours(img, contours, thickness=3):
+def get_image_with_contours(img, contours, thickness=3):
     img = img.copy()
     if img.ndim <= 2:
         img = cv2.cvtColor(img, cv2.COLOR_GRAY2RGB)
     if len(contours) > 0:
         cv2.drawContours(img, contours, -1, (0, 255, 0), thickness)
-    show_image(img)
+    return img
+
+
+def show_image_with_contours(img, contours, thickness=3):
+    show_image(get_image_with_contours(img, contours, thickness=thickness))
 
 
 def show_image_with_contour_rectangles(img, contours, thickness=3):
@@ -123,7 +127,7 @@ def draw_grid(img, grid_shape=(15, 15), color=(0, 255, 0), thickness=1):
     return img
 
 
-def preprocess_image_for_prediction(img, train=False, filename=None):
+def preprocess_image_for_prediction(img, train=False, filename=None, report_dir=None):
     if train:
         if img.ndim > 2:
             img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
@@ -188,3 +192,8 @@ def export_predictions(predictions, filename, grid_size=(15, 15)):
         result += "\n"
     with open(filename, 'w', encoding='utf-8') as f:
         f.write(result)
+
+
+def dump_image(img, filename, report_dir):
+    if report_dir is not None:
+        cv2.imwrite(f'{report_dir}/{filename}.jpg', img)

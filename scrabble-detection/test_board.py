@@ -5,6 +5,7 @@ import cv2
 import numpy as np
 from scrabble_detector import KNN, detect_board_cells, predict_board_cells
 from utils import export_predictions
+import shutil
 
 
 class Comparison:
@@ -70,6 +71,8 @@ def _compare(expected, actual):
     if len(expected) != len(actual) or len(expected[0]) != len(actual[0]):
         raise ValueError(f'Incompatible sizes. Expected: ({len(expected)}, {len(expected[0])}), got ({len(actual)}, {len(actual[0])})')
     return np.array([[int(letter == actual[y][x]) for x, letter in enumerate(row)] for y, row in enumerate(expected)])
+
+
 # def main():
     # global knn
     # knn = KNN.load()
@@ -92,11 +95,14 @@ def _compare(expected, actual):
 
 
 lookup_dir = 'tests'
+report_root = 'test-report'
 parameters = [('6', 0.84), ('7', 0.86), ('8', 0.84), ('9', 0.93), ('14', 0.10), ('16', 0.91)]
 
 
 @pytest.fixture(scope='session', autouse=True)
 def knn_model():
+    shutil.rmtree(report_root, ignore_errors=True)
+    os.makedirs(report_root, exist_ok=True)
     yield KNN.load("knn_model4.joblib")
 
 
@@ -104,11 +110,13 @@ def knn_model():
 def test_boards_fulfill_conditions(knn_model, number, expected_accuracy):
     board_path = f'{lookup_dir}/board{number}.txt'
     img_path = f'{lookup_dir}/board{number}.png'
+    report_dir = f'{report_root}/board{number}/'
+    os.makedirs(report_dir, exist_ok=True)
     assert os.path.isfile(board_path) and os.path.isfile(img_path)
 
     img = cv2.imread(img_path)
-    cells, board = detect_board_cells(img)
-    predictions = predict_board_cells(cells, knn_model)
+    cells, board = detect_board_cells(img, report_dir=report_dir)
+    predictions = predict_board_cells(cells, knn_model, report_dir=report_dir)
     # export_predictions(predictions, board_path)
 
     comparison = compare(board_path, predictions)
