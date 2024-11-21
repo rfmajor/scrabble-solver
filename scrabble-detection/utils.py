@@ -181,9 +181,10 @@ def export_predictions(predictions, filename, grid_size=(15, 15)):
     for coords, letter in predictions:
         y, x = coords
         board[y][x] = letter
-    json_str = json.dumps(board, ensure_ascii=False)
-    json_str = json_str[1:-1]
-    json_str = json_str.replace('],', '],\n')
-    json_str = '[\n ' + json_str + '\n]'
-    with open(f'tests/{filename}', 'w', encoding='utf-8') as f:
-        f.write(json_str)
+    result = ""
+    for row in board:
+        for letter in row:
+            result += letter
+        result += "\n"
+    with open(filename, 'w', encoding='utf-8') as f:
+        f.write(result)

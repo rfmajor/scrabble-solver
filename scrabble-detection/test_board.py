@@ -1,10 +1,10 @@
 from pprint import pprint
 import pytest
 import os
-import json
 import cv2
 import numpy as np
 from scrabble_detector import KNN, detect_board_cells, predict_board_cells
+from utils import export_predictions
 
 
 class Comparison:
@@ -92,7 +92,7 @@ def _compare(expected, actual):
 
 
 lookup_dir = 'tests'
-parameters = [('6', 0.84), ('7', 0.86), ('8', 0.84), ('9', 0.93)]
+parameters = [('6', 0.84), ('7', 0.86), ('8', 0.84), ('9', 0.93), ('14', 0.10), ('16', 0.91)]
 
 
 @pytest.fixture(scope='session', autouse=True)
@@ -109,8 +109,8 @@ def test_boards_fulfill_conditions(knn_model, number, expected_accuracy):
     img = cv2.imread(img_path)
     cells, board = detect_board_cells(img)
     predictions = predict_board_cells(cells, knn_model)
-    # export_predictions(predictions, f'{}.json')
-    # show_image_with_predictions(board, predictions)
+    # export_predictions(predictions, board_path)
+
     comparison = compare(board_path, predictions)
     print(f'Accuracy: {comparison.accuracy():.2f}, expected: {expected_accuracy}')
     print(f'Failures: {comparison.failures()}')
