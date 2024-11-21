@@ -3,6 +3,9 @@ import sys
 import numpy as np
 
 
+file = 'board15.png'
+
+
 def nothing(x):
     pass
 
@@ -46,7 +49,7 @@ cv2.setTrackbarPos('VMax', 'image', 255)
 hMin = sMin = vMin = hMax = sMax = vMax = 0
 phMin = psMin = pvMin = phMax = psMax = pvMax = 0
 
-img = cv2.imread('board15.png')
+img = cv2.imread(file)
 img = image_resize(img, width=400)
 output = img
 waitTime = 33
