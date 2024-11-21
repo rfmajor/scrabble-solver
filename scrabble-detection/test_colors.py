@@ -3,7 +3,7 @@ import sys
 import numpy as np
 
 
-file = 'board15.png'
+file = 'tests/board15.png'
 
 
 def nothing(x):

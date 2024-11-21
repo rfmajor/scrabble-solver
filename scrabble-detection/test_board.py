@@ -111,11 +111,12 @@ def test_boards_fulfill_conditions(knn_model, number, expected_accuracy):
     board_path = f'{lookup_dir}/board{number}.txt'
     img_path = f'{lookup_dir}/board{number}.png'
     report_dir = f'{report_root}/board{number}/'
-    os.makedirs(report_dir, exist_ok=True)
+    report_board_dir = f'{report_dir}/board'
+    os.makedirs(report_board_dir, exist_ok=True)
     assert os.path.isfile(board_path) and os.path.isfile(img_path)
 
     img = cv2.imread(img_path)
-    cells, board = detect_board_cells(img, report_dir=report_dir)
+    cells, board = detect_board_cells(img, report_dir=report_board_dir)
     predictions = predict_board_cells(cells, knn_model, report_dir=report_dir)
     # export_predictions(predictions, board_path)
 

@@ -50,20 +50,25 @@ class KNN:
 def detect_board_cells(img, report_dir=None):
     dump_image(img, '0_original', report_dir)
     result = []
+
+    # hsv = apply_hsv_filter(img)
+    # dump_image(hsv, '1_hsv-board', report_dir)
+    # hsv = cv2.cvtColor(hsv, cv2.COLOR_HSV2BGR)
+
     # convert the image to greyscale
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    dump_image(gray, '1_grey-board', report_dir)
+    dump_image(gray, '2_grey-board', report_dir)
     # get the threshold
     _, thresh = cv2.threshold(gray, 127, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)
-    dump_image(thresh, '2_thresh', report_dir)
+    dump_image(thresh, '3_thresh', report_dir)
 
     # calculate the main contour which encloses the board area
     contours = find_main_contours(thresh)
-    dump_image(get_image_with_contours(thresh, contours), '3_contoured', report_dir)
+    dump_image(get_image_with_contours(thresh, contours), '4_contoured', report_dir)
 
     # transform the image to a 1800x1800 square
     square = warp_perspective(img, contours, 1800)
-    dump_image(square, '4_warped', report_dir)
+    dump_image(square, '5_warped', report_dir)
 
     # get the array of image parts (ROIs)
     rois = get_squares_rois_v2(square, overflow_percent=0.1)
@@ -114,6 +119,30 @@ def detect_board_cells(img, report_dir=None):
 
         result.append((coords, letter_result))
     return result, square
+
+
+# hmin, smin, vmin = 60, 50, 0
+# hmax, smax, vmax = 121, 255, vmax
+# vmax: 0.564 * brightness + 48
+def get_vmax(brightness):
+    return 0.564 * brightness + 48
+
+
+def calculate_brightness(img):
+    hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+    h, s, v = cv2.split(hsv)
+    return np.mean(v)
+
+
+def apply_hsv_filter(img):
+    brightness = calculate_brightness(img)
+    hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+    vmax = get_vmax(brightness)
+    lower = np.array([60, 50, 0], np.uint8)
+    upper = np.array([121, 255, vmax], np.uint8)
+    print(f'vmax: {vmax}, brightness: {brightness}')
+    mask = cv2.inRange(hsv, lower, upper)
+    return cv2.bitwise_and(img, img, mask=mask)
 
 
 """
