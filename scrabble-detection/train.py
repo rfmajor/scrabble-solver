@@ -8,7 +8,8 @@ from sklearn.metrics import accuracy_score
 from sklearn.preprocessing import LabelEncoder
 from sklearn.preprocessing import StandardScaler
 import joblib
-from utils import preprocess_image_for_prediction, predict, load_model
+from utils import preprocess_image_for_prediction
+from scrabble_detector import KNN
 
 letters = np.array(['a', 'a_alt', 'b', 'c', 'c_alt', 'd', 'e', 'e_alt', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n',
                     'n_alt', 'o', 'o_alt', 'p', 'r', 's', 's_alt', 't', 'u', 'w', 'y', 'y_alt', 'z', 'z_alt'])
@@ -57,14 +58,15 @@ def train(images, labels):
 def main():
     filename = "knn_model4.joblib"
     if os.path.isfile(filename):
-        classifier, scaler, le = load_model(filename)
+        model = KNN.load_model(filename)
     else:
         images, labels = load_images()
         classifier, scaler, le = train(images, labels)
         save_model(classifier, scaler, le, filename)
+        model = KNN(classifier, scaler, le)
 
     img = cv2.imread('preprocessed_dataset/g (3).png')
-    result = predict(img, classifier, scaler, le)
+    result = model.do_predict(img)
     print(result)
 
 

@@ -4,32 +4,6 @@ import numpy as np
 import json
 
 
-class KNN:
-    def __init__(self, classifier, scaler, le) -> None:
-        self.classifier = classifier
-        self.scaler = scaler
-        self.le = le
-        super().__init__()
-
-    @staticmethod
-    def load(model_name="knn_model4.joblib"):
-        classifier, scaler, le = load_model(model_name)
-        return KNN(classifier, scaler, le)
-
-    def predict(self, img):
-        return predict(img, self.classifier, self.scaler, self.le)
-
-    def predict_3_labels(self, img):
-        img = preprocess_image_for_prediction(img)
-        img = np.array([img])
-        img = self.scaler.transform(img)
-        distances, values = self.classifier.kneighbors(img, n_neighbors=3)
-        result = []
-        for i in range(min(len(distances), len(values))):
-            result.append((distances[0][i], self.le.inverse_transform([values[0][i]])))
-        return result
-
-
 def image_resize(image, width=None, height=None, inter=cv2.INTER_AREA):
     dim = None
     (h, w) = image.shape[:2]
@@ -149,26 +123,6 @@ def draw_grid(img, grid_shape=(15, 15), color=(0, 255, 0), thickness=1):
     return img
 
 
-def warp_perspective_for_preprocessing(img, max_c, size=60):
-    rect = cv2.minAreaRect(max_c)
-    box = cv2.boxPoints(rect)
-    angle = rect[2]
-    # ul, ur, lr, ll for left tilt and no tilt (45 < angle <= 90)
-    # ll, ul, ur, lr for right tilt (0 <= angle <= 45)
-
-    # determine rotation:
-    if 45 < angle <= 90:
-        pts = np.float32([(0, 0), (size, 0), (size, size), (0, size)])
-    elif 0 <= angle <= 45:
-        pts = np.float32([(0, size), (0, 0), (size, 0), (size, size)])
-    else:
-        raise Exception("Bad tilt!")
-    box = np.float32(box)
-    matrix = cv2.getPerspectiveTransform(box, pts)
-    result = cv2.warpPerspective(img, matrix, (size, size))
-    return result
-
-
 def preprocess_image_for_prediction(img, train=False, filename=None):
     if train:
         if img.ndim > 2:
@@ -187,16 +141,6 @@ def preprocess_image_for_prediction(img, train=False, filename=None):
     img = img.flatten()
     img = (img / 255).astype(int)
     return img
-
-
-# input: 60x60 image
-def predict(img, classifier, scaler, le):
-    img = preprocess_image_for_prediction(img)
-    img = np.array([img])
-    img = scaler.transform(img)
-    prediction = classifier.predict(img)
-    result = le.inverse_transform(prediction)
-    return result
 
 
 def load_model(filename="knn_model.joblib"):

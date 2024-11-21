@@ -1,16 +1,36 @@
 import cv2
 import numpy as np
 
-from utils import image_resize, warp_perspective_for_preprocessing
+from utils import image_resize
 
 
-letters_with_alt = 'acenosyz'
+alt_letters = 'acenosyz'
 letters = 'abcdefghijklmnoprstuwyz'
 
 
 def read(name):
     img = cv2.imread(f'dataset/{name}.jpg')
     return image_resize(image=img, width=960)
+
+
+def warp_perspective_for_preprocessing(img, max_c, size=60):
+    rect = cv2.minAreaRect(max_c)
+    box = cv2.boxPoints(rect)
+    angle = rect[2]
+    # ul, ur, lr, ll for left tilt and no tilt (45 < angle <= 90)
+    # ll, ul, ur, lr for right tilt (0 <= angle <= 45)
+
+    # determine rotation:
+    if 45 < angle <= 90:
+        pts = np.float32([(0, 0), (size, 0), (size, size), (0, size)])
+    elif 0 <= angle <= 45:
+        pts = np.float32([(0, size), (0, 0), (size, 0), (size, size)])
+    else:
+        raise Exception("Bad tilt!")
+    box = np.float32(box)
+    matrix = cv2.getPerspectiveTransform(box, pts)
+    result = cv2.warpPerspective(img, matrix, (size, size))
+    return result
 
 
 def detect_letter(img):
@@ -56,7 +76,7 @@ def remove_edges_and_noise(img):
 def main():
     for c in letters:
         for i in range(10):
-            name = f'{c}{"_alt" if c in letters_with_alt else ""} ({i + 1})'
+            name = f'{c}{"_alt" if c in alt_letters else ""} ({i + 1})'
             img = read(name)
             img = detect_letter(img)
             cv2.imwrite(f'preprocessed_dataset/{name}.png', img)
