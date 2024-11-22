@@ -8,8 +8,6 @@ jobs:
       - run: echo "This job is running on ${{ runner.os }} server hosted by GitHub"
       - name: Check out repository code
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 2
       - name: Setup Python   
         uses: actions/setup-python@v5
         with:
@@ -21,6 +19,11 @@ jobs:
         run: python scrabble-detection/train.py
       - name: Test Python classes using the model
         run: pytest scrabble-detection/test_board.py
+      - name: Check out repository code
+        uses: actions/checkout@v4
+        run: |
+          git fetch origin main --depth 1
+          git checkout origin/main --no-overlay 
       - name: Compare the test results to the main branch tests (placeholder)
         run: |
           git checkout HEAD~1 && git status

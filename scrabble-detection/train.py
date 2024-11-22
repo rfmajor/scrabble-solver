@@ -58,7 +58,7 @@ def train(images, labels):
 def main():
     filename = "knn_model4.joblib"
     if os.path.isfile(filename):
-        model = KNN.load_model(filename)
+        model = KNN.load(filename)
     else:
         images, labels = load_images()
         classifier, scaler, le = train(images, labels)
