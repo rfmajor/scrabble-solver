@@ -8,8 +8,6 @@ jobs:
       - run: echo "This job is running on ${{ runner.os }} server hosted by GitHub"
       - name: Check out repository code
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 2
       - name: Setup Python   
         uses: actions/setup-python@v5
         with:
@@ -18,12 +16,18 @@ jobs:
         run: python -m pip install --upgrade -r scrabble-detection/requirements.txt
         # TODO: Cache the model instead
       - name: Train the model
-        run: python scrabble-detection/train.py
-      - name: Test Python classes using the model
-        run: pytest scrabble-detection/test_board.py
-      - name: Compare the test results to the main branch tests (placeholder)
         run: |
-          git checkout HEAD~1 && git status
+          cd scrabble-detection 
+          python3 train.py
+      - name: Test Python classes using the model
+        run: |
+          cd scrabble-detection 
+          pytest test_board.py 
+      - name: Check out repository code
+        run: |
+          git fetch origin main --depth 1
+          git checkout origin/main 
+          git status
   testJava:
     runs-on: ubuntu-latest
     steps:
