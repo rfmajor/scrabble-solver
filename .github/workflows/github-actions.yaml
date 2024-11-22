@@ -16,9 +16,13 @@ jobs:
         run: python -m pip install --upgrade -r scrabble-detection/requirements.txt
         # TODO: Cache the model instead
       - name: Train the model
-        run: python scrabble-detection/train.py
+        run: |
+          cd scrabble-detection 
+          python3 train.py
       - name: Test Python classes using the model
-        run: pytest scrabble-detection/test_board.py
+        run: |
+          cd scrabble-detection 
+          pytest test_board.py 
       - name: Check out repository code
         uses: actions/checkout@v4
       - run: |
