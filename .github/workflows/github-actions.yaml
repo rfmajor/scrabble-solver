@@ -25,9 +25,8 @@ jobs:
           pytest test_board.py 
       - name: Check out repository code
         run: |
-          git fetch origin main --depth 2
+          git fetch origin main --depth 1
           git checkout origin/main 
-          git checkout HEAD~1 
           git status
   testJava:
     runs-on: ubuntu-latest
