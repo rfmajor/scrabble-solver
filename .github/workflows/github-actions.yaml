@@ -24,13 +24,11 @@ jobs:
           cd scrabble-detection 
           pytest test_board.py 
       - name: Check out repository code
-        uses: actions/checkout@v4
-      - run: |
-          git fetch origin main --depth 1
-          git checkout origin/main 
-      - name: Compare the test results to the main branch tests (placeholder)
         run: |
-          git switch main && git checkout HEAD~1 && git status
+          git fetch origin main --depth 2
+          git checkout origin/main 
+          git checkout HEAD~1 
+          git status
   testJava:
     runs-on: ubuntu-latest
     steps:
