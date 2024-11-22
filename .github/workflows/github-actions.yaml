@@ -21,7 +21,7 @@ jobs:
         run: pytest scrabble-detection/test_board.py
       - name: Check out repository code
         uses: actions/checkout@v4
-        run: |
+      - run: |
           git fetch origin main --depth 1
           git checkout origin/main --no-overlay 
       - name: Compare the test results to the main branch tests (placeholder)
