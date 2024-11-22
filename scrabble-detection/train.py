@@ -57,17 +57,10 @@ def train(images, labels):
 
 def main():
     filename = "knn_model4.joblib"
-    if os.path.isfile(filename):
-        model = KNN.load(filename)
-    else:
+    if not os.path.isfile(filename):
         images, labels = load_images()
         classifier, scaler, le = train(images, labels)
         save_model(classifier, scaler, le, filename)
-        model = KNN(classifier, scaler, le)
-
-    img = cv2.imread('preprocessed_dataset/g (3).png')
-    result = model.do_predict(img)
-    print(result)
 
 
 if __name__ == '__main__':

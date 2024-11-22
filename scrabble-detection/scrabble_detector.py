@@ -28,8 +28,8 @@ class KNN:
         classifier, scaler, le = load_model(model_name)
         return KNN(classifier, scaler, le)
 
-    def do_predict(self, img, report_dir=None):
-        img = preprocess_image_for_prediction(img, report_dir=report_dir)
+    def do_predict(self, img, report_dir=None, train=False):
+        img = preprocess_image_for_prediction(img, train=train, report_dir=report_dir)
         img = np.array([img])
         img = self.scaler.transform(img)
         prediction = self.classifier.predict(img)
