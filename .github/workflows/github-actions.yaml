@@ -27,7 +27,7 @@ jobs:
         uses: actions/checkout@v4
       - run: |
           git fetch origin main --depth 1
-          git checkout origin/main --no-overlay 
+          git checkout origin/main 
       - name: Compare the test results to the main branch tests (placeholder)
         run: |
           git checkout HEAD~1 && git status
