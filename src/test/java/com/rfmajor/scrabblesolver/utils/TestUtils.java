@@ -57,8 +57,6 @@ public final class TestUtils {
             }
             char letter = sequence.charAt(i);
             A nextArc = gaddag.findNextArc(arc, letter);
-            // return false if arc not present unless it's the last iteration,
-            // in which case we also check for the letter in the arc set
             if (!gaddag.isPresent(nextArc)) {
                 return false;
             }
