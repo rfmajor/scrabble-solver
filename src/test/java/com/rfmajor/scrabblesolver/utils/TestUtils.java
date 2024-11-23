@@ -31,9 +31,9 @@ public final class TestUtils {
     }
 
     public static <A> boolean isSequencePresent(String sequence, Gaddag<A> gaddag) {
-        A arc = gaddag.getParentArc();
+        A arc = gaddag.getRootArc();
         for (int i = 0; i < sequence.length(); i++) {
-            if (!gaddag.hasAnyNextArcs(arc)) {
+            if (gaddag.isLastArc(arc)) {
                 return false;
             }
             char letter = sequence.charAt(i);
@@ -45,6 +45,27 @@ public final class TestUtils {
             arc = nextArc;
         }
         return true;
+    }
+
+    public static <A> boolean isWordPresent(String sequence, Gaddag<A> gaddag) {
+        char lastChar = sequence.charAt(sequence.length() - 1);
+
+        A arc = gaddag.getRootArc();
+        for (int i = 0; i < sequence.length() - 1; i++) {
+            if (gaddag.isLastArc(arc)) {
+                return false;
+            }
+            char letter = sequence.charAt(i);
+            A nextArc = gaddag.findNextArc(arc, letter);
+            // return false if arc not present unless it's the last iteration,
+            // in which case we also check for the letter in the arc set
+            if (!gaddag.isPresent(nextArc)) {
+                return false;
+            }
+
+            arc = nextArc;
+        }
+        return gaddag.containsLetter(arc, lastChar);
     }
 
     private TestUtils() {

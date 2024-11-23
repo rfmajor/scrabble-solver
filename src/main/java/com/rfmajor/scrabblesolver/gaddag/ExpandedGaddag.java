@@ -43,14 +43,14 @@ public class ExpandedGaddag extends Gaddag<Long> {
     }
 
     @Override
-    public boolean hasAnyNextArcs(Long arc) {
+    public boolean isLastArc(Long arc) {
         int stateId = getDestinationStateId(arc);
         for (int i = 0; i < arcs[0].length; i++) {
             if (arcs[stateId][i] != 0) {
-                return true;
+                return false;
             }
         }
-        return false;
+        return true;
     }
 
     @Override

@@ -6,12 +6,12 @@ import lombok.Getter;
 
 @Getter
 public abstract class Gaddag<A> {
-    protected final A parentArc;
+    protected final A rootArc;
     protected final Alphabet alphabet;
     protected final char delimiter;
 
-    protected Gaddag(A parentArc, Alphabet alphabet, char delimiter) {
-        this.parentArc = parentArc;
+    protected Gaddag(A rootArc, Alphabet alphabet, char delimiter) {
+        this.rootArc = rootArc;
         this.alphabet = alphabet;
         this.delimiter = delimiter;
     }
@@ -20,12 +20,12 @@ public abstract class Gaddag<A> {
     public abstract boolean hasNextArc(A arc, char letter);
     public abstract boolean containsLetter(A arc, char letter);
     public abstract int getLetterIndicesBitMap(A arc);
-    public abstract boolean hasAnyNextArcs(A arc);
+    public abstract boolean isLastArc(A arc);
     public abstract boolean isPresent(A arc);
 
     public int getOneLetterCompletion(String word) {
         char[] letters = word.toCharArray();
-        A arc = parentArc;
+        A arc = rootArc;
         for (char letter : letters) {
             if (!hasNextArc(arc, letter)) {
                 return 0;
@@ -46,7 +46,7 @@ public abstract class Gaddag<A> {
         char[] firstWordLetters = firstWord.toCharArray();
         int vector = 0;
 
-        A arc = parentArc;
+        A arc = rootArc;
         for (char letter : firstWordLetters) {
             if (!hasNextArc(arc, letter)) {
                 return 0;
