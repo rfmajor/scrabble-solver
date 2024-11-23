@@ -40,3 +40,4 @@ out/
 __pycache__
 *.joblib
 test-report/
+venv/
