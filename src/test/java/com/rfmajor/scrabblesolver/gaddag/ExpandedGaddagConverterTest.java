@@ -1,20 +1,23 @@
 package com.rfmajor.scrabblesolver.gaddag;
 
-import com.rfmajor.scrabblesolver.utils.TestUtils;
 import com.rfmajor.scrabblesolver.common.game.Alphabet;
+import com.rfmajor.scrabblesolver.utils.TestUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import java.util.Collections;
 import java.util.List;
 
 import static com.rfmajor.scrabblesolver.utils.TestUtils.isSequencePresent;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static com.rfmajor.scrabblesolver.utils.TestUtils.isWordPresent;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class ExpandedGaddagConverterTest {
     private ExpandedGaddagConverter expandedGaddagConverter;
     private Alphabet alphabet;
+    private Gaddag<Long> gaddag;
 
     @BeforeEach
     void setUp() {
@@ -25,12 +28,41 @@ class ExpandedGaddagConverterTest {
                 Collections.emptyList(),
                 Collections.emptyList()
         );
+        gaddag = expandedGaddagConverter.convert(List.of("able", "cable", "care", "abler", "ar", "be"), alphabet);
     }
 
     @ParameterizedTest
-    @CsvSource({"c#ar, true", "ac#r, true", "rac#, true", "era, true", "era#, false"})
-    void givenSomeWord_whenConvertCalled_thenSequencePresent(String sequence, boolean actual) {
-        Gaddag<Long> gaddag = expandedGaddagConverter.convert(List.of("care"), alphabet);
-        assertEquals(isSequencePresent(sequence, gaddag), actual);
+    @ValueSource(strings = {
+            "a#bl", "ba#l", "lba#", "elb",
+            "c#abl", "ac#bl", "bac#l", "lbac#", "elba",
+            "c#ar", "ac#r", "rac#", "era",
+            "a#ble", "ba#le", "lba#e", "elba#", "relb",
+            "a#", "r",
+            "b#", "e"
+    })
+    void givenSomeWord_whenConvertCalled_thenSequencePresent(String sequence) {
+        assertTrue(isSequencePresent(sequence, gaddag));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {
+            "a#ble", "ba#le", "lba#e", "elba",
+            "c#able", "ac#ble", "bac#le", "lbac#e", "elbac",
+            "c#are", "ac#re", "rac#e", "erac",
+            "a#bler", "ba#ler", "lba#er", "elba#r", "relba",
+            "a#r", "ra",
+            "b#e", "eb"
+    })
+    void givenSomeWord_whenConvertCalled_thenWordPresent(String sequence) {
+        assertTrue(isWordPresent(sequence, gaddag));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {
+            "c#ar", "ac#r", "rac",
+            "a#bl", "ba#l", "lba"
+    })
+    void givenSomeWord_whenConvertCalled_thenWordNotPresent(String sequence) {
+        assertFalse(isWordPresent(sequence, gaddag));
     }
 }

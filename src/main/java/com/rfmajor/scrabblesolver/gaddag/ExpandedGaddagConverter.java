@@ -35,7 +35,7 @@ public class ExpandedGaddagConverter implements GaddagConverter<Long> {
         private int nextLetterSetId;
         private int currentLetterSetId;
         private int forceLetterSetId;
-        private Set<Integer> initializedStates;
+        private final Set<Integer> initializedStates;
 
         public Converter(Alphabet alphabet) {
             this.nextStateId = 2;
@@ -85,20 +85,16 @@ public class ExpandedGaddagConverter implements GaddagConverter<Long> {
         }
 
         private void forceArc(int letterId, int letterIdToAdd) {
-//            setSourceStateId(currentStateId, letterId, currentStateId, arcs);
             int currentDestinationStateId = getDestinationStateId(arcs[currentStateId][letterId]);
             if (currentDestinationStateId == 0) {
                 setDestinationStateId(currentStateId, letterId, forceStateId, arcs);
                 setLetterBitMapId(currentStateId, letterId, forceLetterSetId, arcs);
-            } else {
-                addLetterToSet(currentStateId, letterId, letterIdToAdd);
             }
         }
 
         private void addFinalArcIfNoneExists(final int letterId, int letterIdToAdd) {
             if (arcs[currentStateId][letterId] == 0L) {
                 boolean incrementNextStateId = !isStateInitialized(nextStateId);
-//                setSourceStateId(currentStateId, letterId, currentStateId, arcs);
                 setDestinationStateId(currentStateId, letterId, nextStateId, arcs);
                 initializedStates.add(nextStateId);
 
@@ -114,7 +110,6 @@ public class ExpandedGaddagConverter implements GaddagConverter<Long> {
         private void addArcIfNoneExists(final int letterId) {
             if (arcs[currentStateId][letterId] == 0L) {
                 boolean incrementNextStateId = !isStateInitialized(nextStateId);
-//                setSourceStateId(currentStateId, letterId, currentStateId, arcs);
                 setDestinationStateId(currentStateId, letterId, nextStateId, arcs);
                 initializedStates.add(nextStateId);
 

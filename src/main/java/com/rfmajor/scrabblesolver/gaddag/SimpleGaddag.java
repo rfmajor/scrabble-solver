@@ -28,8 +28,8 @@ public class SimpleGaddag extends Gaddag<Arc> {
     }
 
     @Override
-    public boolean hasAnyNextArcs(Arc arc) {
-        return !arc.getDestinationState().getOutArcs().isEmpty();
+    public boolean isLastArc(Arc arc) {
+        return arc.getDestinationState().getOutArcs().isEmpty();
     }
 
     @Override
