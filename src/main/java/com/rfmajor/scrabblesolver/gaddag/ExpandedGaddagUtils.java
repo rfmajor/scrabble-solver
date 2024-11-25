@@ -25,24 +25,24 @@ public final class ExpandedGaddagUtils {
         return (int) BitSetUtils.getBitsInRange(arc, LETTER_MAP_START, LETTER_MAP_END);
     }
 
-    public static void setSourceStateId(final int stateId, final int letterId, int value, long[][] arcs) {
-        setValue(stateId, letterId, value, SOURCE_ID_START, SOURCE_ID_END, arcs);
+    public static void setSourceStateId(final int stateId, final int letterId, int destStateIdx, long[][] arcs) {
+        setValue(stateId, letterId, destStateIdx, SOURCE_ID_START, SOURCE_ID_END, arcs);
     }
 
-    public static void setDestinationStateId(final int stateId, final int letterId, int value, long[][] arcs) {
-        setValue(stateId, letterId, value, DEST_ID_START, DEST_ID_END, arcs);
+    public static void setDestinationStateId(final int stateId, final int letterId, int destStateIdx, long[][] arcs) {
+        setValue(stateId, letterId, destStateIdx, DEST_ID_START, DEST_ID_END, arcs);
     }
 
-    public static long setDestinationStateId(long arc, int value) {
-        return BitSetUtils.setBitsInRange(arc, DEST_ID_START, DEST_ID_END, value);
+    public static long setDestinationStateId(long arc, int destStateIdx) {
+        return BitSetUtils.setBitsInRange(arc, DEST_ID_START, DEST_ID_END, destStateIdx);
     }
 
-    public static void setLetterBitMapId(final int stateId, final int letterId, int value, long[][] arcs) {
-        setValue(stateId, letterId, value, LETTER_MAP_START, LETTER_MAP_END, arcs);
+    public static void setLetterBitMapId(final int stateId, final int letterId, int letterMapIdx, long[][] arcs) {
+        setValue(stateId, letterId, letterMapIdx, LETTER_MAP_START, LETTER_MAP_END, arcs);
     }
 
-    public static long setLetterBitMapId(long arc, int value) {
-        return BitSetUtils.setBitsInRange(arc, LETTER_MAP_START, LETTER_MAP_END, value);
+    public static long setLetterBitMapId(long arc, int letterMapIdx) {
+        return BitSetUtils.setBitsInRange(arc, LETTER_MAP_START, LETTER_MAP_END, letterMapIdx);
     }
 
     private static void setValue(final int stateId, final int letterId, int value, int start, int end, long[][] arcs) {

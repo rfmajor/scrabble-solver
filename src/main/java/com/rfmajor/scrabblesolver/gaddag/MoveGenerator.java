@@ -43,7 +43,7 @@ public class MoveGenerator<A> {
 
     public List<Move> generate(int row, int column, Rack rack) {
         List<Move> moves = new ArrayList<>();
-        generate(0, row, column, new Word(), rack, gaddag.getParentArc(), moves);
+        generate(0, row, column, new Word(), rack, gaddag.getRootArc(), moves);
         return moves;
     }
 
