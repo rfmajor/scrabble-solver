@@ -33,7 +33,7 @@ public class ExpandedGaddagConverter implements GaddagConverter<Long> {
         private int forceStateId;
         private final BiMap<Integer, Integer> letterSets;
         private int nextLetterSetId;
-        private int currentLetterSetId;
+        private int lastLetterSetId;
         private int forceLetterSetId;
         private final Set<Integer> initializedStates;
 
@@ -43,7 +43,7 @@ public class ExpandedGaddagConverter implements GaddagConverter<Long> {
             this.alphabet = alphabet;
             this.letterSets = HashBiMap.create();
             this.nextLetterSetId = 1;
-            this.currentLetterSetId = 0;
+            this.lastLetterSetId = 0;
             this.forceLetterSetId = 0;
             this.initializedStates = new HashSet<>(Set.of(1));
         }
@@ -64,14 +64,14 @@ public class ExpandedGaddagConverter implements GaddagConverter<Long> {
 
                 for (int m = word.length() - 3; m >= 0; m--) {
                     forceStateId = currentStateId;
-                    forceLetterSetId = currentLetterSetId;
+                    forceLetterSetId = lastLetterSetId;
                     currentStateId = 1;
-                    currentLetterSetId = 0;
+                    lastLetterSetId = 0;
                     for (int i = m; i >= 0; i--) {
                         addArcIfNoneExists(alphabet.getIndex(word.charAt(i)));
                     }
                     addArcIfNoneExists(alphabet.getDelimiterIndex());
-                    forceArc(alphabet.getIndex(word.charAt(m + 1)), alphabet.getIndex(word.charAt(m + 2)));
+                    forceArc(alphabet.getIndex(word.charAt(m + 1)));
                 }
             }
             // just set to some non-zero value as only the state id (1) matters
@@ -84,12 +84,12 @@ public class ExpandedGaddagConverter implements GaddagConverter<Long> {
             return Arrays.copyOf(arcs, nextStateId);
         }
 
-        private void forceArc(int letterId, int letterIdToAdd) {
+        private void forceArc(int letterId) {
             int currentDestinationStateId = getDestinationStateId(arcs[currentStateId][letterId]);
             if (currentDestinationStateId == 0) {
                 setDestinationStateId(currentStateId, letterId, forceStateId, arcs);
-                setLetterBitMapId(currentStateId, letterId, forceLetterSetId, arcs);
             }
+            setLetterBitMapId(currentStateId, letterId, forceLetterSetId, arcs);
         }
 
         private void addFinalArcIfNoneExists(final int letterId, int letterIdToAdd) {
@@ -103,7 +103,7 @@ public class ExpandedGaddagConverter implements GaddagConverter<Long> {
                 }
             }
             addLetterToSet(currentStateId, letterId, letterIdToAdd);
-            currentLetterSetId = getLetterBitMapId(arcs[currentStateId][letterId]);
+            lastLetterSetId = getLetterBitMapId(arcs[currentStateId][letterId]);
             currentStateId = getDestinationStateId(arcs[currentStateId][letterId]);
         }
 
@@ -117,7 +117,7 @@ public class ExpandedGaddagConverter implements GaddagConverter<Long> {
                     ++nextStateId;
                 }
             }
-            currentLetterSetId = getLetterBitMapId(arcs[currentStateId][letterId]);
+            lastLetterSetId = getLetterBitMapId(arcs[currentStateId][letterId]);
             currentStateId = getDestinationStateId(arcs[currentStateId][letterId]);
         }
 
