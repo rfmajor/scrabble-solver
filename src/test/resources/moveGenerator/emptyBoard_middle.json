@@ -1,0 +1,20 @@
+{
+  "description": "Empty board, the rack containing [acer] letters",
+  "wordsSetup": [],
+  "playDirection": "ACROSS",
+  "rack": "acer",
+  "testCases": [
+    {
+      "startX": 7,
+      "startY": 7,
+      "expected": [
+        {"word": "care", "x": 7, "y": 4, "points": 0, "blanks": []},
+        {"word": "care", "x": 7, "y": 5, "points": 0, "blanks": []},
+        {"word": "care", "x": 7, "y": 6, "points": 0, "blanks": []},
+        {"word": "care", "x": 7, "y": 7, "points": 0, "blanks": []},
+        {"word": "ar", "x": 7, "y": 6, "points": 0, "blanks": []},
+        {"word": "ar", "x": 7, "y": 7, "points": 0, "blanks": []}
+      ]
+    }
+  ]
+}

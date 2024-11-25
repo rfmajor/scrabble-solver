@@ -1,0 +1,39 @@
+{
+  "description": "Board with a vertical word 'able' in the upper right corner, the rack containing [acer] letters",
+  "wordsSetup": [
+    {"word": "able", "row": 0, "column": 14, "direction": "DOWN"}
+  ],
+  "playDirection": "ACROSS",
+  "rack": "acer",
+  "testCases": [
+    {
+      "startX": 0,
+      "startY": 14,
+      "expected": []
+    },
+    {
+      "startX": 1,
+      "startY": 14,
+      "expected": []
+    },
+    {
+      "startX": 2,
+      "startY": 14,
+      "expected": []
+    },
+    {
+      "startX": 3,
+      "startY": 14,
+      "expected": [
+        {"word": "care", "x": 3, "y": 11, "points": 0, "blanks": []}
+      ]
+    },
+    {
+      "startX": 4,
+      "startY": 14,
+      "expected": [
+        {"word": "ar", "x": 4, "y": 13, "points": 0, "blanks": []}
+      ]
+    }
+  ]
+}

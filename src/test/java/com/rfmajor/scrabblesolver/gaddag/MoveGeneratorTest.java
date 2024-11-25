@@ -1,27 +1,50 @@
 package com.rfmajor.scrabblesolver.gaddag;
 
-import com.rfmajor.scrabblesolver.utils.TestUtils;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rfmajor.scrabblesolver.common.game.Alphabet;
 import com.rfmajor.scrabblesolver.common.game.Board;
 import com.rfmajor.scrabblesolver.common.game.Direction;
 import com.rfmajor.scrabblesolver.common.game.Move;
 import com.rfmajor.scrabblesolver.common.game.Rack;
+import com.rfmajor.scrabblesolver.utils.TestUtils;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
+import java.io.IOException;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Stream;
 
 import static com.rfmajor.scrabblesolver.utils.TestUtils.addWordToBoardHorizontally;
 import static com.rfmajor.scrabblesolver.utils.TestUtils.addWordToBoardVertically;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class MoveGeneratorTest {
     private Board board;
     private MoveGenerator<Long> moveGenerator;
     private boolean initialized;
+
+    private static final ObjectMapper objectMapper = new ObjectMapper();
+    private static final String[] TEST_FILENAMES = new String[]{
+            "/moveGenerator/emptyBoard_middle.json",
+            "/moveGenerator/vertical_able_anywhere.json",
+            "/moveGenerator/vertical_able_upperLeft.json",
+            "/moveGenerator/vertical_able_lowerLeft.json",
+            "/moveGenerator/vertical_able_upperRight.json",
+            "/moveGenerator/vertical_able_lowerRight.json",
+            "/moveGenerator/horizontal_able_anywhere.json",
+            "/moveGenerator/horizontal_able_upperLeft.json",
+            "/moveGenerator/horizontal_able_lowerLeft.json",
+            "/moveGenerator/horizontal_able_upperRight.json",
+            "/moveGenerator/horizontal_able_lowerRight.json",
+    };
 
     @BeforeEach
     void setUp() {
@@ -44,126 +67,69 @@ class MoveGeneratorTest {
         }
     }
 
-    @Test
-    void givenEmptyBoard_whenGenerate_thenReturnAllPossibleMoves() {
-        moveGenerator.computeAllCrossSets();
-
-        List<Move> moves = moveGenerator.generate(board.length() / 2, board.length() / 2, new Rack("care"));
-        moves.forEach(move -> System.out.println(move.toString()));
-        assertEquals(6, moves.size());
-    }
-
-    // vertical initial word
-
     @ParameterizedTest
-    @CsvSource({"3, 1", "4, 2", "5, 1", "6, 0", "7, 1", "8, 2"})
-    void givenBoardWithVerticalWord_whenGenerate_thenReturnAllPossibleMoves(int row, int expectedSize) {
-        addWordToBoardVertically("able", 4, 4, board);
-        moveGenerator.computeAllCrossSets();
+    @MethodSource("getAllTestSets")
+    void executeTestCases(TestSet testSet) {
+        System.out.println(testSet.description);
+        assertNotNull(testSet);
 
-        List<Move> moves = moveGenerator.generate(row, 4, new Rack("care"));
-        moves.forEach(move -> System.out.println(move.toString()));
-        assertEquals(expectedSize, moves.size());
+        for (WordSetup setup : testSet.wordsSetup) {
+            if (setup.direction == Direction.ACROSS) {
+                addWordToBoardHorizontally(setup.word, setup.row, setup.column, board);
+            } else if (setup.direction == Direction.DOWN) {
+                addWordToBoardVertically(setup.word, setup.row, setup.column, board);
+            } else {
+                throw new AssertionError(String.format("Invalid direction: %s", setup.direction));
+            }
+        }
+
+        moveGenerator.computeAllCrossSets();
+        assertAll(testSet.testCases.stream()
+                .map(testCase -> () -> {
+                    List<Move> moves = moveGenerator.generate(testCase.startX, testCase.startY, new Rack(testSet.rack));
+                    assertEquals(testCase.expected.size(), moves.size());
+                    assertAllMovesAreContained(testCase.expected, moves);
+                })
+        );
     }
 
-    @ParameterizedTest
-    @CsvSource({"0, 1", "1, 1", "2, 0", "3, 0", "4, 0"})
-    void givenBoardWithVerticalWordInUpperLeftCorner_whenGenerate_thenReturnAllPossibleMoves(int row, int expectedSize) {
-        addWordToBoardVertically("able", 0, 0, board);
-        moveGenerator.computeAllCrossSets();
-
-        List<Move> moves = moveGenerator.generate(row, 0, new Rack("care"));
-        moves.forEach(move -> System.out.println(move.toString()));
-        assertEquals(expectedSize, moves.size());
+    private static void assertAllMovesAreContained(Set<ExpectedMove> expectedMoves, List<Move> actualMoves) {
+        assertAll(expectedMoves.stream()
+                .map(expectedMove -> () -> assertTrue(moveIsContained(expectedMove, actualMoves)))
+        );
     }
 
-    @ParameterizedTest
-    @CsvSource({"10, 1", "11, 1", "12, 1", "13, 0", "14, 0"})
-    void givenBoardWithVerticalWordInLowerLeftCorner_whenGenerate_thenReturnAllPossibleMoves(int row, int expectedSize) {
-        addWordToBoardVertically("able", board.length() - 4, 0, board);
-        moveGenerator.computeAllCrossSets();
-
-        List<Move> moves = moveGenerator.generate(row, 0, new Rack("care"));
-        moves.forEach(move -> System.out.println(move.toString()));
-        assertEquals(expectedSize, moves.size());
+    private static boolean moveIsContained(ExpectedMove expectedMove, List<Move> actualMoves) {
+        for (Move actualMove : actualMoves) {
+            if (expectedMove.word.equals(actualMove.getWord()) && expectedMove.x == actualMove.getX() &&
+                    expectedMove.y == actualMove.getY() && expectedMove.points == actualMove.getPoints() &&
+                    expectedMove.blanks.equals(actualMove.getBlanks())) {
+                return true;
+            }
+        }
+        return false;
     }
 
-    @ParameterizedTest
-    @CsvSource({"0, 0", "1, 0", "2, 0", "3, 1", "4, 1"})
-    void givenBoardWithVerticalWordInUpperRightCorner_whenGenerate_thenReturnAllPossibleMoves(int row, int expectedSize) {
-        addWordToBoardVertically("able", 0, board.length() - 1, board);
-        moveGenerator.computeAllCrossSets();
-
-        List<Move> moves = moveGenerator.generate(row, board.length() - 1, new Rack("care"));
-        moves.forEach(move -> System.out.println(move.toString()));
-        assertEquals(expectedSize, moves.size());
+    private static Stream<Arguments> getAllTestSets() {
+        return Arrays.stream(TEST_FILENAMES)
+                .map(MoveGeneratorTest::loadTestSetFromFile)
+                .map(Arguments::of);
     }
 
-    @ParameterizedTest
-    @CsvSource({"10, 0", "11, 0", "12, 0", "13, 0", "14, 1"})
-    void givenBoardWithVerticalWordInLowerRightCorner_whenGenerate_thenReturnAllPossibleMoves(int row, int expectedSize) {
-        addWordToBoardVertically("able", board.length() - 4, board.length() - 1, board);
-        moveGenerator.computeAllCrossSets();
-
-        List<Move> moves = moveGenerator.generate(row, board.length() - 1, new Rack("care"));
-        moves.forEach(move -> System.out.println(move.toString()));
-        assertEquals(expectedSize, moves.size());
+    private static TestSet loadTestSetFromFile(String filename) {
+        try {
+            return objectMapper.readValue(MoveGeneratorTest.class.getResourceAsStream(filename), TestSet.class);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
-    // horizontal initial word
+    private record TestSet(String description, List<WordSetup> wordsSetup,
+                           Direction playDirection, String rack, List<TestCase> testCases) {}
 
-    @ParameterizedTest
-    @CsvSource({"4, 3", "5, 3", "6, 3", "7, 3"})
-    void givenBoardWithHorizontalWord_whenGenerate_thenReturnAllPossibleMoves(int column, int expectedSize) {
-        addWordToBoardHorizontally("able", 4, 4, board);
-        moveGenerator.computeAllCrossSets();
+    private record TestCase(int startX, int startY, Set<ExpectedMove> expected) {}
 
-        List<Move> moves = moveGenerator.generate(4, column, new Rack("care"));
-        moves.forEach(move -> System.out.println(move.toString()));
-        assertEquals(expectedSize, moves.size());
-    }
+    private record WordSetup(String word, int row, int column, Direction direction) {}
 
-    @ParameterizedTest
-    @CsvSource({"0, 2", "1, 2", "2, 2", "3, 2"})
-    void givenBoardWithHorizontalWordInUpperLeftCorner_whenGenerate_thenReturnAllPossibleMoves(int column, int expectedSize) {
-        addWordToBoardHorizontally("able", 0, 0, board);
-        moveGenerator.computeAllCrossSets();
-
-        List<Move> moves = moveGenerator.generate(0, column, new Rack("care"));
-        moves.forEach(move -> System.out.println(move.toString()));
-        assertEquals(expectedSize, moves.size());
-    }
-
-    @ParameterizedTest
-    @CsvSource({"0, 2", "1, 2", "2, 2", "3, 2"})
-    void givenBoardWithHorizontalWordInLowerLeftCorner_whenGenerate_thenReturnAllPossibleMoves(int column, int expectedSize) {
-        addWordToBoardHorizontally("able", board.length() - 1, 0, board);
-        moveGenerator.computeAllCrossSets();
-
-        List<Move> moves = moveGenerator.generate(board.length() - 1, column, new Rack("care"));
-        moves.forEach(move -> System.out.println(move.toString()));
-        assertEquals(expectedSize, moves.size());
-    }
-
-    @ParameterizedTest
-    @CsvSource({"11, 2", "12, 2", "13, 2", "14, 2"})
-    void givenBoardWithHorizontalWordInUpperRightCorner_whenGenerate_thenReturnAllPossibleMoves(int column, int expectedSize) {
-        addWordToBoardHorizontally("able", 0, board.length() - 4, board);
-        moveGenerator.computeAllCrossSets();
-
-        List<Move> moves = moveGenerator.generate(0, column, new Rack("care"));
-        moves.forEach(move -> System.out.println(move.toString()));
-        assertEquals(expectedSize, moves.size());
-    }
-
-    @ParameterizedTest
-    @CsvSource({"11, 2", "12, 2", "13, 2", "14, 2"})
-    void givenBoardWithHorizontalWordInLowerRightCorner_whenGenerate_thenReturnAllPossibleMoves(int column, int expectedSize) {
-        addWordToBoardHorizontally("able", board.length() - 1, board.length() - 4, board);
-        moveGenerator.computeAllCrossSets();
-
-        List<Move> moves = moveGenerator.generate(board.length() - 1, column, new Rack("care"));
-        moves.forEach(move -> System.out.println(move.toString()));
-        assertEquals(expectedSize, moves.size());
-    }
+    private record ExpectedMove(String word, int x, int y, int points, java.util.Set<Integer> blanks) {}
 }

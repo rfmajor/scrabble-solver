@@ -1,0 +1,46 @@
+{
+  "description": "Board with a horizontal word 'able' somewhere on it, the rack containing [acer] letters",
+  "wordsSetup": [
+    {"word": "able", "row": 4, "column": 4, "direction": "ACROSS"}
+  ],
+  "playDirection": "ACROSS",
+  "rack": "acer",
+  "testCases": [
+    {
+      "startX": 4,
+      "startY": 4,
+      "expected": [
+        {"word": "cable", "x": 4, "y": 3, "points": 0, "blanks": []},
+        {"word": "able", "x": 4, "y": 4, "points": 0, "blanks": []},
+        {"word": "abler", "x": 4, "y": 4, "points": 0, "blanks": []}
+      ]
+    },
+    {
+      "startX": 4,
+      "startY": 5,
+      "expected": [
+        {"word": "cable", "x": 4, "y": 3, "points": 0, "blanks": []},
+        {"word": "able", "x": 4, "y": 4, "points": 0, "blanks": []},
+        {"word": "abler", "x": 4, "y": 4, "points": 0, "blanks": []}
+      ]
+    },
+    {
+      "startX": 4,
+      "startY": 6,
+      "expected": [
+        {"word": "cable", "x": 4, "y": 3, "points": 0, "blanks": []},
+        {"word": "able", "x": 4, "y": 4, "points": 0, "blanks": []},
+        {"word": "abler", "x": 4, "y": 4, "points": 0, "blanks": []}
+      ]
+    },
+    {
+      "startX": 4,
+      "startY": 7,
+      "expected": [
+        {"word": "cable", "x": 4, "y": 3, "points": 0, "blanks": []},
+        {"word": "able", "x": 4, "y": 4, "points": 0, "blanks": []},
+        {"word": "abler", "x": 4, "y": 4, "points": 0, "blanks": []}
+      ]
+    }
+  ]
+}
