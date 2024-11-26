@@ -30,10 +30,10 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class MoveGeneratorTest {
+class MoveAlgorithmExecutorTest {
     private Board board;
-    private MoveGenerator<Long> expandedMoveGenerator;
-    private MoveGenerator<Arc> simpleMoveGenerator;
+    private MoveAlgorithmExecutor<Long> expandedMoveAlgorithmExecutor;
+    private MoveAlgorithmExecutor<Arc> simpleMoveAlgorithmExecutor;
 
     private static final ObjectMapper objectMapper = new ObjectMapper();
     private static final String[] TEST_FILENAMES = new String[]{
@@ -66,8 +66,8 @@ class MoveGeneratorTest {
 
         Gaddag<Arc> simpleGaddag = simpleGaddagConverter.convert(words, alphabet);
         Gaddag<Long> expandedGaddag = expandedGaddagConverter.convert(words, alphabet);
-        expandedMoveGenerator = new MoveGenerator<>(board, expandedGaddag, Direction.ACROSS);
-        simpleMoveGenerator = new MoveGenerator<>(board, simpleGaddag, Direction.ACROSS);
+        expandedMoveAlgorithmExecutor = new MoveAlgorithmExecutor<>(board, expandedGaddag, Direction.ACROSS);
+        simpleMoveAlgorithmExecutor = new MoveAlgorithmExecutor<>(board, simpleGaddag, Direction.ACROSS);
     }
 
     @BeforeEach
@@ -90,11 +90,11 @@ class MoveGeneratorTest {
             }
         }
 
-        expandedMoveGenerator.computeAllCrossSets();
-        simpleMoveGenerator.computeAllCrossSets();
+        expandedMoveAlgorithmExecutor.computeAllCrossSets();
+        simpleMoveAlgorithmExecutor.computeAllCrossSets();
         assertAll(testSet.testCases.stream()
                 .map(testCase -> () -> {
-                    List<Move> moves = expandedMoveGenerator.generate(testCase.startX, testCase.startY, new Rack(testSet.rack));
+                    List<Move> moves = expandedMoveAlgorithmExecutor.generate(testCase.startX, testCase.startY, new Rack(testSet.rack));
                     assertEquals(testCase.expected.size(), moves.size(), "Expected and actual moves differ in length");
                     assertAllMovesAreContained(testCase.expected, moves);
                 })
@@ -121,14 +121,14 @@ class MoveGeneratorTest {
 
     private static Stream<Arguments> getAllTestSets() {
         return Arrays.stream(TEST_FILENAMES)
-                .map(MoveGeneratorTest::loadTestSetFromFile)
+                .map(MoveAlgorithmExecutorTest::loadTestSetFromFile)
                 .map(testSet -> Named.of(testSet.title, testSet))
                 .map(Arguments::of);
     }
 
     private static TestSet loadTestSetFromFile(String filename) {
         try {
-            return objectMapper.readValue(MoveGeneratorTest.class.getResourceAsStream(filename), TestSet.class);
+            return objectMapper.readValue(MoveAlgorithmExecutorTest.class.getResourceAsStream(filename), TestSet.class);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

@@ -7,8 +7,7 @@ import com.rfmajor.scrabblesolver.common.game.Field;
 import com.rfmajor.scrabblesolver.common.game.Move;
 import com.rfmajor.scrabblesolver.common.game.Rack;
 import com.rfmajor.scrabblesolver.common.game.SpecialFields;
-import com.rfmajor.scrabblesolver.gaddag.MoveGeneratorFacade;
-import lombok.Data;
+import com.rfmajor.scrabblesolver.gaddag.MoveGenerator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -22,7 +21,7 @@ public class PointCalculator {
 
     public static final int FULL_RACK_BONUS = 50;
 
-    public void calculatePoints(Set<Move> moves, MoveGeneratorFacade moveGenerator, Rack rack, Set<Field> blankFields) {
+    public <A> void calculatePoints(Set<Move> moves, MoveGenerator<A> moveGenerator, Rack rack, Set<Field> blankFields) {
         Set<Move> invalidMoves = new HashSet<>();
         moves.forEach(move -> calculatePoints(
                 move, moveGenerator.getBoard(),
