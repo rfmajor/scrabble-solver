@@ -1,5 +1,5 @@
 {
-  "description": "Board with a horizontal word 'able' in the upper left corner, the rack containing [acer] letters",
+  "title": "Board with a horizontal word 'able' in the upper left corner, the rack containing [acer] letters",
   "wordsSetup": [
     {"word": "able", "row": 0, "column": 0, "direction": "ACROSS"}
   ],

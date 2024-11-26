@@ -7,7 +7,10 @@ import com.rfmajor.scrabblesolver.common.game.Direction;
 import com.rfmajor.scrabblesolver.common.game.Move;
 import com.rfmajor.scrabblesolver.common.game.Rack;
 import com.rfmajor.scrabblesolver.utils.TestUtils;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Named;
+import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -26,10 +29,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class MoveGeneratorTest {
     private Board board;
-    private MoveGenerator<Long> moveGenerator;
-    private boolean initialized;
+    private MoveGenerator<Long> expandedMoveGenerator;
+    private MoveGenerator<Arc> simpleMoveGenerator;
 
     private static final ObjectMapper objectMapper = new ObjectMapper();
     private static final String[] TEST_FILENAMES = new String[]{
@@ -46,31 +50,34 @@ class MoveGeneratorTest {
             "/moveGenerator/horizontal_able_lowerRight.json",
     };
 
+
+    @BeforeAll
+    void setUpClass() {
+        board = new Board();
+        Alphabet alphabet = new Alphabet(
+                TestUtils.mapStringToLettersList("abcdefghijklmnopqrstuvwxyz#"),
+                Collections.emptyList(),
+                Collections.emptyList()
+        );
+        List<String> words = List.of("able", "cable", "care", "abler", "ar", "be");
+        GaddagConverter<Arc> simpleGaddagConverter = new SimpleGaddagConverter();
+        ExpandedGaddagConverter expandedGaddagConverter = new ExpandedGaddagConverter();
+        expandedGaddagConverter.setMaxNumberOfAllocatedStates(100);
+
+        Gaddag<Arc> simpleGaddag = simpleGaddagConverter.convert(words, alphabet);
+        Gaddag<Long> expandedGaddag = expandedGaddagConverter.convert(words, alphabet);
+        expandedMoveGenerator = new MoveGenerator<>(board, expandedGaddag, Direction.ACROSS);
+        simpleMoveGenerator = new MoveGenerator<>(board, simpleGaddag, Direction.ACROSS);
+    }
+
     @BeforeEach
     void setUp() {
-        board = new Board();
-        if (!initialized) {
-            Alphabet alphabet = new Alphabet(
-                    TestUtils.mapStringToLettersList("abcdefghijklmnopqrstuvwxyz#"),
-                    Collections.emptyList(),
-                    Collections.emptyList()
-            );
-            List<String> words = List.of("able", "cable", "care", "abler", "ar", "be");
-            GaddagConverter<Arc> simpleGaddagConverter = new SimpleGaddagConverter();
-            ExpandedGaddagConverter expandedGaddagConverter = new ExpandedGaddagConverter();
-            expandedGaddagConverter.setMaxNumberOfAllocatedStates(100);
-
-            Gaddag<Arc> simpleGaddag = simpleGaddagConverter.convert(words, alphabet);
-            Gaddag<Long> expandedGaddag = expandedGaddagConverter.convert(words, alphabet);
-            moveGenerator = new MoveGenerator<>(board, expandedGaddag, Direction.ACROSS);
-            initialized = true;
-        }
+        board.clear();
     }
 
     @ParameterizedTest
     @MethodSource("getAllTestSets")
     void executeTestCases(TestSet testSet) {
-        System.out.println(testSet.description);
         assertNotNull(testSet);
 
         for (WordSetup setup : testSet.wordsSetup) {
@@ -83,11 +90,12 @@ class MoveGeneratorTest {
             }
         }
 
-        moveGenerator.computeAllCrossSets();
+        expandedMoveGenerator.computeAllCrossSets();
+        simpleMoveGenerator.computeAllCrossSets();
         assertAll(testSet.testCases.stream()
                 .map(testCase -> () -> {
-                    List<Move> moves = moveGenerator.generate(testCase.startX, testCase.startY, new Rack(testSet.rack));
-                    assertEquals(testCase.expected.size(), moves.size());
+                    List<Move> moves = expandedMoveGenerator.generate(testCase.startX, testCase.startY, new Rack(testSet.rack));
+                    assertEquals(testCase.expected.size(), moves.size(), "Expected and actual moves differ in length");
                     assertAllMovesAreContained(testCase.expected, moves);
                 })
         );
@@ -95,7 +103,8 @@ class MoveGeneratorTest {
 
     private static void assertAllMovesAreContained(Set<ExpectedMove> expectedMoves, List<Move> actualMoves) {
         assertAll(expectedMoves.stream()
-                .map(expectedMove -> () -> assertTrue(moveIsContained(expectedMove, actualMoves)))
+                .map(expectedMove -> () -> assertTrue(moveIsContained(expectedMove, actualMoves),
+                        String.format("Move %s is not contained within the results", expectedMove)))
         );
     }
 
@@ -113,6 +122,7 @@ class MoveGeneratorTest {
     private static Stream<Arguments> getAllTestSets() {
         return Arrays.stream(TEST_FILENAMES)
                 .map(MoveGeneratorTest::loadTestSetFromFile)
+                .map(testSet -> Named.of(testSet.title, testSet))
                 .map(Arguments::of);
     }
 
@@ -124,7 +134,7 @@ class MoveGeneratorTest {
         }
     }
 
-    private record TestSet(String description, List<WordSetup> wordsSetup,
+    private record TestSet(String title, List<WordSetup> wordsSetup,
                            Direction playDirection, String rack, List<TestCase> testCases) {}
 
     private record TestCase(int startX, int startY, Set<ExpectedMove> expected) {}
