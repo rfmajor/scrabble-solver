@@ -38,6 +38,10 @@ public class Board {
     public static final int DEFAULT_SIZE = 15;
     private static final char DEFAULT_EMPTY_CHAR = '\u0000';
 
+    public void clear() {
+        fillBoardWithEmptyChars();
+    }
+
     public char getField(int x, int y) {
         return fields[x][y];
     }

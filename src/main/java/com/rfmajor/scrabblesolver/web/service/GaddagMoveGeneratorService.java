@@ -4,7 +4,7 @@ import com.rfmajor.scrabblesolver.common.PointCalculator;
 import com.rfmajor.scrabblesolver.common.game.Field;
 import com.rfmajor.scrabblesolver.common.game.Move;
 import com.rfmajor.scrabblesolver.common.game.Rack;
-import com.rfmajor.scrabblesolver.gaddag.MoveGeneratorFacade;
+import com.rfmajor.scrabblesolver.gaddag.MoveGenerator;
 import com.rfmajor.scrabblesolver.web.mapper.MoveMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -23,7 +23,7 @@ public class GaddagMoveGeneratorService implements MoveGeneratorService {
 
     @Override
     public List<MoveDto> generateMoves(GenerateMovesRequest request) {
-        MoveGeneratorFacade<?> moveGenerator = moveGeneratorFactory.getMoveGenerator(
+        MoveGenerator<?> moveGenerator = moveGeneratorFactory.getMoveGenerator(
                 request.getAlphabetLanguage(), request.getBoard());
         Rack rack = new Rack(request.getRackLetters());
         Set<Move> moves = moveGenerator.generate(rack);
