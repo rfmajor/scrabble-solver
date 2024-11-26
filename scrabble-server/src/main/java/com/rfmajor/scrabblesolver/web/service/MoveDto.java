@@ -1,12 +1,10 @@
 package com.rfmajor.scrabblesolver.web.service;
 
 import com.rfmajor.scrabblesolver.common.game.Direction;
-import com.rfmajor.scrabblesolver.common.game.Field;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
-import java.util.Set;
 
 @Data
 @NoArgsConstructor

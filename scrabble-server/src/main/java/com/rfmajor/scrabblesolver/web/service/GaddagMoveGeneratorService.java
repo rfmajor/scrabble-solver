@@ -17,7 +17,7 @@ import java.util.Set;
 @Service
 @RequiredArgsConstructor
 public class GaddagMoveGeneratorService implements MoveGeneratorService {
-    private final MoveGeneratorFactory<?> moveGeneratorFactory;
+    private final MoveGeneratorFactory moveGeneratorFactory;
     private final MoveMapper moveMapper;
     private final PointCalculator pointCalculator;
 

@@ -6,27 +6,18 @@ import com.rfmajor.scrabblesolver.common.game.Field;
 import com.rfmajor.scrabblesolver.common.game.SpecialFields;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.Resource;
-import org.springframework.stereotype.Component;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-@Component
-@RequiredArgsConstructor
 public class SpecialFieldsReader {
-    private final ObjectMapper objectMapper;
-    @Value("classpath:specialFields.json")
-    private Resource resourceFile;
+    private ObjectMapper objectMapper = new ObjectMapper();
+    private String fileName;
 
     public SpecialFields read() throws IOException {
-        File jsonFile = resourceFile.getFile();
-        SpecialFieldsUnparsed specialFieldsUnparsed = objectMapper.readValue(jsonFile, SpecialFieldsUnparsed.class);
+        SpecialFieldsUnparsed specialFieldsUnparsed = objectMapper.readValue(getClass().getResource(fileName), SpecialFieldsUnparsed.class);
         return SpecialFields.builder()
                 .doubleLetterFields(mapFields(specialFieldsUnparsed.getDoubleLetterFields()))
                 .tripleLetterFields(mapFields(specialFieldsUnparsed.getTripleLetterFields()))

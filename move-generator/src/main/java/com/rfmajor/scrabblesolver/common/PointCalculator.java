@@ -9,13 +9,11 @@ import com.rfmajor.scrabblesolver.common.game.Rack;
 import com.rfmajor.scrabblesolver.common.game.SpecialFields;
 import com.rfmajor.scrabblesolver.gaddag.MoveGenerator;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
 
 import java.util.HashSet;
 import java.util.Set;
 
 @RequiredArgsConstructor
-@Component
 public class PointCalculator {
     private final SpecialFields specialFields;
 
