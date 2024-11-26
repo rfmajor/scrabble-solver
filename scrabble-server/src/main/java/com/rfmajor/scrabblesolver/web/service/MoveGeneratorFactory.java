@@ -8,15 +8,15 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class MoveGeneratorFactory<A> {
-    private final LexiconRegistry<A> lexiconRegistry;
+public class MoveGeneratorFactory {
+    private final LexiconRegistry lexiconRegistry;
     private final BoardMapper boardMapper;
 
-    public MoveGenerator<A> getMoveGenerator(String alphabetLanguage, BoardDto board) {
+    public MoveGenerator<Long> getMoveGenerator(String alphabetLanguage, BoardDto board) {
         if (!lexiconRegistry.hasLexicon(alphabetLanguage)) {
             throw new LexiconNotFoundException("Lexicon not found for language: " + alphabetLanguage);
         }
-        Gaddag<A> gaddag = lexiconRegistry.getLexicon(alphabetLanguage);
+        Gaddag<Long> gaddag = lexiconRegistry.getLexicon(alphabetLanguage);
         return new MoveGenerator<>(boardMapper.fromDto(board), gaddag);
     }
 }

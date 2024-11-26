@@ -2,9 +2,6 @@ package com.rfmajor.scrabblesolver.input;
 
 import com.rfmajor.scrabblesolver.common.game.Alphabet;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.Resource;
-import org.springframework.stereotype.Component;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
@@ -14,15 +11,12 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
-@Component
 @Slf4j
 public class DictionaryReader {
-    @Value("${dictionary.words.filepath}")
-    private Resource dictionaryResource;
-    @Value("${dictionary.alphabet.filepath}")
-    private Resource alphabetResource;
-    @Value("${gaddag.wordlength.constraint}")
+    private String dictionaryFilename;
+    private String alphabetFilename;
     private int maxWordLength;
 
     private static final int NUM_OF_ALPHABET_LINES = 3;
@@ -33,7 +27,7 @@ public class DictionaryReader {
     public List<String> readAllWords(Alphabet alphabet) {
         List<String> words = new ArrayList<>();
         try (
-                FileInputStream fis = new FileInputStream(dictionaryResource.getFile());
+                FileInputStream fis = new FileInputStream(Objects.requireNonNull(getClass().getResource(dictionaryFilename)).getFile());
                 InputStreamReader isr = new InputStreamReader(fis, StandardCharsets.UTF_8);
                 BufferedReader reader = new BufferedReader(isr)
         ) {
@@ -54,7 +48,7 @@ public class DictionaryReader {
     public String[] readAlphabetLines() {
         String[] lines = new String[NUM_OF_ALPHABET_LINES];
         try (
-                FileInputStream fis = new FileInputStream(alphabetResource.getFile());
+                FileInputStream fis = new FileInputStream(Objects.requireNonNull(getClass().getResource(alphabetFilename)).getFile());
                 InputStreamReader isr = new InputStreamReader(fis, StandardCharsets.UTF_8);
                 BufferedReader reader = new BufferedReader(isr)
         ) {
