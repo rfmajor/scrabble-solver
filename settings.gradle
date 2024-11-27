@@ -1,4 +1,5 @@
 rootProject.name = 'scrabble-solver'
 
-include 'move-generator'
-include 'scrabble-server'
+include 'movegen'
+include 'server'
+include 'detection'
