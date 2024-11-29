@@ -23,11 +23,11 @@ jobs:
         # TODO: Cache the model instead
       - name: Train the model
         run: |
-          cd scrabble-detection 
+          cd detection 
           python3 train.py
       - name: Test Python classes using the model
         run: |
-          cd scrabble-detection 
+          cd detection 
           pytest test_board.py 
       - name: Check out repository code
         run: |
