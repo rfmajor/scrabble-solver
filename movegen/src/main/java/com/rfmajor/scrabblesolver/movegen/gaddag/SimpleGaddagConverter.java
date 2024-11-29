@@ -4,23 +4,32 @@ import com.rfmajor.scrabblesolver.movegen.common.model.Alphabet;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.List;
+import java.util.function.Predicate;
 
 @RequiredArgsConstructor
 @Slf4j
 public class SimpleGaddagConverter implements GaddagConverter<Arc> {
     @Override
-    public Gaddag<Arc> convert(List<String> words, Alphabet alphabet) {
+    public Gaddag<Arc> convert(Iterable<String> wordIterable, Alphabet alphabet) {
+        return convert(wordIterable, alphabet, word -> true);
+    }
+
+    @Override
+    public Gaddag<Arc> convert(Iterable<String> wordIterable, Alphabet alphabet, Predicate<String> wordPredicate) {
         Arc parentArc = new Arc();
         State parentState = new State();
         parentArc.setDestinationState(parentState);
 
-        processWords(words, parentState, alphabet);
+        processWords(wordIterable, parentState, alphabet, wordPredicate);
         return new SimpleGaddag(parentArc, alphabet, alphabet.getDelimiter());
     }
 
-    private void processWords(List<String> words, State state, Alphabet alphabet) {
-        for (String word : words) {
+    private void processWords(Iterable<String> wordIterable, State state,
+                              Alphabet alphabet, Predicate<String> wordPredicate) {
+        for (String word : wordIterable) {
+            if (!wordPredicate.test(word)) {
+                continue;
+            }
             log.info("Processing word: {}", word);
             addSingleWord(word, state, alphabet);
         }

@@ -1,14 +1,16 @@
 package com.rfmajor.scrabblesolver.movegen.common;
 
-import com.rfmajor.scrabblesolver.movegen.utils.TestUtils;
 import com.rfmajor.scrabblesolver.movegen.common.model.Alphabet;
 import com.rfmajor.scrabblesolver.movegen.common.model.Board;
 import com.rfmajor.scrabblesolver.movegen.gaddag.Arc;
 import com.rfmajor.scrabblesolver.movegen.gaddag.Gaddag;
 import com.rfmajor.scrabblesolver.movegen.gaddag.GaddagConverter;
 import com.rfmajor.scrabblesolver.movegen.gaddag.SimpleGaddagConverter;
+import com.rfmajor.scrabblesolver.movegen.utils.TestUtils;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 
 import java.util.Collections;
 import java.util.List;
@@ -17,32 +19,34 @@ import static com.rfmajor.scrabblesolver.movegen.utils.TestUtils.addWordToBoardV
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class CrossSetCalculatorTest {
     private Gaddag<Arc> gaddag;
     private Alphabet alphabet;
     private Board board;
     private CrossSetCalculator crossSetCalculator;
-    private boolean initialized;
 
     private static final int ROW = 1;
     private static final int COLUMN = 3;
 
+    @BeforeAll
+    void setUpAll() {
+        board = new Board();
+        alphabet = new Alphabet(
+                TestUtils.mapStringToLettersList("abcdefghijklmnopqrstuvwxyz#"),
+                Collections.emptyList(),
+                Collections.emptyList()
+        );
+        GaddagConverter<Arc> gaddagObjectConverter = new SimpleGaddagConverter();
+        gaddag = gaddagObjectConverter.convert(
+                List.of("pa", "able", "payable", "parable", "pay", "par", "part", "park", "cable"),
+                alphabet);
+        crossSetCalculator = new CrossSetCalculator(board, gaddag);
+    }
+
     @BeforeEach
     void setUp() {
-        board = new Board();
-        if (!initialized) {
-            alphabet = new Alphabet(
-                    TestUtils.mapStringToLettersList("abcdefghijklmnopqrstuvwxyz#"),
-                    Collections.emptyList(),
-                    Collections.emptyList()
-            );
-            GaddagConverter<Arc> gaddagObjectConverter = new SimpleGaddagConverter();
-            gaddag = gaddagObjectConverter.convert(
-                    List.of("pa", "able", "payable", "parable", "pay", "par", "part", "park", "cable"),
-                    alphabet);
-            crossSetCalculator = new CrossSetCalculator(board, gaddag);
-            initialized = true;
-        }
+        board.clear();
     }
 
     @Test

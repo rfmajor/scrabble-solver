@@ -12,6 +12,10 @@ public final class BitSetUtils {
         return bitSet | (1 << index);
     }
 
+    public static long addToSet(long bitSet, long index) {
+        return bitSet | (1L << index);
+    }
+
     public static int removeFromSet(int bitSet, int index) {
         return bitSet & ~(1 << index);
     }

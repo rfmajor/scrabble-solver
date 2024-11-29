@@ -3,69 +3,107 @@ package com.rfmajor.scrabblesolver.movegen.gaddag;
 import com.rfmajor.scrabblesolver.movegen.common.BitSetUtils;
 import com.rfmajor.scrabblesolver.movegen.common.model.Alphabet;
 import com.rfmajor.scrabblesolver.movegen.utils.TestUtils;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Named;
+import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-abstract class GaddagTest<A> {
-    protected Gaddag<A> gaddag;
-    protected Alphabet alphabet;
-    protected boolean initialized;
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+class GaddagTest {
+    private Gaddag<Long> expandedGaddag;
+    private Gaddag<Arc> simpleGaddag;
+    private Gaddag<Long> compressedGaddag;
+    private Alphabet alphabet;
 
-    protected abstract GaddagConverter<A> createConverter();
+    private static final TestSet[] TEST_SETS = new TestSet[] {
+            new TestSet("One word",
+                    new TestCase("p#ar", null, 't', 'k'),
+                    new TestCase("ap#r", null, 't', 'k'),
+                    new TestCase("rap#", null, 't', 'k')
+            ),
+            new TestSet("Two words",
+                    new TestCase("ap#", "able", 'r', 'y')
+            ),
+            new TestSet("One letter",
+                    new TestCase("p", null, 'o')
+            )
+    };
 
-    @BeforeEach
+    @BeforeAll
     void setUp() {
-        if (!initialized) {
-            alphabet = new Alphabet(
-                    TestUtils.mapStringToLettersList("abcdefghijklmnopqrstuvwxyz#"),
-                    Collections.emptyList(),
-                    Collections.emptyList()
-            );
-            GaddagConverter<A> gaddagConverter = createConverter();
-            gaddag = gaddagConverter.convert(
-                    List.of("pa", "pi", "op", "able", "payable", "parable", "pay", "par", "part", "park"),
-                    alphabet);
-            initialized = true;
-        }
+        alphabet = new Alphabet(
+                TestUtils.mapStringToLettersList("abcdefghijklmnopqrstuvwxyz#"),
+                Collections.emptyList(),
+                Collections.emptyList()
+        );
+        List<String> words = List.of("pa", "pi", "op", "able", "payable", "parable", "pay", "par", "part", "park");
+
+        GaddagConverter<Long> expandedGaddagConverter = new ExpandedGaddagConverter();
+        GaddagConverter<Arc> simpleGaddagConverter = new SimpleGaddagConverter();
+        ExpandedGaddagCompressor expandedGaddagCompressor = new ExpandedGaddagCompressor();
+
+        expandedGaddag = expandedGaddagConverter.convert(words, alphabet);
+        simpleGaddag = simpleGaddagConverter.convert(words, alphabet);
+        compressedGaddag = expandedGaddagCompressor.minimize((ExpandedGaddag) expandedGaddag);
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"p#ar","ap#r", "rap#"})
-    void givenWord_whenGetOneLetterCompletion_thenReturnCompletion(String word) {
-        int bitSet = gaddag.getOneLetterCompletion(word);
-        Assertions.assertTrue(BitSetUtils.containsOnly(bitSet, alphabet.getIndex('t'), alphabet.getIndex('k')));
+    @MethodSource("getArgumentsForTesting")
+    void executeTestCases_simpleGaddag(TestSet testSet) {
+        executeTestSet(testSet, simpleGaddag);
     }
 
-    @Test
-    void givenOneLetter_whenGetOneLetterCompletion_thenReturnCompletion() {
-        int bitSet = gaddag.getOneLetterCompletion("p");
-        assertTrue(BitSetUtils.containsOnly(bitSet, alphabet.getIndex('o')));
+    @ParameterizedTest
+    @MethodSource("getArgumentsForTesting")
+    void executeTestCases_expandedGaddag(TestSet testSet) {
+        executeTestSet(testSet, expandedGaddag);
     }
 
-    @Test
-    void given2Words_whenGetOneLetterCompletion_thenReturnCompletion() {
-        String firstWord = "ap#";
-        String secondWord = "able";
-        int bitSet = gaddag.getOneLetterCompletion(firstWord, secondWord);
-        assertTrue(BitSetUtils.containsOnly(bitSet, alphabet.getIndex('r'), alphabet.getIndex('y')));
+    @ParameterizedTest
+    @MethodSource("getArgumentsForTesting")
+    void executeTestCases_compressedGaddag(TestSet testSet) {
+        executeTestSet(testSet, compressedGaddag);
     }
 
-    @Test
-    void name() {
-        GaddagConverter<A> gaddagConverter = createConverter();
-        gaddag = gaddagConverter.convert(
-                List.of("park", "part"),
-                alphabet);
-        String word = "p#ar";
-        int bitSet = gaddag.getOneLetterCompletion(word);
-        assertTrue(BitSetUtils.containsOnly(bitSet, alphabet.getIndex('k'), alphabet.getIndex('t')));
+    private <A> void executeTestSet(TestSet testSet, Gaddag<A> gaddag) {
+        assertNotNull(testSet);
+
+        assertAll(Arrays.stream(testSet.testCases)
+                .map(testCase -> () -> {
+                    int bitSet;
+                    if (testCase.word2 == null) {
+                        bitSet = gaddag.getOneLetterCompletion(testCase.word1);
+                    } else {
+                        bitSet = gaddag.getOneLetterCompletion(testCase.word1, testCase.word2);
+                    }
+                    int[] expectedIndices = IntStream.range(0, testCase.expected.length)
+                            .mapToObj(i -> testCase.expected[i])
+                            .map(alphabet::getIndex)
+                            .mapToInt(Integer::intValue)
+                            .toArray();
+                    assertTrue(BitSetUtils.containsOnly(bitSet, expectedIndices));
+                })
+        );
     }
+
+    private static Stream<Arguments> getArgumentsForTesting() {
+        return Arrays.stream(TEST_SETS)
+                .map(testSet -> Named.of(testSet.name, testSet))
+                .map(Arguments::of);
+    }
+
+    private record TestSet(String name, TestCase... testCases) {}
+    private record TestCase(String word1, String word2, char... expected) {}
 }

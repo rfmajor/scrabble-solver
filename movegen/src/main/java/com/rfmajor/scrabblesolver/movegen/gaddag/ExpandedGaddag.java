@@ -1,6 +1,5 @@
 package com.rfmajor.scrabblesolver.movegen.gaddag;
 
-import com.google.common.collect.BiMap;
 import com.rfmajor.scrabblesolver.movegen.common.BitSetUtils;
 import com.rfmajor.scrabblesolver.movegen.common.model.Alphabet;
 
@@ -8,12 +7,12 @@ import static com.rfmajor.scrabblesolver.movegen.gaddag.ExpandedGaddagUtils.getD
 import static com.rfmajor.scrabblesolver.movegen.gaddag.ExpandedGaddagUtils.getLetterBitMapId;
 
 public class ExpandedGaddag extends Gaddag<Long> {
-    private final long[][] arcs;
-    private final BiMap<Integer, Integer> letterSets;
+    protected final long[][] arcs;
+    protected final int[] letterSets;
 
-    public ExpandedGaddag(Long parentArc, Alphabet alphabet, char delimiter,
-                          long[][] arcs, BiMap<Integer, Integer> letterSets) {
-        super(parentArc, alphabet, delimiter);
+    public ExpandedGaddag(Long rootArc, Alphabet alphabet, char delimiter,
+                          long[][] arcs, int[] letterSets) {
+        super(rootArc, alphabet, delimiter);
         this.arcs = arcs;
         this.letterSets = letterSets;
     }
@@ -39,7 +38,10 @@ public class ExpandedGaddag extends Gaddag<Long> {
     @Override
     public int getLetterIndicesBitMap(Long arc) {
         int letterSetId = getLetterBitMapId(arc);
-        return letterSets.getOrDefault(letterSetId, 0);
+        if (letterSetId >= letterSets.length) {
+            return 0;
+        }
+        return letterSets[letterSetId];
     }
 
     @Override
@@ -56,5 +58,25 @@ public class ExpandedGaddag extends Gaddag<Long> {
     @Override
     public boolean isPresent(Long arc) {
         return arc != null && arc != 0;
+    }
+
+    public void printEmptyStates() {
+        long emptyStates = 0;
+        long emptyArcs = 0;
+        for (long[] state : arcs) {
+            boolean zeroState = true;
+            for (long arc : state) {
+                if (arc != 0) {
+                    zeroState = false;
+                } else {
+                    emptyArcs++;
+                }
+            }
+            if (zeroState) {
+                emptyStates++;
+            }
+        }
+        System.out.printf("Empty states: %d\n", emptyStates);
+        System.out.printf("Empty arcs: %d\n", emptyArcs);
     }
 }

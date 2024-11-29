@@ -5,29 +5,40 @@ import com.google.common.collect.HashBiMap;
 import com.rfmajor.scrabblesolver.movegen.common.BitSetUtils;
 import com.rfmajor.scrabblesolver.movegen.common.model.Alphabet;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
+import java.util.function.Predicate;
 
+import static com.rfmajor.scrabblesolver.movegen.gaddag.ExpandedGaddagUtils.LETTER_MAP_END;
+import static com.rfmajor.scrabblesolver.movegen.gaddag.ExpandedGaddagUtils.LETTER_MAP_START;
 import static com.rfmajor.scrabblesolver.movegen.gaddag.ExpandedGaddagUtils.getDestinationStateId;
 import static com.rfmajor.scrabblesolver.movegen.gaddag.ExpandedGaddagUtils.getLetterBitMapId;
 import static com.rfmajor.scrabblesolver.movegen.gaddag.ExpandedGaddagUtils.setDestinationStateId;
 import static com.rfmajor.scrabblesolver.movegen.gaddag.ExpandedGaddagUtils.setLetterBitMapId;
 
+@Slf4j
 public class ExpandedGaddagConverter implements GaddagConverter<Long> {
     @Setter
-    private int maxNumberOfAllocatedStates = 100;
+    private int initialStates = 1_048_576;
 
     @Override
-    public Gaddag<Long> convert(List<String> words, Alphabet alphabet) {
-        return new Converter(alphabet).convert(words);
+    public Gaddag<Long> convert(Iterable<String> wordIterable, Alphabet alphabet) {
+        return convert(wordIterable, alphabet, word -> true);
+    }
+
+    @Override
+    public Gaddag<Long> convert(Iterable<String> wordIterable, Alphabet alphabet, Predicate<String> wordPredicate) {
+        return new Converter(alphabet).convert(wordIterable, wordPredicate);
     }
 
     private class Converter {
         private int nextStateId;
-        private final long[][] arcs;
+        private double loadFactor = 0.95;
+        private int maximumStates = Integer.MAX_VALUE;
+        private long[][] arcs;
         private final Alphabet alphabet;
         private int currentStateId;
         private int forceStateId;
@@ -39,7 +50,7 @@ public class ExpandedGaddagConverter implements GaddagConverter<Long> {
 
         public Converter(Alphabet alphabet) {
             this.nextStateId = 2;
-            this.arcs = new long[maxNumberOfAllocatedStates][alphabet.size()];
+            this.arcs = new long[initialStates][alphabet.size()];
             this.alphabet = alphabet;
             this.letterSets = HashBiMap.create();
             this.nextLetterSetId = 1;
@@ -48,8 +59,11 @@ public class ExpandedGaddagConverter implements GaddagConverter<Long> {
             this.initializedStates = new HashSet<>(Set.of(1));
         }
 
-        public Gaddag<Long> convert(List<String> words) {
-            for (String word : words) {
+        public Gaddag<Long> convert(Iterable<String> wordIterable, Predicate<String> wordPredicate) {
+            for (String word : wordIterable) {
+                if (!wordPredicate.test(word)) {
+                    continue;
+                }
                 currentStateId = 1;
                 for (int i = word.length() - 1; i >= 2; i--) {
                     addArcIfNoneExists(alphabet.getIndex(word.charAt(i)));
@@ -74,10 +88,12 @@ public class ExpandedGaddagConverter implements GaddagConverter<Long> {
                     forceArc(alphabet.getIndex(word.charAt(m + 1)));
                 }
             }
+            int maxBitmapId = (int)(Math.pow(2, LETTER_MAP_END - LETTER_MAP_START - 1));
             // just set to some non-zero value as only the state id (1) matters
-            long parentArc = setLetterBitMapId(0L, Integer.MAX_VALUE);
-            parentArc = setDestinationStateId(parentArc, 1);
-            return new ExpandedGaddag(parentArc, alphabet, alphabet.getDelimiter(), downSizeArcs(), letterSets);
+            long rootArc = setLetterBitMapId(0L, maxBitmapId);
+            rootArc = setDestinationStateId(rootArc, 1);
+            return new ExpandedGaddag(rootArc, alphabet, alphabet.getDelimiter(), downSizeArcs(),
+                    mapLetterSetsToArray(letterSets));
         }
 
         private long[][] downSizeArcs() {
@@ -99,7 +115,7 @@ public class ExpandedGaddagConverter implements GaddagConverter<Long> {
                 initializedStates.add(nextStateId);
 
                 if (incrementNextStateId) {
-                    ++nextStateId;
+                    incrementStateId();
                 }
             }
             addLetterToSet(currentStateId, letterId, letterIdToAdd);
@@ -114,18 +130,40 @@ public class ExpandedGaddagConverter implements GaddagConverter<Long> {
                 initializedStates.add(nextStateId);
 
                 if (incrementNextStateId) {
-                    ++nextStateId;
+                    incrementStateId();
                 }
             }
             lastLetterSetId = getLetterBitMapId(arcs[currentStateId][letterId]);
             currentStateId = getDestinationStateId(arcs[currentStateId][letterId]);
         }
 
+        private void incrementStateId() {
+            tryResize();
+            ++nextStateId;
+        }
+
+        private void tryResize() {
+            double load = ((double) (nextStateId + 1)) / arcs.length;
+            if (load > loadFactor) {
+                int oldLength = arcs.length;
+                int newLength = oldLength * 2;
+                System.out.printf(("Allocating %s states\n"), newLength);
+                if (newLength > maximumStates) {
+                    throw new RuntimeException(String.format("Exceeded the maximum states space (tried to allocate %d)", newLength));
+                }
+                arcs = Arrays.copyOf(arcs, newLength);
+
+                for (int i = oldLength; i < arcs.length; i++) {
+                    arcs[i] = new long[alphabet.size()];
+                }
+            }
+        }
+
         private boolean isStateInitialized(int stateId) {
             return initializedStates.contains(stateId);
         }
 
-        private int addLetterToSet(final int stateId, final int letterId, int letterIdToAdd) {
+        private void addLetterToSet(final int stateId, final int letterId, int letterIdToAdd) {
             int letterSetId = getLetterBitMapId(arcs[stateId][letterId]);
             int letterSet = letterSets.getOrDefault(letterSetId, 0);
             letterSet = BitSetUtils.addToSet(letterSet, letterIdToAdd);
@@ -138,7 +176,13 @@ public class ExpandedGaddagConverter implements GaddagConverter<Long> {
             }
             setLetterBitMapId(stateId, letterId, letterSetId, arcs);
 
-            return letterSetId;
         }
+    }
+
+    private int[] mapLetterSetsToArray(BiMap<Integer, Integer> letterSets) {
+        // +1 because sets start from 1 in the original map
+        int[] result = new int[letterSets.size() + 1];
+        letterSets.forEach((k, v) -> result[k] = v);
+        return result;
     }
 }

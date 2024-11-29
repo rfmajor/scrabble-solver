@@ -32,6 +32,7 @@ class MoveAlgorithmExecutorTest {
     private Board board;
     private MoveAlgorithmExecutor<Long> expandedMoveAlgorithmExecutor;
     private MoveAlgorithmExecutor<Arc> simpleMoveAlgorithmExecutor;
+    private MoveAlgorithmExecutor<Long> compressedMoveAlgorithmExecutor;
 
     private static final ObjectMapper objectMapper = new ObjectMapper();
     private static final String[] TEST_FILENAMES = new String[]{
@@ -60,12 +61,15 @@ class MoveAlgorithmExecutorTest {
         List<String> words = List.of("able", "cable", "care", "abler", "ar", "be");
         GaddagConverter<Arc> simpleGaddagConverter = new SimpleGaddagConverter();
         ExpandedGaddagConverter expandedGaddagConverter = new ExpandedGaddagConverter();
-        expandedGaddagConverter.setMaxNumberOfAllocatedStates(100);
+        ExpandedGaddagCompressor expandedGaddagCompressor = new ExpandedGaddagCompressor();
 
         Gaddag<Arc> simpleGaddag = simpleGaddagConverter.convert(words, alphabet);
         Gaddag<Long> expandedGaddag = expandedGaddagConverter.convert(words, alphabet);
+        Gaddag<Long> compressedGaddag = expandedGaddagCompressor.minimize((ExpandedGaddag) (expandedGaddag));
+
         expandedMoveAlgorithmExecutor = new MoveAlgorithmExecutor<>(board, expandedGaddag, Direction.ACROSS);
         simpleMoveAlgorithmExecutor = new MoveAlgorithmExecutor<>(board, simpleGaddag, Direction.ACROSS);
+        compressedMoveAlgorithmExecutor = new MoveAlgorithmExecutor<>(board, compressedGaddag, Direction.ACROSS);
     }
 
     @BeforeEach
@@ -75,7 +79,23 @@ class MoveAlgorithmExecutorTest {
 
     @ParameterizedTest
     @MethodSource("getAllTestSets")
-    void executeTestCases(TestSet testSet) {
+    void executeTestCases_simpleGaddag(TestSet testSet) {
+        executeTestCase(testSet, simpleMoveAlgorithmExecutor);
+    }
+
+    @ParameterizedTest
+    @MethodSource("getAllTestSets")
+    void executeTestCases_expandedGaddag(TestSet testSet) {
+        executeTestCase(testSet, expandedMoveAlgorithmExecutor);
+    }
+
+    @ParameterizedTest
+    @MethodSource("getAllTestSets")
+    void executeTestCases_compressedGaddag(TestSet testSet) {
+        executeTestCase(testSet, compressedMoveAlgorithmExecutor);
+    }
+
+    private <A> void executeTestCase(TestSet testSet, MoveAlgorithmExecutor<A> algorithmExecutor) {
         assertNotNull(testSet);
 
         for (WordSetup setup : testSet.wordsSetup) {
@@ -88,11 +108,10 @@ class MoveAlgorithmExecutorTest {
             }
         }
 
-        expandedMoveAlgorithmExecutor.computeAllCrossSets();
-        simpleMoveAlgorithmExecutor.computeAllCrossSets();
+        algorithmExecutor.computeAllCrossSets();
         assertAll(testSet.testCases.stream()
                 .map(testCase -> () -> {
-                    List<Move> moves = expandedMoveAlgorithmExecutor.generate(testCase.startX, testCase.startY, new Rack(testSet.rack));
+                    List<Move> moves = algorithmExecutor.generate(testCase.startX, testCase.startY, new Rack(testSet.rack));
                     assertEquals(testCase.expected.size(), moves.size(), "Expected and actual moves differ in length");
                     assertAllMovesAreContained(testCase.expected, moves);
                 })
