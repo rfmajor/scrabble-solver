@@ -7,12 +7,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ExpandedGaddagUtils {
 
-    // TODO: For some reason these are actually inverted - the destination id is written to the last 24 bits
-    //       and the letter id is written to the bits (26,40), this should be fixed
     public static final int DEST_ID_START = 0;
-    public static final int DEST_ID_END = 24;
-    public static final int LETTER_MAP_START = 24;
-    public static final int LETTER_MAP_END = 38;
+    public static final int DEST_ID_END = 25;
+    public static final int LETTER_MAP_START = 25;
+    public static final int LETTER_MAP_END = 39;
 
     public static int getDestinationStateId(long arc) {
         return (int) BitSetUtils.getBitsInRange(arc, DEST_ID_START, DEST_ID_END);

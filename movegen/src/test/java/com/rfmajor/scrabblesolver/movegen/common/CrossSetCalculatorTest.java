@@ -21,7 +21,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class CrossSetCalculatorTest {
-    private Gaddag<Arc> gaddag;
     private Alphabet alphabet;
     private Board board;
     private CrossSetCalculator crossSetCalculator;
@@ -38,7 +37,7 @@ class CrossSetCalculatorTest {
                 Collections.emptyList()
         );
         GaddagConverter<Arc> gaddagObjectConverter = new SimpleGaddagConverter();
-        gaddag = gaddagObjectConverter.convert(
+        Gaddag<Arc> gaddag = gaddagObjectConverter.convert(
                 List.of("pa", "able", "payable", "parable", "pay", "par", "part", "park", "cable"),
                 alphabet);
         crossSetCalculator = new CrossSetCalculator(board, gaddag);

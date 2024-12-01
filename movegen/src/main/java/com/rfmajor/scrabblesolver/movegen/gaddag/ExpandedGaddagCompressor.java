@@ -27,6 +27,7 @@ public class ExpandedGaddagCompressor {
 
         compressArray(valueHolder.arcStateIdx, valueHolder);
 
+        System.out.printf("Arcs and states: %d, letter sets: %d\n", valueHolder.arcsAndStates.length, expandedGaddag.letterSets.length);
         // iterate over the arcs and set their destination state ids to the new ids
         int i = 0;
         while (i < valueHolder.arcsAndStates.length) {
