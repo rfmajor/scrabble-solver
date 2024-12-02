@@ -2,8 +2,10 @@ package com.rfmajor.scrabblesolver.movegen;
 
 import com.rfmajor.scrabblesolver.movegen.common.model.Alphabet;
 import com.rfmajor.scrabblesolver.movegen.common.model.Board;
+import com.rfmajor.scrabblesolver.movegen.gaddag.CompressedByteGaddag;
+import com.rfmajor.scrabblesolver.movegen.gaddag.CompressedGaddagFileWriter;
 import com.rfmajor.scrabblesolver.movegen.gaddag.ExpandedGaddag;
-import com.rfmajor.scrabblesolver.movegen.gaddag.ExpandedGaddagCompressor;
+import com.rfmajor.scrabblesolver.movegen.gaddag.ExpandedGaddagByteArrayCompressor;
 import com.rfmajor.scrabblesolver.movegen.gaddag.ExpandedGaddagConverter;
 import com.rfmajor.scrabblesolver.movegen.gaddag.FileWordIterable;
 import com.rfmajor.scrabblesolver.movegen.gaddag.Gaddag;
@@ -24,7 +26,7 @@ public class Main {
 
         ExpandedGaddagConverter expandedGaddagConverter = new ExpandedGaddagConverter();
         Gaddag<Long> expandedGaddag;
-        ExpandedGaddagCompressor expandedGaddagCompressor = new ExpandedGaddagCompressor();
+        ExpandedGaddagByteArrayCompressor expandedGaddagByteArrayCompressor = new ExpandedGaddagByteArrayCompressor();
 
         try (FileWordIterable fileWordIterable = new FileWordIterable(Main.class.getResourceAsStream("/slowa.txt"))) {
             expandedGaddag = expandedGaddagConverter.convert(fileWordIterable, alphabet, word -> {
@@ -41,7 +43,9 @@ public class Main {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-        Gaddag<Long> compressedGaddag = expandedGaddagCompressor.minimize((ExpandedGaddag) expandedGaddag);
+        Gaddag<Long> compressedGaddag = expandedGaddagByteArrayCompressor.minimize((ExpandedGaddag) expandedGaddag);
+        CompressedGaddagFileWriter writer = new CompressedGaddagFileWriter();
+        writer.write((CompressedByteGaddag) compressedGaddag);
     }
 
     public static List<Character> mapStringToLettersList(String letters) {

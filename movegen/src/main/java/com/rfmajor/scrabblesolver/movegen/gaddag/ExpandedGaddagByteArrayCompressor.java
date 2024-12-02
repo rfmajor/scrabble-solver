@@ -18,11 +18,21 @@ public class ExpandedGaddagByteArrayCompressor {
     public Gaddag<Long> minimize(ExpandedGaddag expandedGaddag) {
         ValueHolder valueHolder = new ValueHolder(new byte[INITIAL_SIZE], 0,
                 expandedGaddag.getAlphabet().size(), new int[expandedGaddag.arcs.length]);
+        int emptyStateIdx = -1;
 
         // copy the states and arcs to a one dimensional array
         for (int i = 1; i < expandedGaddag.arcs.length; i++) {
             long[] state = expandedGaddag.arcs[i];
             long stateBitMap = getArcsBitMap(state, valueHolder.alphabetSize);
+
+            // eliminate empty states
+            if (stateBitMap == 0) {
+                if (emptyStateIdx == -1) {
+                    emptyStateIdx = writeToArrayAtCurrentIdx(stateBitMap, valueHolder);
+                }
+                writeNewDestinationStateIdx(i, emptyStateIdx, valueHolder.stateMappings);
+                continue;
+            }
 
             int stateIdx = writeToArrayAtCurrentIdx(stateBitMap, valueHolder);
 
