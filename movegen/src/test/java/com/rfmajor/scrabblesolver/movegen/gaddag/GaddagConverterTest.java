@@ -23,6 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 class GaddagConverterTest {
     private Gaddag<Long> expandedGaddag;
     private Gaddag<Long> compressedGaddag;
+    private Gaddag<Long> compressedByteGaddag;
     private Gaddag<Arc> simpleGaddag;
 
     private static final String[] SEQUENCE_PRESENT = new String[]{
@@ -59,6 +60,8 @@ class GaddagConverterTest {
         SimpleGaddagConverter simpleGaddagConverter = new SimpleGaddagConverter();
         ExpandedGaddagConverter expandedGaddagConverter = new ExpandedGaddagConverter();
         ExpandedGaddagCompressor expandedGaddagCompressor = new ExpandedGaddagCompressor();
+        ExpandedGaddagByteArrayCompressor expandedByteGaddagCompressor = new ExpandedGaddagByteArrayCompressor();
+
         Alphabet alphabet = new Alphabet(
                 TestUtils.mapStringToLettersList("aąbcćdeęfghijklłmnńoóprsśtuwyzźż#"),
                 Collections.emptyList(),
@@ -68,6 +71,7 @@ class GaddagConverterTest {
         simpleGaddag = simpleGaddagConverter.convert(words, alphabet);
         expandedGaddag = expandedGaddagConverter.convert(words, alphabet);
         compressedGaddag = expandedGaddagCompressor.minimize((ExpandedGaddag) expandedGaddag);
+        compressedByteGaddag = expandedByteGaddagCompressor.minimize((ExpandedGaddag) expandedGaddag);
     }
 
     @ParameterizedTest
@@ -86,6 +90,12 @@ class GaddagConverterTest {
     @MethodSource("getArgumentsForTheTests")
     void executeTestCases_compressedGaddag(TestCase testCase) {
         executeTestCases(testCase, compressedGaddag);
+    }
+
+    @ParameterizedTest
+    @MethodSource("getArgumentsForTheTests")
+    void executeTestCases_compressedByteGaddag(TestCase testCase) {
+        executeTestCases(testCase, compressedByteGaddag);
     }
 
     private <A> void executeTestCases(TestCase testCase, Gaddag<A> gaddag) {

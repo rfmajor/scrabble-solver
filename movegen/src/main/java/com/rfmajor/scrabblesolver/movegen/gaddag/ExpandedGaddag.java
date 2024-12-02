@@ -59,24 +59,4 @@ public class ExpandedGaddag extends Gaddag<Long> {
     public boolean isPresent(Long arc) {
         return arc != null && arc != 0;
     }
-
-    public void printEmptyStates() {
-        long emptyStates = 0;
-        long emptyArcs = 0;
-        for (long[] state : arcs) {
-            boolean zeroState = true;
-            for (long arc : state) {
-                if (arc != 0) {
-                    zeroState = false;
-                } else {
-                    emptyArcs++;
-                }
-            }
-            if (zeroState) {
-                emptyStates++;
-            }
-        }
-        System.out.printf("Empty states: %d\n", emptyStates);
-        System.out.printf("Empty arcs: %d\n", emptyArcs);
-    }
 }

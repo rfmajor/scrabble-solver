@@ -48,7 +48,7 @@ public final class BitSetUtils {
             throw new IllegalArgumentException("Invalid value for bitshift");
         }
         int length = endIndex - startIndex;
-        return (bitSet & (((1L << length) - 1) << (Long.SIZE - endIndex))) >>> (Long.SIZE - endIndex);
+        return (bitSet & (((1L << length) - 1) << startIndex)) >>> startIndex;
     }
 
     public static long setBitsInRange(long bitSet, int startIndex, int /*exclusive*/ endIndex, long value) {
@@ -58,15 +58,33 @@ public final class BitSetUtils {
         int length = endIndex - startIndex;
         int valueBitLength = Long.SIZE - Long.numberOfLeadingZeros(value);
         if (valueBitLength > length) {
-            throw new IllegalArgumentException("Value too large to be saved in the given range");
+            throw new IllegalArgumentException(String.format(
+                    "Value %d with %d bit length too large to be saved in the given range (%d, %d)",
+                    value, valueBitLength, startIndex, endIndex));
         }
         bitSet = setZerosInRange(bitSet, startIndex, endIndex);
 
-        return bitSet | (value << (Long.SIZE - endIndex));
+        return bitSet | (value << startIndex);
+    }
+
+    public static long setBitsInRange(long bitSet, int startIndex, int /*exclusive*/ endIndex, byte value) {
+        if (startIndex < 0 || endIndex > Long.SIZE) {
+            throw new IllegalArgumentException("Invalid value for bitshift");
+        }
+//        int length = endIndex - startIndex;
+//        int valueBitLength = Long.SIZE - Long.numberOfLeadingZeros(value);
+//        if (valueBitLength > length) {
+//            throw new IllegalArgumentException(String.format(
+//                    "Value %d with %d bit length too large to be saved in the given range (%d, %d)",
+//                    value, valueBitLength, startIndex, endIndex));
+//        }
+        bitSet = setZerosInRange(bitSet, startIndex, endIndex);
+
+        return bitSet | ((long) value << startIndex);
     }
 
     public static long setZerosInRange(long bitSet, int startIndex, int endIndex) {
         int length = endIndex - startIndex;
-        return bitSet &  ~(((1L << length) - 1) << (Long.SIZE - endIndex));
+        return bitSet &  ~(((1L << length) - 1) << startIndex);
     }
 }

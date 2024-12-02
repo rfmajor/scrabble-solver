@@ -25,6 +25,7 @@ class GaddagTest {
     private Gaddag<Long> expandedGaddag;
     private Gaddag<Arc> simpleGaddag;
     private Gaddag<Long> compressedGaddag;
+    private Gaddag<Long> compressedByteGaddag;
     private Alphabet alphabet;
 
     private static final TestSet[] TEST_SETS = new TestSet[] {
@@ -53,10 +54,12 @@ class GaddagTest {
         GaddagConverter<Long> expandedGaddagConverter = new ExpandedGaddagConverter();
         GaddagConverter<Arc> simpleGaddagConverter = new SimpleGaddagConverter();
         ExpandedGaddagCompressor expandedGaddagCompressor = new ExpandedGaddagCompressor();
+        ExpandedGaddagByteArrayCompressor expandedGaddagByteArrayCompressor = new ExpandedGaddagByteArrayCompressor();
 
         expandedGaddag = expandedGaddagConverter.convert(words, alphabet);
         simpleGaddag = simpleGaddagConverter.convert(words, alphabet);
         compressedGaddag = expandedGaddagCompressor.minimize((ExpandedGaddag) expandedGaddag);
+        compressedByteGaddag = expandedGaddagByteArrayCompressor.minimize((ExpandedGaddag) expandedGaddag);
     }
 
     @ParameterizedTest
@@ -75,6 +78,12 @@ class GaddagTest {
     @MethodSource("getArgumentsForTesting")
     void executeTestCases_compressedGaddag(TestSet testSet) {
         executeTestSet(testSet, compressedGaddag);
+    }
+
+    @ParameterizedTest
+    @MethodSource("getArgumentsForTesting")
+    void executeTestCases_compressedByteGaddag(TestSet testSet) {
+        executeTestSet(testSet, compressedByteGaddag);
     }
 
     private <A> void executeTestSet(TestSet testSet, Gaddag<A> gaddag) {
