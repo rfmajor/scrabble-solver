@@ -6,12 +6,13 @@ import com.rfmajor.scrabblesolver.movegen.common.model.Alphabet;
 import static com.rfmajor.scrabblesolver.movegen.gaddag.ExpandedGaddagUtils.getDestinationStateId;
 import static com.rfmajor.scrabblesolver.movegen.gaddag.ExpandedGaddagUtils.getLetterBitMapId;
 
-public class CompressedGaddag extends Gaddag<Long> {
-    protected final long[] arcsAndStates;
+public class CompressedByteGaddag extends Gaddag<Long> {
+    protected final byte[] arcsAndStates;
 
     protected final int[] letterSets;
+    private static final int INDEX_MULTIPLIER = 5;
 
-    protected CompressedGaddag(Long rootArc, Alphabet alphabet, char delimiter, long[] arcsAndStates, int[] letterSets) {
+    protected CompressedByteGaddag(Long rootArc, Alphabet alphabet, char delimiter, byte[] arcsAndStates, int[] letterSets) {
         super(rootArc, alphabet, delimiter);
         this.arcsAndStates = arcsAndStates;
         this.letterSets = letterSets;
@@ -19,32 +20,32 @@ public class CompressedGaddag extends Gaddag<Long> {
 
     @Override
     public Long findNextArc(Long arc, char letter) {
-        int nextStateId = getDestinationStateId(arc);
-        long state = arcsAndStates[nextStateId];
+        int nextStateId = getDestinationStateId(arc) * INDEX_MULTIPLIER;
+        long state = getRecord(nextStateId);
         int letterIdx = alphabet.getIndex(letter);
-        int offset = getLetterOffset(state, letterIdx);
+        int offset = getLetterOffset(state, letterIdx) * INDEX_MULTIPLIER;
 
-        if (offset == -1 || nextStateId + offset >= arcsAndStates.length || nextStateId + offset < 0) {
+        if (offset < 0 || nextStateId + offset >= arcsAndStates.length || nextStateId + offset < 0) {
             return null;
         }
-        return arcsAndStates[nextStateId + offset];
+        return getRecord(nextStateId + offset);
     }
 
     @Override
     public boolean hasNextArc(Long arc, char letter) {
-        int nextStateId = getDestinationStateId(arc);
+        int nextStateId = getDestinationStateId(arc) * INDEX_MULTIPLIER;
         if (nextStateId >= arcsAndStates.length) {
             return false;
         }
-        long state = arcsAndStates[nextStateId];
-        if (state == 0 || getStateBitMap(state) == 0) {
+        long state = getRecord(nextStateId);
+        if (state ==0 || getStateBitMap(state) == 0) {
             return false;
         }
 
         int letterIdx = alphabet.getIndex(letter);
-        int offset = getLetterOffset(state, letterIdx);
+        int offset = getLetterOffset(state, letterIdx) * INDEX_MULTIPLIER;
 
-        if (offset == -1) {
+        if (offset < 0) {
             return false;
         }
         return nextStateId + offset < arcsAndStates.length;
@@ -67,8 +68,8 @@ public class CompressedGaddag extends Gaddag<Long> {
 
     @Override
     public boolean isLastArc(Long arc) {
-        int stateId = getDestinationStateId(arc);
-        long bitMap = getStateBitMap(arcsAndStates[stateId]);
+        int stateId = getDestinationStateId(arc) * INDEX_MULTIPLIER;
+        long bitMap = getStateBitMap(getRecord(stateId));
         return bitMap == 0;
     }
 
@@ -92,5 +93,24 @@ public class CompressedGaddag extends Gaddag<Long> {
             bitMap >>>= 1L;
         }
         return offset;
+    }
+
+    private long getRecord(int idx) {
+        byte[] subArray = getSubArray(idx);
+        return mergeBytes(subArray);
+    }
+
+    private byte[] getSubArray(int start) {
+        byte[] subArray = new byte[INDEX_MULTIPLIER];
+        System.arraycopy(arcsAndStates, start, subArray, 0, subArray.length);
+        return subArray;
+    }
+
+    private long mergeBytes(byte[] array) {
+        long result = 0L;
+        for (int i = 0; i < array.length; i++) {
+            result = BitSetUtils.setBitsInRange(result, i * 8, (i + 1) * 8, array[i]);
+        }
+        return result;
     }
 }

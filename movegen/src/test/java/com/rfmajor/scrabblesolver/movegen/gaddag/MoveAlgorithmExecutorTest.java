@@ -33,6 +33,7 @@ class MoveAlgorithmExecutorTest {
     private MoveAlgorithmExecutor<Long> expandedMoveAlgorithmExecutor;
     private MoveAlgorithmExecutor<Arc> simpleMoveAlgorithmExecutor;
     private MoveAlgorithmExecutor<Long> compressedMoveAlgorithmExecutor;
+    private MoveAlgorithmExecutor<Long> compressedByteMoveAlgorithmExecutor;
 
     private static final ObjectMapper objectMapper = new ObjectMapper();
     private static final String[] TEST_FILENAMES = new String[]{
@@ -62,14 +63,17 @@ class MoveAlgorithmExecutorTest {
         GaddagConverter<Arc> simpleGaddagConverter = new SimpleGaddagConverter();
         ExpandedGaddagConverter expandedGaddagConverter = new ExpandedGaddagConverter();
         ExpandedGaddagCompressor expandedGaddagCompressor = new ExpandedGaddagCompressor();
+        ExpandedGaddagByteArrayCompressor expandedGaddagByteArrayCompressor = new ExpandedGaddagByteArrayCompressor();
 
         Gaddag<Arc> simpleGaddag = simpleGaddagConverter.convert(words, alphabet);
         Gaddag<Long> expandedGaddag = expandedGaddagConverter.convert(words, alphabet);
         Gaddag<Long> compressedGaddag = expandedGaddagCompressor.minimize((ExpandedGaddag) (expandedGaddag));
+        Gaddag<Long> compressedByteGaddag = expandedGaddagByteArrayCompressor.minimize((ExpandedGaddag) expandedGaddag);
 
         expandedMoveAlgorithmExecutor = new MoveAlgorithmExecutor<>(board, expandedGaddag, Direction.ACROSS);
         simpleMoveAlgorithmExecutor = new MoveAlgorithmExecutor<>(board, simpleGaddag, Direction.ACROSS);
         compressedMoveAlgorithmExecutor = new MoveAlgorithmExecutor<>(board, compressedGaddag, Direction.ACROSS);
+        compressedByteMoveAlgorithmExecutor = new MoveAlgorithmExecutor<>(board, compressedByteGaddag, Direction.ACROSS);
     }
 
     @BeforeEach
@@ -93,6 +97,12 @@ class MoveAlgorithmExecutorTest {
     @MethodSource("getAllTestSets")
     void executeTestCases_compressedGaddag(TestSet testSet) {
         executeTestCase(testSet, compressedMoveAlgorithmExecutor);
+    }
+
+    @ParameterizedTest
+    @MethodSource("getAllTestSets")
+    void executeTestCases_compressedByteGaddag(TestSet testSet) {
+        executeTestCase(testSet, compressedByteMoveAlgorithmExecutor);
     }
 
     private <A> void executeTestCase(TestSet testSet, MoveAlgorithmExecutor<A> algorithmExecutor) {
