@@ -15,7 +15,8 @@ compileJava {
 }
 
 dependencies {
-    implementation project(':movegen')
+    implementation project(':gaddag-converter')
+    implementation project(':common')
 
     implementation(libs.spring.boot.starter)
     implementation(libs.spring.boot.starter.web)

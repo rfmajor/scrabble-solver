@@ -1,7 +1,7 @@
 package com.rfmajor.scrabblesolver.server.web.mapper;
 
-import com.rfmajor.scrabblesolver.movegen.common.model.Field;
-import com.rfmajor.scrabblesolver.movegen.common.model.Move;
+import com.rfmajor.scrabblesolver.common.scrabble.Field;
+import com.rfmajor.scrabblesolver.common.scrabble.Move;
 import com.rfmajor.scrabblesolver.server.web.service.MoveDto;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;

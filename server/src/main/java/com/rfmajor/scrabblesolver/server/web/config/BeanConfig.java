@@ -2,12 +2,12 @@ package com.rfmajor.scrabblesolver.server.web.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
-import com.rfmajor.scrabblesolver.movegen.common.PointCalculator;
-import com.rfmajor.scrabblesolver.movegen.common.model.SpecialFields;
-import com.rfmajor.scrabblesolver.movegen.gaddag.ExpandedGaddagConverter;
-import com.rfmajor.scrabblesolver.movegen.gaddag.SimpleGaddagConverter;
-import com.rfmajor.scrabblesolver.movegen.input.DictionaryReader;
-import com.rfmajor.scrabblesolver.movegen.input.SpecialFieldsReader;
+import com.rfmajor.scrabblesolver.common.scrabble.SpecialFields;
+import com.rfmajor.scrabblesolver.common.gaddag.calculate.PointCalculator;
+import com.rfmajor.scrabblesolver.common.gaddag.convert.ExpandedGaddagConverter;
+import com.rfmajor.scrabblesolver.common.gaddag.convert.SimpleGaddagConverter;
+import com.rfmajor.scrabblesolver.gaddag.converter.input.DictionaryReader;
+import com.rfmajor.scrabblesolver.gaddag.converter.input.SpecialFieldsReader;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
