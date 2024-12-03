@@ -33,17 +33,19 @@ class GaddagTest {
     private Gaddag<Long> compressedByteGaddag;
     private Alphabet alphabet;
 
-    private static final TestSet[] TEST_SETS = new TestSet[] {
-            new TestSet("One word",
-                    new TestCase("p#ar", null, 't', 'k'),
-                    new TestCase("ap#r", null, 't', 'k'),
-                    new TestCase("rap#", null, 't', 'k')
+    private static final CompletionTestSet[] COMPLETION_TEST_SETS = new CompletionTestSet[] {
+            new CompletionTestSet("One word",
+                    new CompletionTestCase("p#ar", null, 't', 'k'),
+                    new CompletionTestCase("ap#r", null, 't', 'k'),
+                    new CompletionTestCase("rap#", null, 't', 'k'),
+                    new CompletionTestCase("p#a", null, 'y', 'r'),
+                    new CompletionTestCase("ap#", null, 'y', 'r')
             ),
-            new TestSet("Two words",
-                    new TestCase("ap#", "able", 'r', 'y')
+            new CompletionTestSet("Two words",
+                    new CompletionTestCase("ap#", "able", 'r', 'y')
             ),
-            new TestSet("One letter",
-                    new TestCase("p", null, 'o')
+            new CompletionTestSet("One letter",
+                    new CompletionTestCase("p", null, 'o')
             )
     };
 
@@ -68,42 +70,42 @@ class GaddagTest {
     }
 
     @ParameterizedTest
-    @MethodSource("getArgumentsForTesting")
-    void executeTestCases_simpleGaddag(TestSet testSet) {
-        executeTestSet(testSet, simpleGaddag);
+    @MethodSource("getArgumentsForCompletionTesting")
+    void executeCompletionTestCases_simpleGaddag(CompletionTestSet completionTestSet) {
+        executeCompletionTestSet(completionTestSet, simpleGaddag);
     }
 
     @ParameterizedTest
-    @MethodSource("getArgumentsForTesting")
-    void executeTestCases_expandedGaddag(TestSet testSet) {
-        executeTestSet(testSet, expandedGaddag);
+    @MethodSource("getArgumentsForCompletionTesting")
+    void executeCompletionTestCases_expandedGaddag(CompletionTestSet completionTestSet) {
+        executeCompletionTestSet(completionTestSet, expandedGaddag);
     }
 
     @ParameterizedTest
-    @MethodSource("getArgumentsForTesting")
-    void executeTestCases_compressedGaddag(TestSet testSet) {
-        executeTestSet(testSet, compressedGaddag);
+    @MethodSource("getArgumentsForCompletionTesting")
+    void executeCompletionTestCases_compressedGaddag(CompletionTestSet completionTestSet) {
+        executeCompletionTestSet(completionTestSet, compressedGaddag);
     }
 
     @ParameterizedTest
-    @MethodSource("getArgumentsForTesting")
-    void executeTestCases_compressedByteGaddag(TestSet testSet) {
-        executeTestSet(testSet, compressedByteGaddag);
+    @MethodSource("getArgumentsForCompletionTesting")
+    void executeCompletionTestCases_compressedByteGaddag(CompletionTestSet completionTestSet) {
+        executeCompletionTestSet(completionTestSet, compressedByteGaddag);
     }
 
-    private <A> void executeTestSet(TestSet testSet, Gaddag<A> gaddag) {
-        assertNotNull(testSet);
+    private <A> void executeCompletionTestSet(CompletionTestSet completionTestSet, Gaddag<A> gaddag) {
+        assertNotNull(completionTestSet);
 
-        assertAll(Arrays.stream(testSet.testCases)
-                .map(testCase -> () -> {
+        assertAll(Arrays.stream(completionTestSet.completionTestCases)
+                .map(completionTestCase -> () -> {
                     int bitSet;
-                    if (testCase.word2 == null) {
-                        bitSet = gaddag.getOneLetterCompletion(testCase.word1);
+                    if (completionTestCase.word2 == null) {
+                        bitSet = gaddag.getOneLetterCompletion(completionTestCase.word1);
                     } else {
-                        bitSet = gaddag.getOneLetterCompletion(testCase.word1, testCase.word2);
+                        bitSet = gaddag.getOneLetterCompletion(completionTestCase.word1, completionTestCase.word2);
                     }
-                    int[] expectedIndices = IntStream.range(0, testCase.expected.length)
-                            .mapToObj(i -> testCase.expected[i])
+                    int[] expectedIndices = IntStream.range(0, completionTestCase.expected.length)
+                            .mapToObj(i -> completionTestCase.expected[i])
                             .map(alphabet::getIndex)
                             .mapToInt(Integer::intValue)
                             .toArray();
@@ -112,12 +114,12 @@ class GaddagTest {
         );
     }
 
-    private static Stream<Arguments> getArgumentsForTesting() {
-        return Arrays.stream(TEST_SETS)
-                .map(testSet -> Named.of(testSet.name, testSet))
+    private static Stream<Arguments> getArgumentsForCompletionTesting() {
+        return Arrays.stream(COMPLETION_TEST_SETS)
+                .map(completionTestSet -> Named.of(completionTestSet.name, completionTestSet))
                 .map(Arguments::of);
     }
 
-    private record TestSet(String name, TestCase... testCases) {}
-    private record TestCase(String word1, String word2, char... expected) {}
+    private record CompletionTestSet(String name, CompletionTestCase... completionTestCases) {}
+    private record CompletionTestCase(String word1, String word2, char... expected) {}
 }
