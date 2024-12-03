@@ -44,40 +44,67 @@ public final class BitSetUtils {
     }
 
     public static long getBitsInRange(long bitSet, int startIndex, int /*exclusive*/ endIndex) {
-        if (startIndex < 0 || endIndex > Long.SIZE) {
-            throw new IllegalArgumentException("Invalid value for bitshift");
-        }
+        validateRangeValues(startIndex, endIndex);
+
         int length = endIndex - startIndex;
         return (bitSet & (((1L << length) - 1) << startIndex)) >>> startIndex;
     }
 
     public static long setBitsInRange(long bitSet, int startIndex, int /*exclusive*/ endIndex, long value) {
-        if (startIndex < 0 || endIndex > Long.SIZE) {
-            throw new IllegalArgumentException("Invalid value for bitshift");
-        }
-        int length = endIndex - startIndex;
+        validateRangeValues(startIndex, endIndex);
+
         int valueBitLength = Long.SIZE - Long.numberOfLeadingZeros(value);
-        if (valueBitLength > length) {
-            throw new IllegalArgumentException(String.format(
-                    "Value %d with %d bit length too large to be saved in the given range (%d, %d)",
-                    value, valueBitLength, startIndex, endIndex));
-        }
+        validateValueLength(valueBitLength, startIndex, endIndex, value);
+
         bitSet = setZerosInRange(bitSet, startIndex, endIndex);
 
         return bitSet | (value << startIndex);
     }
 
     public static long setBitsInRange(long bitSet, int startIndex, int /*exclusive*/ endIndex, byte value) {
-        if (startIndex < 0 || endIndex > Long.SIZE) {
-            throw new IllegalArgumentException("Invalid value for bitshift");
-        }
+        validateRangeValues(startIndex, endIndex);
+
+        int valueBitLength = getNonPaddedBitLengthOfValue(value);
+        validateValueLength(valueBitLength, startIndex, endIndex, value);
+
         bitSet = setZerosInRange(bitSet, startIndex, endIndex);
 
-        return bitSet | ((long) value << startIndex);
+        return bitSet | (Byte.toUnsignedLong(value) << startIndex);
     }
 
     public static long setZerosInRange(long bitSet, int startIndex, int endIndex) {
         int length = endIndex - startIndex;
         return bitSet &  ~(((1L << length) - 1) << startIndex);
+    }
+
+    private static void validateRangeValues(int startIndex, int endIndex) {
+        if (startIndex < 0 || endIndex < 0 || startIndex > Long.SIZE || endIndex > Long.SIZE) {
+            throw new IllegalArgumentException("Invalid value for bitshift");
+        }
+
+        if (startIndex >= endIndex) {
+            throw new IllegalArgumentException("Start index needs to be less than the end index");
+        }
+    }
+
+    private static void validateValueLength(int valueLength, int startIndex, int endIndex, long value) {
+        int maximumLength = endIndex - startIndex;
+        if (valueLength > maximumLength) {
+            throw new IllegalArgumentException(String.format(
+                    "Value %d with %d bit length too large to be saved in the given range (%d, %d)",
+                    value, valueLength, startIndex, endIndex));
+        }
+    }
+
+    private static int getNonPaddedBitLengthOfValue(byte value) {
+        if (value == 0) {
+            return 0;
+        }
+        int length = 8;
+        while ((0b1 << 7 & value) == 0) {
+            value <<= 1;
+            length--;
+        }
+        return length;
     }
 }

@@ -39,13 +39,30 @@ public final class CompressedGaddagUtils {
         return count;
     }
 
-    public static byte[] getSubArray(int start, byte[] original) {
+    public static int getLetterOffset(long state, int letterIdx, int alphabetSize) {
+        long bitMap = getStateBitMap(state, alphabetSize);
+        if ((bitMap & (1L << letterIdx)) == 0L) {
+            return -1;
+        }
+        int offset = 1;
+        for (int i = 0; i < letterIdx; i++) {
+            offset += (int) (bitMap & 1L);
+            bitMap >>>= 1L;
+        }
+        return offset;
+    }
+
+    public static long getStateBitMap(long state, int alphabetSize) {
+        return BitSetUtils.getBitsInRange(state, 0, alphabetSize);
+    }
+
+    private static byte[] getSubArray(int start, byte[] original) {
         byte[] subArray = new byte[INDEX_MULTIPLIER];
         System.arraycopy(original, start, subArray, 0, subArray.length);
         return subArray;
     }
 
-    public static long mergeBytes(byte[] array) {
+    private static long mergeBytes(byte[] array) {
         long result = 0L;
         for (int i = 0; i < array.length; i++) {
             result = BitSetUtils.setBitsInRange(result, i * 8, (i + 1) * 8, array[i]);
