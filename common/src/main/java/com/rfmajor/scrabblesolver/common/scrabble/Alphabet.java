@@ -1,27 +1,34 @@
 package com.rfmajor.scrabblesolver.common.scrabble;
 
-import com.google.common.collect.BiMap;
-import com.google.common.collect.ImmutableBiMap;
-import com.google.common.collect.ImmutableMap;
 import com.rfmajor.scrabblesolver.common.gaddag.utils.BitSetUtils;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class Alphabet {
-    private final BiMap<Character, Integer> lettersToIndices;
-    private final Map<Character, Integer> lettersToPoints;
-    private final Map<Character, Integer> lettersToQuantities;
+    private final Map<Character, Integer> lettersToIndices;
+    private final char[] indicesToLetters;
+    private final int[] indicesToPoints;
+    private final int[] indicesToQuantities;
 
     public Alphabet(List<Character> letters, List<Integer> points, List<Integer> quantities) {
-        this.lettersToIndices = ImmutableBiMap.copyOf(mapLettersToIndices(letters));
-        this.lettersToPoints = ImmutableMap.copyOf(mapLettersToNumericValues(letters, points));
-        this.lettersToQuantities = ImmutableMap.copyOf(mapLettersToNumericValues(letters, quantities));
+        this.lettersToIndices = new HashMap<>();
+        this.indicesToLetters = new char[letters.size()];
+        this.indicesToPoints = new int[letters.size()];
+        this.indicesToQuantities = new int[letters.size()];
+        mapLetters(letters, points, quantities);
+    }
+
+    private void mapLetters(List<Character> letters, List<Integer> points, List<Integer> quantities) {
+        for (int i = 0; i < letters.size(); i++) {
+            char letter = letters.get(i);
+            lettersToIndices.put(letter, i);
+            indicesToLetters[i] = letter;
+            indicesToPoints[i] = i < points.size() ? points.get(i) : 0;
+            indicesToQuantities[i] = i < quantities.size() ? quantities.get(i) : 0;
+        }
     }
 
     public int getDelimiterIndex() {
@@ -29,7 +36,7 @@ public class Alphabet {
     }
 
     public char getDelimiter() {
-        return lettersToIndices.inverse().get(getDelimiterIndex());
+        return indicesToLetters[getDelimiterIndex()];
     }
 
     public char getLetter(int index) {
@@ -37,11 +44,12 @@ public class Alphabet {
             throw new IllegalArgumentException(
                     String.format("Index %d is not present in the alphabet", index));
         }
-        return lettersToIndices.inverse().get(index);
+        return indicesToLetters[index];
     }
 
     public int getPoints(char letter) {
-        return lettersToPoints.getOrDefault(letter, 0);
+        int index = lettersToIndices.get(letter);
+        return indicesToPoints[index];
     }
 
     public Set<Character> letterSet() {
@@ -64,19 +72,6 @@ public class Alphabet {
         return lettersToIndices.containsKey(letter);
     }
 
-    private static Map<Character, Integer> mapLettersToIndices(List<Character> letters) {
-        return Stream.iterate(0, i -> i < letters.size(), i -> i + 1)
-                        .collect(Collectors.toMap(letters::get, Function.identity()));
-    }
-
-    private static Map<Character, Integer> mapLettersToNumericValues(List<Character> letters, List<Integer> values) {
-        Map<Character, Integer> lettersToPoints = new HashMap<>();
-        for (int i = 0; i < letters.size() && i < values.size(); i++) {
-            lettersToPoints.put(letters.get(i), values.get(i));
-        }
-        return lettersToPoints;
-    }
-
     public boolean isLegalWord(String line) {
         for (int i = 0; i < line.length(); i++) {
             if (!containsLetter(line.charAt(i))) {
@@ -90,9 +85,5 @@ public class Alphabet {
         return lettersToIndices.keySet().stream()
                 .filter(letter -> BitSetUtils.contains(letterSet, getIndex(letter)))
                 .toList();
-    }
-
-    public Map<Character, Integer> getLettersToQuantities() {
-        return new HashMap<>(lettersToQuantities);
     }
 }

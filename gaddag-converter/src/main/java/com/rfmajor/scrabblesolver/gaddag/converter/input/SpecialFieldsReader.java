@@ -17,7 +17,8 @@ public class SpecialFieldsReader {
     private String fileName;
 
     public SpecialFields read() throws IOException {
-        SpecialFieldsUnparsed specialFieldsUnparsed = objectMapper.readValue(getClass().getResource(fileName), SpecialFieldsUnparsed.class);
+        SpecialFieldsUnparsed specialFieldsUnparsed =
+                objectMapper.readValue(getClass().getResource(fileName), SpecialFieldsUnparsed.class);
         return SpecialFields.builder()
                 .doubleLetterFields(mapFields(specialFieldsUnparsed.getDoubleLetterFields()))
                 .tripleLetterFields(mapFields(specialFieldsUnparsed.getTripleLetterFields()))

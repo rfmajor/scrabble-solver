@@ -5,10 +5,10 @@ import com.rfmajor.scrabblesolver.common.scrabble.Board;
 import com.rfmajor.scrabblesolver.common.gaddag.model.CompressedByteGaddag;
 import com.rfmajor.scrabblesolver.common.gaddag.model.ExpandedGaddag;
 import com.rfmajor.scrabblesolver.common.gaddag.model.Gaddag;
-import com.rfmajor.scrabblesolver.gaddag.converter.gaddag.CompressedGaddagFileWriter;
+import com.rfmajor.scrabblesolver.common.gaddag.export.CompressedGaddagFileExporter;
 import com.rfmajor.scrabblesolver.common.gaddag.convert.ExpandedGaddagByteArrayCompressor;
 import com.rfmajor.scrabblesolver.common.gaddag.convert.ExpandedGaddagConverter;
-import com.rfmajor.scrabblesolver.gaddag.converter.gaddag.FileWordIterable;
+import com.rfmajor.scrabblesolver.common.gaddag.export.FileWordIterable;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -44,8 +44,8 @@ public class Main {
             throw new RuntimeException(e);
         }
         CompressedByteGaddag compressedGaddag = expandedGaddagByteArrayCompressor.minimize((ExpandedGaddag) expandedGaddag);
-        CompressedGaddagFileWriter writer = new CompressedGaddagFileWriter();
-        writer.write(compressedGaddag);
+        CompressedGaddagFileExporter writer = new CompressedGaddagFileExporter();
+        writer.export(compressedGaddag, "gaddag.bin");
     }
 
     public static List<Character> mapStringToLettersList(String letters) {

@@ -1,6 +1,5 @@
 package com.rfmajor.scrabblesolver.common.scrabble;
 
-import com.rfmajor.scrabblesolver.common.scrabble.Board;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -26,8 +25,7 @@ class BoardTest {
     @Test
     void givenBoardWithAddedLetter_whenAddLetterToAlreadyOccupiedField_thenThrowException() {
         board.addLetter('f', 1, 2);
-        assertThrows(Board.LetterAlreadyPresentException.class,
-                () -> board.addLetter('c', 1, 2));
+        assertThrows(IllegalArgumentException.class, () -> board.addLetter('c', 1, 2));
     }
 
     @Test

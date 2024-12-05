@@ -20,7 +20,7 @@ public class PointCalculator {
 
     public <A> void calculatePoints(Set<Move> moves, MoveGenerator<A> moveGenerator, Rack rack, Set<Field> blankFields) {
         Set<Move> invalidMoves = new HashSet<>();
-        moves.forEach(move -> calculatePoints(
+        moves.forEach(move -> calculatePointsInternal(
                 move, moveGenerator.getBoard(),
                 moveGenerator.getTransposedBoard(),
                 moveGenerator.getAlphabet(),
@@ -29,8 +29,8 @@ public class PointCalculator {
         moves.removeAll(invalidMoves);
     }
 
-    private void calculatePoints(Move move, Board board, Board transposedBoard, Alphabet alphabet,
-                                 Rack rack, Set<Move> invalidMoves, Set<Field> blankFields) {
+    private void calculatePointsInternal(Move move, Board board, Board transposedBoard, Alphabet alphabet,
+                                         Rack rack, Set<Move> invalidMoves, Set<Field> blankFields) {
         if (move.getDirection() == Direction.DOWN) {
             board = transposedBoard;
         }

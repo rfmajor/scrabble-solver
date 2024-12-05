@@ -1,4 +1,4 @@
-package com.rfmajor.scrabblesolver.gaddag.converter.gaddag;
+package com.rfmajor.scrabblesolver.common.gaddag.export;
 
 import java.io.File;
 import java.io.FileInputStream;

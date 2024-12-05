@@ -5,6 +5,8 @@ import com.rfmajor.scrabblesolver.common.gaddag.utils.BitSetUtils;
 import com.rfmajor.scrabblesolver.common.scrabble.Alphabet;
 import lombok.Getter;
 
+import java.io.Serializable;
+
 import static com.rfmajor.scrabblesolver.common.gaddag.utils.CompressedGaddagUtils.INDEX_MULTIPLIER;
 import static com.rfmajor.scrabblesolver.common.gaddag.utils.CompressedGaddagUtils.getLetterOffset;
 import static com.rfmajor.scrabblesolver.common.gaddag.utils.CompressedGaddagUtils.getRecord;
@@ -13,8 +15,8 @@ import static com.rfmajor.scrabblesolver.common.gaddag.utils.ExpandedGaddagUtils
 import static com.rfmajor.scrabblesolver.common.gaddag.utils.ExpandedGaddagUtils.getLetterBitMapId;
 
 @Getter
-public class CompressedByteGaddag extends Gaddag<Long> {
-    protected final byte[] arcsAndStates;
+public class CompressedByteGaddag extends Gaddag<Long> implements Serializable {
+    protected final transient byte[] arcsAndStates;
     protected final int[] letterSets;
 
     public CompressedByteGaddag(Long rootArc, Alphabet alphabet, char delimiter, byte[] arcsAndStates, int[] letterSets) {

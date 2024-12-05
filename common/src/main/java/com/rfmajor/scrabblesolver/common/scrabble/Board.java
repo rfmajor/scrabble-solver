@@ -126,7 +126,7 @@ public class Board {
 
     public void addLetter(char letter, int x, int y) {
         if (!isEmpty(x, y)) {
-            throw new LetterAlreadyPresentException("Letter %s is already present on field (%d, %d)"
+            throw new IllegalArgumentException("Letter %s is already present on field (%d, %d)"
                     .formatted(letter, x, y));
         }
         fields[x][y] = letter;
@@ -144,12 +144,6 @@ public class Board {
             }
         }
         return new Board(transposedFields, emptyChar);
-    }
-
-    public static class LetterAlreadyPresentException extends RuntimeException {
-        public LetterAlreadyPresentException(String message) {
-            super(message);
-        }
     }
 
     private void fillBoardWithEmptyChars() {
