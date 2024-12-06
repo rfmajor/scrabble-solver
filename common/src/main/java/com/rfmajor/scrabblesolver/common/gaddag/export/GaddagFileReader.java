@@ -14,7 +14,7 @@ import static com.rfmajor.scrabblesolver.common.gaddag.utils.ByteStreamUtils.MET
 
 @Slf4j
 public class GaddagFileReader implements GaddagReader {
-
+    @Override
     public CompressedByteGaddag read(String directoryPath) {
         Path gaddagFile = Paths.get(directoryPath, GADDAG_FILENAME);
         Path metadataFile = Paths.get(directoryPath, METADATA_FILENAME);

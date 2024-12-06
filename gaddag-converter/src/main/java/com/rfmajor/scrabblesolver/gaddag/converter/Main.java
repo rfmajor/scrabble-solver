@@ -17,7 +17,8 @@ import java.util.List;
 
 public class Main {
     public static void main(String[] args) throws IOException {
-        executeRead(args);
+//        executeRead(args);
+        executeCompression(args);
     }
 
     public static List<Character> mapStringToLettersList(String letters) {
