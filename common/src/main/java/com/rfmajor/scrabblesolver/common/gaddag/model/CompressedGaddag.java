@@ -1,7 +1,9 @@
 package com.rfmajor.scrabblesolver.common.gaddag.model;
 
-import com.rfmajor.scrabblesolver.common.scrabble.Alphabet;
 import com.rfmajor.scrabblesolver.common.gaddag.utils.BitSetUtils;
+import com.rfmajor.scrabblesolver.common.scrabble.Alphabet;
+
+import java.util.Arrays;
 
 import static com.rfmajor.scrabblesolver.common.gaddag.utils.CompressedGaddagUtils.getLetterOffset;
 import static com.rfmajor.scrabblesolver.common.gaddag.utils.CompressedGaddagUtils.getStateBitMap;
@@ -77,5 +79,23 @@ public class CompressedGaddag extends Gaddag<Long> {
     @Override
     public boolean isPresent(Long arc) {
         return arc != null;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+        CompressedGaddag that = (CompressedGaddag) o;
+        return Arrays.equals(arcsAndStates, that.arcsAndStates) &&
+                Arrays.equals(letterSets, that.letterSets);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = super.hashCode();
+        result = 31 * result + Arrays.hashCode(arcsAndStates);
+        result = 31 * result + Arrays.hashCode(letterSets);
+        return result;
     }
 }

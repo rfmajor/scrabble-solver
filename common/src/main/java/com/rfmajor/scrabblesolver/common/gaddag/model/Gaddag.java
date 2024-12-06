@@ -1,8 +1,10 @@
 package com.rfmajor.scrabblesolver.common.gaddag.model;
 
-import com.rfmajor.scrabblesolver.common.scrabble.Alphabet;
 import com.rfmajor.scrabblesolver.common.gaddag.utils.BitSetUtils;
+import com.rfmajor.scrabblesolver.common.scrabble.Alphabet;
 import lombok.Getter;
+
+import java.util.Objects;
 
 @Getter
 public abstract class Gaddag<A> {
@@ -62,6 +64,21 @@ public abstract class Gaddag<A> {
         }
 
         return vector;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Gaddag<?> gaddag = (Gaddag<?>) o;
+        return delimiter == gaddag.delimiter &&
+                Objects.equals(rootArc, gaddag.rootArc) &&
+                Objects.equals(alphabet, gaddag.alphabet);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(rootArc, alphabet, delimiter);
     }
 
     private boolean hasWordCompletion(A arc, String word) {

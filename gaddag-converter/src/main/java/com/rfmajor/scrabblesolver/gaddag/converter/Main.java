@@ -2,8 +2,8 @@ package com.rfmajor.scrabblesolver.gaddag.converter;
 
 import com.rfmajor.scrabblesolver.common.gaddag.convert.ExpandedGaddagByteArrayCompressor;
 import com.rfmajor.scrabblesolver.common.gaddag.convert.ExpandedGaddagConverter;
-import com.rfmajor.scrabblesolver.common.gaddag.export.CompressedGaddagFileExporter;
-import com.rfmajor.scrabblesolver.common.gaddag.export.CompressedGaddagFileReader;
+import com.rfmajor.scrabblesolver.common.gaddag.export.GaddagFileExporter;
+import com.rfmajor.scrabblesolver.common.gaddag.export.GaddagFileReader;
 import com.rfmajor.scrabblesolver.common.gaddag.export.FileWordIterable;
 import com.rfmajor.scrabblesolver.common.gaddag.model.CompressedByteGaddag;
 import com.rfmajor.scrabblesolver.common.gaddag.model.ExpandedGaddag;
@@ -25,7 +25,7 @@ public class Main {
     }
 
     private static void executeRead(String[] args) {
-        CompressedGaddagFileReader reader = new CompressedGaddagFileReader();
+        GaddagFileReader reader = new GaddagFileReader();
         CompressedByteGaddag gaddag = reader.read("output");
     }
 
@@ -58,7 +58,7 @@ public class Main {
             throw new RuntimeException(e);
         }
         CompressedByteGaddag compressedGaddag = expandedGaddagByteArrayCompressor.minimize((ExpandedGaddag) expandedGaddag);
-        CompressedGaddagFileExporter writer = new CompressedGaddagFileExporter();
+        GaddagFileExporter writer = new GaddagFileExporter();
         writer.export(compressedGaddag, "output");
     }
 }

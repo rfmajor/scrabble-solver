@@ -3,9 +3,11 @@ package com.rfmajor.scrabblesolver.common.scrabble;
 import com.rfmajor.scrabblesolver.common.gaddag.utils.BitSetUtils;
 import com.rfmajor.scrabblesolver.common.gaddag.utils.ExportingUtils;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 public class Alphabet {
@@ -100,6 +102,26 @@ public class Alphabet {
         System.arraycopy(indicesToQuantitiesBytes, 0, bytes, indicesToPointsBytes.length, indicesToQuantitiesBytes.length);
 
         return bytes;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Alphabet alphabet = (Alphabet) o;
+        return Objects.equals(lettersToIndices, alphabet.lettersToIndices) &&
+                Arrays.equals(indicesToLetters, alphabet.indicesToLetters) &&
+                Arrays.equals(indicesToPoints, alphabet.indicesToPoints) &&
+                Arrays.equals(indicesToQuantities, alphabet.indicesToQuantities);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = Objects.hash(lettersToIndices);
+        result = 31 * result + Arrays.hashCode(indicesToLetters);
+        result = 31 * result + Arrays.hashCode(indicesToPoints);
+        result = 31 * result + Arrays.hashCode(indicesToQuantities);
+        return result;
     }
 
     private void init(List<Character> letters, List<Integer> points, List<Integer> quantities) {
