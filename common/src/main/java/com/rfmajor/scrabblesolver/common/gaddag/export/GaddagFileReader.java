@@ -9,8 +9,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.zip.GZIPInputStream;
 
-import static com.rfmajor.scrabblesolver.common.gaddag.utils.ExportingUtils.GADDAG_FILENAME;
-import static com.rfmajor.scrabblesolver.common.gaddag.utils.ExportingUtils.METADATA_FILENAME;
+import static com.rfmajor.scrabblesolver.common.gaddag.utils.ByteStreamUtils.GADDAG_FILENAME;
+import static com.rfmajor.scrabblesolver.common.gaddag.utils.ByteStreamUtils.METADATA_FILENAME;
 
 @Slf4j
 public class GaddagFileReader implements GaddagReader {

@@ -1,7 +1,7 @@
 package com.rfmajor.scrabblesolver.common.scrabble;
 
 import com.rfmajor.scrabblesolver.common.gaddag.utils.BitSetUtils;
-import com.rfmajor.scrabblesolver.common.gaddag.utils.ExportingUtils;
+import com.rfmajor.scrabblesolver.common.gaddag.utils.ByteStreamUtils;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -91,9 +91,9 @@ public class Alphabet {
     }
 
     public byte[] asByteArray() {
-        byte[] indicesToLettersBytes = ExportingUtils.charArrayToBytes(indicesToLetters);
-        byte[] indicesToPointsBytes = ExportingUtils.intArrayToBytes(indicesToPoints);
-        byte[] indicesToQuantitiesBytes = ExportingUtils.intArrayToBytes(indicesToQuantities);
+        byte[] indicesToLettersBytes = ByteStreamUtils.charArrayToBytes(indicesToLetters);
+        byte[] indicesToPointsBytes = ByteStreamUtils.intArrayToBytes(indicesToPoints);
+        byte[] indicesToQuantitiesBytes = ByteStreamUtils.intArrayToBytes(indicesToQuantities);
 
         byte[] bytes = new byte[indicesToLettersBytes.length + indicesToPointsBytes.length + indicesToQuantitiesBytes.length];
 

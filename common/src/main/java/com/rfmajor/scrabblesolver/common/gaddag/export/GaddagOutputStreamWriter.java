@@ -1,7 +1,7 @@
 package com.rfmajor.scrabblesolver.common.gaddag.export;
 
 import com.rfmajor.scrabblesolver.common.gaddag.model.CompressedByteGaddag;
-import com.rfmajor.scrabblesolver.common.gaddag.utils.ExportingUtils;
+import com.rfmajor.scrabblesolver.common.gaddag.utils.ByteStreamUtils;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
@@ -11,11 +11,11 @@ import java.nio.charset.StandardCharsets;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import static com.rfmajor.scrabblesolver.common.gaddag.utils.ExportingUtils.ALPHABET;
-import static com.rfmajor.scrabblesolver.common.gaddag.utils.ExportingUtils.ARCS_AND_STATES;
-import static com.rfmajor.scrabblesolver.common.gaddag.utils.ExportingUtils.DELIMITER;
-import static com.rfmajor.scrabblesolver.common.gaddag.utils.ExportingUtils.LETTER_SETS;
-import static com.rfmajor.scrabblesolver.common.gaddag.utils.ExportingUtils.ROOT_ARC;
+import static com.rfmajor.scrabblesolver.common.gaddag.utils.ByteStreamUtils.ALPHABET;
+import static com.rfmajor.scrabblesolver.common.gaddag.utils.ByteStreamUtils.ARCS_AND_STATES;
+import static com.rfmajor.scrabblesolver.common.gaddag.utils.ByteStreamUtils.DELIMITER;
+import static com.rfmajor.scrabblesolver.common.gaddag.utils.ByteStreamUtils.LETTER_SETS;
+import static com.rfmajor.scrabblesolver.common.gaddag.utils.ByteStreamUtils.ROOT_ARC;
 
 @Slf4j
 public class GaddagOutputStreamWriter {
@@ -25,10 +25,10 @@ public class GaddagOutputStreamWriter {
         Map<String, Integer> lengthsMap = new LinkedHashMap<>();
         Map<String, byte[]> byteData = new LinkedHashMap<>();
 
-        byteData.put(ROOT_ARC, ExportingUtils.longToBytes(compressedByteGaddag.getRootArc()));
+        byteData.put(ROOT_ARC, ByteStreamUtils.longToBytes(compressedByteGaddag.getRootArc()));
         byteData.put(ALPHABET, compressedByteGaddag.getAlphabet().asByteArray());
-        byteData.put(DELIMITER, ExportingUtils.charToBytes(compressedByteGaddag.getDelimiter()));
-        byteData.put(LETTER_SETS, ExportingUtils.intArrayToBytes(compressedByteGaddag.getLetterSets()));
+        byteData.put(DELIMITER, ByteStreamUtils.charToBytes(compressedByteGaddag.getDelimiter()));
+        byteData.put(LETTER_SETS, ByteStreamUtils.intArrayToBytes(compressedByteGaddag.getLetterSets()));
         byteData.put(ARCS_AND_STATES, compressedByteGaddag.getArcsAndStates());
 
         try (gaddagOutputStream) {

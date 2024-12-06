@@ -1,7 +1,7 @@
 package com.rfmajor.scrabblesolver.common.gaddag.export;
 
 import com.rfmajor.scrabblesolver.common.gaddag.model.CompressedByteGaddag;
-import com.rfmajor.scrabblesolver.common.gaddag.utils.ExportingUtils;
+import com.rfmajor.scrabblesolver.common.gaddag.utils.ByteStreamUtils;
 import com.rfmajor.scrabblesolver.common.scrabble.Alphabet;
 
 import java.io.BufferedReader;
@@ -12,11 +12,11 @@ import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import static com.rfmajor.scrabblesolver.common.gaddag.utils.ExportingUtils.ALPHABET;
-import static com.rfmajor.scrabblesolver.common.gaddag.utils.ExportingUtils.ARCS_AND_STATES;
-import static com.rfmajor.scrabblesolver.common.gaddag.utils.ExportingUtils.DELIMITER;
-import static com.rfmajor.scrabblesolver.common.gaddag.utils.ExportingUtils.LETTER_SETS;
-import static com.rfmajor.scrabblesolver.common.gaddag.utils.ExportingUtils.ROOT_ARC;
+import static com.rfmajor.scrabblesolver.common.gaddag.utils.ByteStreamUtils.ALPHABET;
+import static com.rfmajor.scrabblesolver.common.gaddag.utils.ByteStreamUtils.ARCS_AND_STATES;
+import static com.rfmajor.scrabblesolver.common.gaddag.utils.ByteStreamUtils.DELIMITER;
+import static com.rfmajor.scrabblesolver.common.gaddag.utils.ByteStreamUtils.LETTER_SETS;
+import static com.rfmajor.scrabblesolver.common.gaddag.utils.ByteStreamUtils.ROOT_ARC;
 
 public class GaddagInputStreamReader {
     public CompressedByteGaddag readFromInputStreams(InputStream gaddagInputStream, InputStream metadataInputStream)
@@ -31,10 +31,10 @@ public class GaddagInputStreamReader {
             }
         }
 
-        Long rootArc = ExportingUtils.bytesToLong(dataInBytes.get(ROOT_ARC));
+        Long rootArc = ByteStreamUtils.bytesToLong(dataInBytes.get(ROOT_ARC));
         Alphabet alphabet = readAlphabet(dataInBytes.get(ALPHABET));
-        char delimiter = ExportingUtils.bytesToChar(dataInBytes.get(DELIMITER));
-        int[] letterSets = ExportingUtils.bytesToIntArray(dataInBytes.get(LETTER_SETS));
+        char delimiter = ByteStreamUtils.bytesToChar(dataInBytes.get(DELIMITER));
+        int[] letterSets = ByteStreamUtils.bytesToIntArray(dataInBytes.get(LETTER_SETS));
         byte[] arcsAndStatesBytes = dataInBytes.get(ARCS_AND_STATES);
 
         return new CompressedByteGaddag(rootArc, alphabet, delimiter, arcsAndStatesBytes, letterSets);
@@ -60,9 +60,9 @@ public class GaddagInputStreamReader {
         byte[] indicesToPointsBytes = Arrays.copyOfRange(alphabetBytes, length * 2, length * 6);
         byte[] indicesToQuantitiesBytes = Arrays.copyOfRange(alphabetBytes, length * 6, length * 10);
 
-        char[] indicesToLetters = ExportingUtils.bytesToCharArray(indicesToLettersBytes);
-        int[] indicesToPoints = ExportingUtils.bytesToIntArray(indicesToPointsBytes);
-        int[] indicesToQuantities = ExportingUtils.bytesToIntArray(indicesToQuantitiesBytes);
+        char[] indicesToLetters = ByteStreamUtils.bytesToCharArray(indicesToLettersBytes);
+        int[] indicesToPoints = ByteStreamUtils.bytesToIntArray(indicesToPointsBytes);
+        int[] indicesToQuantities = ByteStreamUtils.bytesToIntArray(indicesToQuantitiesBytes);
 
         return new Alphabet(indicesToLetters, indicesToPoints, indicesToQuantities);
     }
