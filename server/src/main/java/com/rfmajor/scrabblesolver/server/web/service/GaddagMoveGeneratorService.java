@@ -1,10 +1,10 @@
 package com.rfmajor.scrabblesolver.server.web.service;
 
-import com.rfmajor.scrabblesolver.movegen.common.PointCalculator;
-import com.rfmajor.scrabblesolver.movegen.common.model.Field;
-import com.rfmajor.scrabblesolver.movegen.common.model.Move;
-import com.rfmajor.scrabblesolver.movegen.common.model.Rack;
-import com.rfmajor.scrabblesolver.movegen.gaddag.MoveGenerator;
+import com.rfmajor.scrabblesolver.common.scrabble.Field;
+import com.rfmajor.scrabblesolver.common.scrabble.Move;
+import com.rfmajor.scrabblesolver.common.scrabble.Rack;
+import com.rfmajor.scrabblesolver.common.gaddag.calculate.PointCalculator;
+import com.rfmajor.scrabblesolver.common.gaddag.calculate.MoveGenerator;
 import com.rfmajor.scrabblesolver.server.web.mapper.MoveMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

@@ -1,7 +1,7 @@
 package com.rfmajor.scrabblesolver.server.web.service;
 
-import com.rfmajor.scrabblesolver.movegen.gaddag.Gaddag;
-import com.rfmajor.scrabblesolver.movegen.gaddag.MoveGenerator;
+import com.rfmajor.scrabblesolver.common.gaddag.model.Gaddag;
+import com.rfmajor.scrabblesolver.common.gaddag.calculate.MoveGenerator;
 import com.rfmajor.scrabblesolver.server.web.mapper.BoardMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;

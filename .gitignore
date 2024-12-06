@@ -25,6 +25,10 @@ bin/
 out/
 !**/src/main/**/out/
 !**/src/test/**/out/
+*.bin
+*.zip
+*slowa.txt
+output/
 
 ### NetBeans ###
 /nbproject/private/

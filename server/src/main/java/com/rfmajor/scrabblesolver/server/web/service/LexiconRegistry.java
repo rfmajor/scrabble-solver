@@ -1,9 +1,9 @@
 package com.rfmajor.scrabblesolver.server.web.service;
 
-import com.rfmajor.scrabblesolver.movegen.common.model.Alphabet;
-import com.rfmajor.scrabblesolver.movegen.gaddag.ExpandedGaddagConverter;
-import com.rfmajor.scrabblesolver.movegen.gaddag.Gaddag;
-import com.rfmajor.scrabblesolver.movegen.input.DictionaryReader;
+import com.rfmajor.scrabblesolver.common.scrabble.Alphabet;
+import com.rfmajor.scrabblesolver.common.gaddag.model.Gaddag;
+import com.rfmajor.scrabblesolver.common.gaddag.convert.ExpandedGaddagConverter;
+import com.rfmajor.scrabblesolver.gaddag.converter.input.DictionaryReader;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;

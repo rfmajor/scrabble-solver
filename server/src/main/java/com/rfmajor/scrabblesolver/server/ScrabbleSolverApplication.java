@@ -1,6 +1,6 @@
 package com.rfmajor.scrabblesolver.server;
 
-import com.rfmajor.scrabblesolver.movegen.common.model.SpecialFields;
+import com.rfmajor.scrabblesolver.common.scrabble.SpecialFields;
 import com.rfmajor.scrabblesolver.server.web.service.LexiconRegistry;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

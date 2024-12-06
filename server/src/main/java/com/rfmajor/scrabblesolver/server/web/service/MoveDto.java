@@ -1,6 +1,6 @@
 package com.rfmajor.scrabblesolver.server.web.service;
 
-import com.rfmajor.scrabblesolver.movegen.common.model.Direction;
+import com.rfmajor.scrabblesolver.common.scrabble.Direction;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
