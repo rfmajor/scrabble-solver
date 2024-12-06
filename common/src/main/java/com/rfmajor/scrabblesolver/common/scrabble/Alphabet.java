@@ -1,6 +1,7 @@
 package com.rfmajor.scrabblesolver.common.scrabble;
 
 import com.rfmajor.scrabblesolver.common.gaddag.utils.BitSetUtils;
+import com.rfmajor.scrabblesolver.common.gaddag.utils.ExportingUtils;
 
 import java.util.HashMap;
 import java.util.List;
@@ -13,22 +14,22 @@ public class Alphabet {
     private final int[] indicesToPoints;
     private final int[] indicesToQuantities;
 
+    public static final int BYTE_ARRAY_DIVISOR = 10;
+
     public Alphabet(List<Character> letters, List<Integer> points, List<Integer> quantities) {
         this.lettersToIndices = new HashMap<>();
         this.indicesToLetters = new char[letters.size()];
         this.indicesToPoints = new int[letters.size()];
         this.indicesToQuantities = new int[letters.size()];
-        mapLetters(letters, points, quantities);
+        init(letters, points, quantities);
     }
 
-    private void mapLetters(List<Character> letters, List<Integer> points, List<Integer> quantities) {
-        for (int i = 0; i < letters.size(); i++) {
-            char letter = letters.get(i);
-            lettersToIndices.put(letter, i);
-            indicesToLetters[i] = letter;
-            indicesToPoints[i] = i < points.size() ? points.get(i) : 0;
-            indicesToQuantities[i] = i < quantities.size() ? quantities.get(i) : 0;
-        }
+    public Alphabet(char[] indicesToLetters, int[] indicesToPoints, int[] indicesToQuantities) {
+        this.lettersToIndices = new HashMap<>();
+        this.indicesToLetters = indicesToLetters;
+        this.indicesToPoints = indicesToPoints;
+        this.indicesToQuantities = indicesToQuantities;
+        init();
     }
 
     public int getDelimiterIndex() {
@@ -85,5 +86,35 @@ public class Alphabet {
         return lettersToIndices.keySet().stream()
                 .filter(letter -> BitSetUtils.contains(letterSet, getIndex(letter)))
                 .toList();
+    }
+
+    public byte[] asByteArray() {
+        byte[] indicesToLettersBytes = ExportingUtils.charArrayToBytes(indicesToLetters);
+        byte[] indicesToPointsBytes = ExportingUtils.intArrayToBytes(indicesToPoints);
+        byte[] indicesToQuantitiesBytes = ExportingUtils.intArrayToBytes(indicesToQuantities);
+
+        byte[] bytes = new byte[indicesToLettersBytes.length + indicesToPointsBytes.length + indicesToQuantitiesBytes.length];
+
+        System.arraycopy(indicesToLettersBytes, 0, bytes, 0, indicesToLettersBytes.length);
+        System.arraycopy(indicesToPointsBytes, 0, bytes, indicesToLettersBytes.length, indicesToPointsBytes.length);
+        System.arraycopy(indicesToQuantitiesBytes, 0, bytes, indicesToPointsBytes.length, indicesToQuantitiesBytes.length);
+
+        return bytes;
+    }
+
+    private void init(List<Character> letters, List<Integer> points, List<Integer> quantities) {
+        for (int i = 0; i < letters.size(); i++) {
+            char letter = letters.get(i);
+            lettersToIndices.put(letter, i);
+            indicesToLetters[i] = letter;
+            indicesToPoints[i] = i < points.size() ? points.get(i) : 0;
+            indicesToQuantities[i] = i < quantities.size() ? quantities.get(i) : 0;
+        }
+    }
+
+    private void init() {
+        for (int i = 0; i < indicesToLetters.length; i++) {
+            lettersToIndices.put(indicesToLetters[i], i);
+        }
     }
 }

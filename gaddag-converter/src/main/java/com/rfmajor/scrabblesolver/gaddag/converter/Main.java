@@ -1,14 +1,15 @@
 package com.rfmajor.scrabblesolver.gaddag.converter;
 
-import com.rfmajor.scrabblesolver.common.scrabble.Alphabet;
-import com.rfmajor.scrabblesolver.common.scrabble.Board;
+import com.rfmajor.scrabblesolver.common.gaddag.convert.ExpandedGaddagByteArrayCompressor;
+import com.rfmajor.scrabblesolver.common.gaddag.convert.ExpandedGaddagConverter;
+import com.rfmajor.scrabblesolver.common.gaddag.export.CompressedGaddagFileExporter;
+import com.rfmajor.scrabblesolver.common.gaddag.export.CompressedGaddagFileReader;
+import com.rfmajor.scrabblesolver.common.gaddag.export.FileWordIterable;
 import com.rfmajor.scrabblesolver.common.gaddag.model.CompressedByteGaddag;
 import com.rfmajor.scrabblesolver.common.gaddag.model.ExpandedGaddag;
 import com.rfmajor.scrabblesolver.common.gaddag.model.Gaddag;
-import com.rfmajor.scrabblesolver.common.gaddag.export.CompressedGaddagFileExporter;
-import com.rfmajor.scrabblesolver.common.gaddag.convert.ExpandedGaddagByteArrayCompressor;
-import com.rfmajor.scrabblesolver.common.gaddag.convert.ExpandedGaddagConverter;
-import com.rfmajor.scrabblesolver.common.gaddag.export.FileWordIterable;
+import com.rfmajor.scrabblesolver.common.scrabble.Alphabet;
+import com.rfmajor.scrabblesolver.common.scrabble.Board;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -16,6 +17,19 @@ import java.util.List;
 
 public class Main {
     public static void main(String[] args) throws IOException {
+        executeRead(args);
+    }
+
+    public static List<Character> mapStringToLettersList(String letters) {
+        return letters.chars().mapToObj(c -> (char) c).toList();
+    }
+
+    private static void executeRead(String[] args) {
+        CompressedGaddagFileReader reader = new CompressedGaddagFileReader();
+        CompressedByteGaddag gaddag = reader.read("output");
+    }
+
+    private static void executeCompression(String[] args) {
         final int maxLength = Integer.parseInt(args[0]);
         Board board = new Board();
         Alphabet alphabet = new Alphabet(
@@ -45,10 +59,6 @@ public class Main {
         }
         CompressedByteGaddag compressedGaddag = expandedGaddagByteArrayCompressor.minimize((ExpandedGaddag) expandedGaddag);
         CompressedGaddagFileExporter writer = new CompressedGaddagFileExporter();
-        writer.export(compressedGaddag, "gaddag.bin");
-    }
-
-    public static List<Character> mapStringToLettersList(String letters) {
-        return letters.chars().mapToObj(c -> (char) c).toList();
+        writer.export(compressedGaddag, "output");
     }
 }

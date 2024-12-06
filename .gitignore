@@ -28,6 +28,7 @@ out/
 *.bin
 *.zip
 *slowa.txt
+output/
 
 ### NetBeans ###
 /nbproject/private/
