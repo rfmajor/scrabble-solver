@@ -12,6 +12,6 @@ public class GenerateMovesRequest {
     private int[][] crossSets;
     private boolean[][] anchors;
     private String rackLetters;
-    private String alphabetLanguage;
     private Set<int[]> blankFields;
+    private boolean computeCrossSets;
 }

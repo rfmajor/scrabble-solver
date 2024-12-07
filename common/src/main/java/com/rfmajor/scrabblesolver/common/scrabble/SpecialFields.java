@@ -13,6 +13,11 @@ public class SpecialFields {
     private final Set<Field> doubleWordFields;
     private final Set<Field> tripleWordFields;
 
+    public static final String DOUBLE_LETTER = "doubleLetter";
+    public static final String TRIPLE_LETTER = "tripleLetter";
+    public static final String DOUBLE_WORD = "doubleWord";
+    public static final String TRIPLE_WORD = "tripleWord";
+
     public boolean isDoubleLetter(int x, int y) {
         return doubleLetterFields.contains(new Field(x, y));
     }

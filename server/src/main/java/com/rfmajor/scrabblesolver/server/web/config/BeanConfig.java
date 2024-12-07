@@ -2,51 +2,51 @@ package com.rfmajor.scrabblesolver.server.web.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
-import com.rfmajor.scrabblesolver.common.scrabble.SpecialFields;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.rfmajor.scrabblesolver.common.gaddag.calculate.PointCalculator;
-import com.rfmajor.scrabblesolver.common.gaddag.convert.ExpandedGaddagConverter;
-import com.rfmajor.scrabblesolver.common.gaddag.convert.SimpleGaddagConverter;
-import com.rfmajor.scrabblesolver.gaddag.converter.input.DictionaryReader;
-import com.rfmajor.scrabblesolver.gaddag.converter.input.SpecialFieldsReader;
+import com.rfmajor.scrabblesolver.common.gaddag.export.GaddagFileReader;
+import com.rfmajor.scrabblesolver.common.gaddag.model.Gaddag;
+import com.rfmajor.scrabblesolver.common.scrabble.Alphabet;
+import com.rfmajor.scrabblesolver.common.scrabble.SpecialFields;
+import com.rfmajor.scrabblesolver.server.web.mapper.SpecialFieldsDeserializer;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.io.File;
 import java.io.IOException;
 
 @Configuration
 public class BeanConfig {
     @Bean
-    public SimpleGaddagConverter simpleGaddagConverter() {
-        return new SimpleGaddagConverter();
-    }
-
-    @Bean
-    public ExpandedGaddagConverter expandedGaddagConverter() {
-        return new ExpandedGaddagConverter();
-    }
-
-    @Bean
     public ObjectMapper defaultObjectMapper() {
-        return new JsonMapper();
+        ObjectMapper mapper = new JsonMapper();
+        SimpleModule module = new SimpleModule();
+
+        module.addDeserializer(SpecialFields.class, new SpecialFieldsDeserializer());
+        mapper.registerModule(module);
+
+        return mapper;
     }
 
     @Bean
-    public SpecialFieldsReader specialFieldsReader() {
-        return new SpecialFieldsReader();
+    public SpecialFields specialFields(@Value("${specialFields.filename}") String filename,
+                                       ObjectMapper objectMapper) throws IOException {
+        return objectMapper.readValue(new File(filename), SpecialFields.class);
     }
 
     @Bean
-    public SpecialFields specialFields(SpecialFieldsReader specialFieldsReader) throws IOException {
-        return specialFieldsReader.read();
+    public Gaddag<Long> gaddag(@Value("${gaddag.directory}") String directory) {
+        return new GaddagFileReader().read(directory);
+    }
+
+    @Bean
+    public Alphabet alphabet(Gaddag<Long> gaddag) {
+        return gaddag.getAlphabet();
     }
 
     @Bean
     public PointCalculator pointCalculator(SpecialFields specialFields) {
         return new PointCalculator(specialFields);
-    }
-
-    @Bean
-    public DictionaryReader dictionaryReader() {
-        return new DictionaryReader();
     }
 }

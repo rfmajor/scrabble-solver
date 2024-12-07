@@ -23,10 +23,10 @@ public class MoveGenerator<A> {
         this.transposedMoveAlgorithmExecutor = new MoveAlgorithmExecutor<>(board.transpose(), gaddag, Direction.DOWN);
     }
 
-    public Set<Move> generate(Rack rack) {
+    public Set<Move> generate(Rack rack, boolean computeCrossSets) {
         Set<Move> moves = new HashSet<>();
-        generateMoves(moves, moveAlgorithmExecutor, rack);
-        generateMoves(moves, transposedMoveAlgorithmExecutor, rack);
+        generateMoves(moves, moveAlgorithmExecutor, rack, computeCrossSets);
+        generateMoves(moves, transposedMoveAlgorithmExecutor, rack, computeCrossSets);
         return moves;
     }
 
@@ -42,7 +42,11 @@ public class MoveGenerator<A> {
         return moveAlgorithmExecutor.getAlphabet();
     }
 
-    private void generateMoves(Set<Move> moves, MoveAlgorithmExecutor<A> moveAlgorithmExecutor, Rack rack) {
+    private void generateMoves(Set<Move> moves, MoveAlgorithmExecutor<A> moveAlgorithmExecutor, Rack rack,
+                               boolean computeCrossSets) {
+        if (computeCrossSets) {
+            moveAlgorithmExecutor.computeAllCrossSets();
+        }
         CrossSetCalculator crossSetCalculator = moveAlgorithmExecutor.getCrossSetCalculator();
         for (Field anchor : crossSetCalculator.getAnchors()) {
             List<Move> result = moveAlgorithmExecutor.generate(anchor.getRow(), anchor.getColumn(), rack);

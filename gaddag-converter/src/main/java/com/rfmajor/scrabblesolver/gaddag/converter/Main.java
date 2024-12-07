@@ -2,17 +2,17 @@ package com.rfmajor.scrabblesolver.gaddag.converter;
 
 import com.rfmajor.scrabblesolver.common.gaddag.convert.ExpandedGaddagByteArrayCompressor;
 import com.rfmajor.scrabblesolver.common.gaddag.convert.ExpandedGaddagConverter;
+import com.rfmajor.scrabblesolver.common.gaddag.export.FileWordIterable;
 import com.rfmajor.scrabblesolver.common.gaddag.export.GaddagFileExporter;
 import com.rfmajor.scrabblesolver.common.gaddag.export.GaddagFileReader;
-import com.rfmajor.scrabblesolver.common.gaddag.export.FileWordIterable;
 import com.rfmajor.scrabblesolver.common.gaddag.model.CompressedByteGaddag;
 import com.rfmajor.scrabblesolver.common.gaddag.model.ExpandedGaddag;
 import com.rfmajor.scrabblesolver.common.gaddag.model.Gaddag;
 import com.rfmajor.scrabblesolver.common.scrabble.Alphabet;
 import com.rfmajor.scrabblesolver.common.scrabble.Board;
+import com.rfmajor.scrabblesolver.gaddag.converter.input.AlphabetReader;
 
 import java.io.IOException;
-import java.util.Collections;
 import java.util.List;
 
 public class Main {
@@ -30,14 +30,11 @@ public class Main {
         CompressedByteGaddag gaddag = reader.read("output");
     }
 
-    private static void executeCompression(String[] args) {
+    private static void executeCompression(String[] args) throws IOException {
         final int maxLength = Integer.parseInt(args[0]);
         Board board = new Board();
-        Alphabet alphabet = new Alphabet(
-                mapStringToLettersList("aąbcćdeęfghijklłmnńoóprsśtuwyzźż#"),
-                Collections.emptyList(),
-                Collections.emptyList()
-        );
+        Alphabet alphabet = new AlphabetReader().readFromFile("output/alphabet.json");
+        System.out.println(alphabet.toString());
 
         ExpandedGaddagConverter expandedGaddagConverter = new ExpandedGaddagConverter();
         Gaddag<Long> expandedGaddag;
