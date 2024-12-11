@@ -1,13 +1,12 @@
 package com.rfmajor.scrabblesolver.common.gaddag.calculate;
 
+import com.rfmajor.scrabblesolver.common.gaddag.model.Gaddag;
+import com.rfmajor.scrabblesolver.common.gaddag.utils.BitSetUtils;
 import com.rfmajor.scrabblesolver.common.scrabble.Alphabet;
 import com.rfmajor.scrabblesolver.common.scrabble.Board;
 import com.rfmajor.scrabblesolver.common.scrabble.Direction;
 import com.rfmajor.scrabblesolver.common.scrabble.Move;
 import com.rfmajor.scrabblesolver.common.scrabble.Rack;
-import com.rfmajor.scrabblesolver.common.gaddag.model.Gaddag;
-import com.rfmajor.scrabblesolver.common.gaddag.utils.BitSetUtils;
-import com.rfmajor.scrabblesolver.common.gaddag.calculate.CrossSetCalculator;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
@@ -23,7 +22,7 @@ import java.util.List;
 @Getter
 public class MoveAlgorithmExecutor<A> {
     private final Board board;
-    private final CrossSetCalculator crossSetCalculator;
+    private final CrossSetCalculator<A> crossSetCalculator;
     private final Alphabet alphabet;
     private final Gaddag<A> gaddag;
     private char delimiter;
@@ -31,7 +30,7 @@ public class MoveAlgorithmExecutor<A> {
 
     public MoveAlgorithmExecutor(Board board, Gaddag<A> gaddag, Direction moveDirection) {
         this.board = board;
-        this.crossSetCalculator = new CrossSetCalculator(board, gaddag);
+        this.crossSetCalculator = new CrossSetCalculator<>(board, gaddag);
         this.alphabet = gaddag.getAlphabet();
         this.gaddag = gaddag;
         this.delimiter = gaddag.getDelimiter();

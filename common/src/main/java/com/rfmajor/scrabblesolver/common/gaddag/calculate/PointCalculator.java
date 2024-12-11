@@ -18,14 +18,10 @@ public class PointCalculator {
 
     public static final int FULL_RACK_BONUS = 50;
 
-    public <A> void calculatePoints(Set<Move> moves, MoveGenerator<A> moveGenerator, Rack rack, Set<Field> blankFields) {
+    public void calculatePoints(Set<Move> moves, Board board, Board transposedBoard, Alphabet alphabet, Rack rack, Set<Field> blankFields) {
         Set<Move> invalidMoves = new HashSet<>();
-        moves.forEach(move -> calculatePointsInternal(
-                move, moveGenerator.getBoard(),
-                moveGenerator.getTransposedBoard(),
-                moveGenerator.getAlphabet(),
-                rack, invalidMoves, blankFields
-        ));
+        moves.forEach(move ->
+                calculatePointsInternal(move, board, transposedBoard, alphabet, rack, invalidMoves, blankFields));
         moves.removeAll(invalidMoves);
     }
 

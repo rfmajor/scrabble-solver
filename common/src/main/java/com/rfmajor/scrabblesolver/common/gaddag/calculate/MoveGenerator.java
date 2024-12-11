@@ -1,12 +1,12 @@
 package com.rfmajor.scrabblesolver.common.gaddag.calculate;
 
+import com.rfmajor.scrabblesolver.common.gaddag.model.Gaddag;
 import com.rfmajor.scrabblesolver.common.scrabble.Alphabet;
 import com.rfmajor.scrabblesolver.common.scrabble.Board;
 import com.rfmajor.scrabblesolver.common.scrabble.Direction;
 import com.rfmajor.scrabblesolver.common.scrabble.Field;
 import com.rfmajor.scrabblesolver.common.scrabble.Move;
 import com.rfmajor.scrabblesolver.common.scrabble.Rack;
-import com.rfmajor.scrabblesolver.common.gaddag.model.Gaddag;
 import lombok.RequiredArgsConstructor;
 
 import java.util.HashSet;
@@ -47,7 +47,7 @@ public class MoveGenerator<A> {
         if (computeCrossSets) {
             moveAlgorithmExecutor.computeAllCrossSets();
         }
-        CrossSetCalculator crossSetCalculator = moveAlgorithmExecutor.getCrossSetCalculator();
+        CrossSetCalculator<A> crossSetCalculator = moveAlgorithmExecutor.getCrossSetCalculator();
         for (Field anchor : crossSetCalculator.getAnchors()) {
             List<Move> result = moveAlgorithmExecutor.generate(anchor.getRow(), anchor.getColumn(), rack);
             moves.addAll(result);

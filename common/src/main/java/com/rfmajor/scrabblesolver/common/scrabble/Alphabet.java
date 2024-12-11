@@ -104,6 +104,7 @@ public class Alphabet {
 
     public List<Character> getAllowedLetters(int letterSet) {
         return lettersToIndices.keySet().stream()
+                .filter(letter -> getIndex(letter) != getDelimiterIndex())
                 .filter(letter -> BitSetUtils.contains(letterSet, getIndex(letter)))
                 .toList();
     }
