@@ -1,12 +1,9 @@
-package com.rfmajor.scrabblesolver.server.web.mapper;
+package com.rfmajor.scrabblesolver.common.scrabble;
 
-import com.fasterxml.jackson.core.JacksonException;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
-import com.rfmajor.scrabblesolver.common.scrabble.Field;
-import com.rfmajor.scrabblesolver.common.scrabble.SpecialFields;
 
 import java.io.IOException;
 import java.util.HashSet;
@@ -17,18 +14,18 @@ import static com.rfmajor.scrabblesolver.common.scrabble.SpecialFields.DOUBLE_WO
 import static com.rfmajor.scrabblesolver.common.scrabble.SpecialFields.TRIPLE_LETTER;
 import static com.rfmajor.scrabblesolver.common.scrabble.SpecialFields.TRIPLE_WORD;
 
-public class SpecialFieldsDeserializer extends StdDeserializer<SpecialFields> {
+public final class SpecialFieldsDeserializer extends StdDeserializer<SpecialFields> {
 
     public SpecialFieldsDeserializer() {
         this(null);
     }
 
-    protected SpecialFieldsDeserializer(Class<?> vc) {
+    private SpecialFieldsDeserializer(Class<?> vc) {
         super(vc);
     }
 
     @Override
-    public SpecialFields deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException, JacksonException {
+    public SpecialFields deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
         JsonNode node = jsonParser.getCodec().readTree(jsonParser);
         return SpecialFields.builder()
                 .doubleLetterFields(getFieldsFromNode(DOUBLE_LETTER, node))

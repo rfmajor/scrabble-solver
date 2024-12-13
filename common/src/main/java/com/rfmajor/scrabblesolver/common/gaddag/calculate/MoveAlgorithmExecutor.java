@@ -117,11 +117,14 @@ public class MoveAlgorithmExecutor<A> {
         }
     }
 
+    /**
+     * Immutable class used for holding the data about the current word and creating other words by adding letters
+     */
     @Data
     @AllArgsConstructor
-    private static class Word {
-        private String letters;
-        private int blanks;
+    private static final class Word {
+        private final String letters;
+        private final int blanks;
 
         public Word() {
             letters = "";

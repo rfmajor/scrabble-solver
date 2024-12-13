@@ -12,9 +12,10 @@ import java.util.stream.Stream;
 @AllArgsConstructor
 public class Rack {
     private final Map<Character, Integer> letters;
+    @Getter
     private int size;
     @Getter
-    private int maxSize;
+    private final int maxSize;
     public static final char BLANK = ' ';
     public static final int DEFAULT_MAX_SIZE = 7;
 
@@ -69,10 +70,6 @@ public class Rack {
                 .filter(letter -> letter != Rack.BLANK)
                 .filter(letter -> BitSetUtils.contains(letterSet, alphabet.getIndex(letter)))
                 .toList();
-    }
-
-    public int getSize() {
-        return size;
     }
 
     private Stream<Character> getLettersStream() {

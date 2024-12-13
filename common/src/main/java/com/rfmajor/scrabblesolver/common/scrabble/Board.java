@@ -3,21 +3,24 @@ package com.rfmajor.scrabblesolver.common.scrabble;
 import lombok.Data;
 
 /**
- * com.rfmajor.scrabblesolver.common.scrabble.Board represented by a 2-dimensional array
+ * Board represented by a 2-dimensional array
  * Indexed by x (row) and y (columns), where x == 0 is the first row from the top and
- * y == 0 is the first column from the left. Example - (1, 2) coordinates on a 5x5 board:
+ * y == 0 is the first column from the left. Example, (1, 2) coordinates on a 5x5 board:
  *
- * 0 0 0 0 0
- * 0 0 X 0 0
- * 0 0 0 0 0
- * 0 0 0 0 0
- * 0 0 0 0 0
+ *     (y)--------->
+ * (x)
+ *  |     0 0 0 0 0
+ *  |     0 0 X 0 0
+ *  |     0 0 0 0 0
+ *  |     0 0 0 0 0
+ *  |     0 0 0 0 0
+ *  v
  */
 
 @Data
 public class Board {
-    private char[][] fields;
-    private char emptyChar;
+    private final char[][] fields;
+    private final char emptyChar;
 
     public Board() {
         this.fields = new char[DEFAULT_SIZE][DEFAULT_SIZE];

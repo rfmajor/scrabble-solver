@@ -8,12 +8,11 @@ import com.rfmajor.scrabblesolver.common.gaddag.export.GaddagFileReader;
 import com.rfmajor.scrabblesolver.common.gaddag.model.Gaddag;
 import com.rfmajor.scrabblesolver.common.scrabble.Alphabet;
 import com.rfmajor.scrabblesolver.common.scrabble.SpecialFields;
-import com.rfmajor.scrabblesolver.server.web.mapper.SpecialFieldsDeserializer;
+import com.rfmajor.scrabblesolver.common.scrabble.SpecialFieldsDeserializer;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import java.io.File;
 import java.io.IOException;
 
 @Configuration
@@ -30,9 +29,8 @@ public class BeanConfig {
     }
 
     @Bean
-    public SpecialFields specialFields(@Value("${specialFields.filename}") String filename,
-                                       ObjectMapper objectMapper) throws IOException {
-        return objectMapper.readValue(new File(filename), SpecialFields.class);
+    public SpecialFields specialFields() throws IOException {
+        return SpecialFields.loadDefault();
     }
 
     @Bean
