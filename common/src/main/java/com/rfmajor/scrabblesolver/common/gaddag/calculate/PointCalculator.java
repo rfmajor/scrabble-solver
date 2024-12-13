@@ -136,11 +136,11 @@ public class PointCalculator {
     private Set<Integer> getBlankIndices(Set<Field> blankFields, Move move, int y) {
         Set<Integer> blankIndices = new HashSet<>();
         for (Field blankField : blankFields) {
-            if (move.getDirection() == Direction.ACROSS && blankField.getColumn() == y) {
-                blankIndices.add(blankField.getRow());
+            if (move.getDirection() == Direction.ACROSS && blankField.column() == y) {
+                blankIndices.add(blankField.row());
             }
-            else if (move.getDirection() == Direction.DOWN && blankField.getRow() == y){
-                blankIndices.add(blankField.getColumn());
+            else if (move.getDirection() == Direction.DOWN && blankField.row() == y){
+                blankIndices.add(blankField.column());
             }
         }
         return blankIndices;

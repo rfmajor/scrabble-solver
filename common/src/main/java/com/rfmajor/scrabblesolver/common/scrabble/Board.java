@@ -20,26 +20,16 @@ import lombok.Data;
 @Data
 public class Board {
     private final char[][] fields;
-    private final char emptyChar;
 
     public Board() {
         this.fields = new char[DEFAULT_SIZE][DEFAULT_SIZE];
-        this.emptyChar = DEFAULT_EMPTY_CHAR;
     }
 
-    public Board(int size, char emptyChar) {
-        this.fields = new char[size][size];
-        this.emptyChar = emptyChar;
-        fillBoardWithEmptyChars();
-    }
-
-    public Board(char[][] fields, char emptyChar) {
+    public Board(char[][] fields) {
         this.fields = fields;
-        this.emptyChar = emptyChar;
     }
 
     public static final int DEFAULT_SIZE = 15;
-    private static final char DEFAULT_EMPTY_CHAR = '\u0000';
 
     public void clear() {
         fillBoardWithEmptyChars();
@@ -53,7 +43,7 @@ public class Board {
      * Check if the field is empty without validating indices
      */
     public boolean isEmpty(int x, int y) {
-        return fields[x][y] == emptyChar;
+        return fields[x][y] == 0;
     }
 
     /**
@@ -77,7 +67,7 @@ public class Board {
     public boolean isEmpty() {
         for (int i = 0; i < length(); i++) {
             for (int j = 0; j < length(); j++) {
-                if (fields[i][j] != emptyChar) {
+                if (fields[i][j] != 0) {
                     return false;
                 }
             }
@@ -86,11 +76,11 @@ public class Board {
     }
 
     public boolean hasLettersAbove(int row, int column) {
-        return row > 0 && fields[row - 1][column] != emptyChar;
+        return row > 0 && fields[row - 1][column] != 0;
     }
 
     public boolean hasLettersBelow(int row, int column) {
-        return row < length() - 1 && fields[row + 1][column] != emptyChar;
+        return row < length() - 1 && fields[row + 1][column] != 0;
     }
 
     public String readWordUpwards(int row, int column, char delimiter) {
@@ -103,8 +93,8 @@ public class Board {
 
     private String readWordUpwards(int row, int column, boolean appendDelimiter, char delimiter, boolean reversed) {
         StringBuilder stringBuilder = new StringBuilder();
-        for (; row >= 0 && fields[row][column] != emptyChar; row--) {
-            stringBuilder.append(fields[row][column]);
+        for (int i = row; i >= 0 && fields[i][column] != 0; i--) {
+            stringBuilder.append(fields[i][column]);
         }
         if (appendDelimiter) {
             stringBuilder.append(delimiter);
@@ -118,8 +108,8 @@ public class Board {
 
     public String readWordDownwards(int row, int column, boolean reversed) {
         StringBuilder stringBuilder = new StringBuilder();
-        for (; row < length() && fields[row][column] != emptyChar; row++) {
-            stringBuilder.append(fields[row][column]);
+        for (int i = row; i < length() && fields[i][column] != 0; i++) {
+            stringBuilder.append(fields[i][column]);
         }
         if (reversed) {
             stringBuilder.reverse();
@@ -146,13 +136,13 @@ public class Board {
                 transposedFields[j][i] = fields[i][j];
             }
         }
-        return new Board(transposedFields, emptyChar);
+        return new Board(transposedFields);
     }
 
     private void fillBoardWithEmptyChars() {
         for (int i = 0; i < length(); i++) {
             for (int j = 0; j < length(); j++) {
-                fields[i][j] = emptyChar;
+                fields[i][j] = 0;
             }
         }
     }

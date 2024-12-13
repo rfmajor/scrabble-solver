@@ -3,6 +3,9 @@ package com.rfmajor.scrabblesolver.server.web.config;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.rfmajor.scrabblesolver.common.gaddag.calculate.CrossSetCalculator;
+import com.rfmajor.scrabblesolver.common.gaddag.calculate.MoveGenerator;
+import com.rfmajor.scrabblesolver.common.gaddag.calculate.MovePostProcessor;
 import com.rfmajor.scrabblesolver.common.gaddag.calculate.PointCalculator;
 import com.rfmajor.scrabblesolver.common.gaddag.export.GaddagFileReader;
 import com.rfmajor.scrabblesolver.common.gaddag.model.Gaddag;
@@ -39,6 +42,13 @@ public class BeanConfig {
     }
 
     @Bean
+    public MoveGenerator<Long> moveGenerator(Gaddag<Long> gaddag,
+                                             CrossSetCalculator<Long> crossSetCalculator,
+                                             MovePostProcessor movePostProcessor) {
+        return new MoveGenerator<>(gaddag, crossSetCalculator, movePostProcessor);
+    }
+
+    @Bean
     public Alphabet alphabet(Gaddag<Long> gaddag) {
         return gaddag.getAlphabet();
     }
@@ -46,5 +56,15 @@ public class BeanConfig {
     @Bean
     public PointCalculator pointCalculator(SpecialFields specialFields) {
         return new PointCalculator(specialFields);
+    }
+
+    @Bean
+    public CrossSetCalculator<Long> crossSetCalculator(Gaddag<Long> gaddag) {
+        return new CrossSetCalculator<>(gaddag);
+    }
+
+    @Bean
+    public MovePostProcessor movePostProcessor() {
+        return new MovePostProcessor();
     }
 }
