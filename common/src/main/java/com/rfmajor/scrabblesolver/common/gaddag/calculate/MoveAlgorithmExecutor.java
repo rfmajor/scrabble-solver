@@ -5,7 +5,9 @@ import com.rfmajor.scrabblesolver.common.gaddag.utils.BitSetUtils;
 import com.rfmajor.scrabblesolver.common.scrabble.Alphabet;
 import com.rfmajor.scrabblesolver.common.scrabble.Board;
 import com.rfmajor.scrabblesolver.common.scrabble.Direction;
+import com.rfmajor.scrabblesolver.common.scrabble.Field;
 import com.rfmajor.scrabblesolver.common.scrabble.Move;
+import com.rfmajor.scrabblesolver.common.scrabble.MoveGroup;
 import com.rfmajor.scrabblesolver.common.scrabble.Rack;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -13,27 +15,64 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Class responsible for the move generation on the scrabble board
  */
-@Getter
 public class MoveAlgorithmExecutor<A> {
+    @Getter
     private final Alphabet alphabet;
+    @Getter
     private final Gaddag<A> gaddag;
+    @Getter
     private final char delimiter;
+    private final MovePostProcessor movePostProcessor;
+    private final PointCalculator pointCalculator;
+    private final CrossSetCalculator<A> crossSetCalculator;
 
-    public MoveAlgorithmExecutor(Gaddag<A> gaddag) {
+    public MoveAlgorithmExecutor(Gaddag<A> gaddag, MovePostProcessor movePostProcessor,
+                                 PointCalculator pointCalculator, CrossSetCalculator<A> crossSetCalculator) {
         this.alphabet = gaddag.getAlphabet();
         this.gaddag = gaddag;
         this.delimiter = gaddag.getDelimiter();
+        this.movePostProcessor = movePostProcessor;
+        this.pointCalculator = pointCalculator;
+        this.crossSetCalculator = crossSetCalculator;
+    }
+
+    public List<MoveGroup> generateAllPossibleMoves(Rack rack, Board board) {
+        Set<Move> moves = new HashSet<>();
+        generateAllPossibleMoves(moves, rack, board, Direction.ACROSS);
+        generateAllPossibleMoves(moves, rack, board, Direction.DOWN);
+
+        List<Move> movesWithPoints = pointCalculator.calculatePoints(moves, board, alphabet, rack);
+        return movePostProcessor.groupMovesByNameAndPoints(movesWithPoints);
+    }
+
+    public List<MoveGroup> generateGroups(int row, int column, Rack rack, Board board,
+                                    FieldSet fieldSet, Direction moveDirection) {
+        List<Move> moves = generate(row, column, rack, board, fieldSet, moveDirection);
+        return movePostProcessor.groupMovesByNameAndPoints(moves);
     }
 
     public List<Move> generate(int row, int column, Rack rack, Board board,
                                FieldSet fieldSet, Direction moveDirection) {
         InternalMoveExecutor internalMoveExecutor = new InternalMoveExecutor(board, fieldSet, moveDirection);
-        return internalMoveExecutor.generateMoves(0, row, column, new Word(), rack, gaddag.getRootArc());
+        List<Move> moves = internalMoveExecutor.generateMoves(0, row, column, new Word(), rack, gaddag.getRootArc());
+        return pointCalculator.calculatePoints(moves, board, alphabet, rack);
+    }
+
+    private void generateAllPossibleMoves(Set<Move> moves, Rack rack, Board board, Direction moveDirection) {
+        board = moveDirection == Direction.ACROSS ? board : board.transpose();
+        FieldSet fieldSet = crossSetCalculator.computeAllCrossSetsAndAnchors(board);
+
+        for (Field anchor : fieldSet.anchors()) {
+            List<Move> result = generate(anchor.row(), anchor.column(), rack, board, fieldSet, moveDirection);
+            moves.addAll(result);
+        }
     }
 
     @RequiredArgsConstructor

@@ -2,6 +2,10 @@ package com.rfmajor.scrabblesolver.common.scrabble;
 
 import lombok.Data;
 
+import java.util.HashSet;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 /**
  * Board represented by a 2-dimensional array
  * Indexed by x (row) and y (columns), where x == 0 is the first row from the top and
@@ -20,19 +24,23 @@ import lombok.Data;
 @Data
 public class Board {
     private final char[][] fields;
+    private final Set<Field> blankFields;
 
     public Board() {
         this.fields = new char[DEFAULT_SIZE][DEFAULT_SIZE];
+        this.blankFields = new HashSet<>();
     }
 
-    public Board(char[][] fields) {
+    public Board(char[][] fields, Set<Field> blankFields) {
         this.fields = fields;
+        this.blankFields = blankFields;
     }
 
     public static final int DEFAULT_SIZE = 15;
 
     public void clear() {
         fillBoardWithEmptyChars();
+        blankFields.clear();
     }
 
     public char getField(int x, int y) {
@@ -136,7 +144,12 @@ public class Board {
                 transposedFields[j][i] = fields[i][j];
             }
         }
-        return new Board(transposedFields);
+
+        Set<Field> transposedBlankFields = blankFields.stream()
+                .map(field -> new Field(field.column(), field.row()))
+                .collect(Collectors.toSet());
+
+        return new Board(transposedFields, transposedBlankFields);
     }
 
     private void fillBoardWithEmptyChars() {

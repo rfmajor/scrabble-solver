@@ -9,7 +9,10 @@ import com.rfmajor.scrabblesolver.common.scrabble.Rack;
 import com.rfmajor.scrabblesolver.common.scrabble.SpecialFields;
 import lombok.RequiredArgsConstructor;
 
+import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @RequiredArgsConstructor
@@ -18,15 +21,23 @@ public class PointCalculator {
 
     public static final int FULL_RACK_BONUS = 50;
 
-    public void calculatePoints(Set<Move> moves, Board board, Board transposedBoard, Alphabet alphabet, Rack rack, Set<Field> blankFields) {
+
+    public List<Move> calculatePoints(Collection<Move> moves, Board board, Alphabet alphabet, Rack rack) {
+        Set<Move> validMoves = new HashSet<>(moves);
         Set<Move> invalidMoves = new HashSet<>();
-        moves.forEach(move ->
-                calculatePointsInternal(move, board, transposedBoard, alphabet, rack, invalidMoves, blankFields));
-        moves.removeAll(invalidMoves);
+
+        validMoves.forEach(move ->
+                calculatePointsInternal(move, board, board.transpose(), alphabet, rack, invalidMoves));
+        validMoves.removeAll(invalidMoves);
+
+        return validMoves.stream()
+                .sorted(Comparator.comparingInt(Move::getPoints).reversed()
+                        .thenComparing(Move::getWord))
+                .toList();
     }
 
     private void calculatePointsInternal(Move move, Board board, Board transposedBoard, Alphabet alphabet,
-                                         Rack rack, Set<Move> invalidMoves, Set<Field> blankFields) {
+                                         Rack rack, Set<Move> invalidMoves) {
         if (move.getDirection() == Direction.DOWN) {
             board = transposedBoard;
         }
@@ -37,7 +48,7 @@ public class PointCalculator {
         int newlyPopulatedFields = 0;
         for (int i = 0; i < word.length; i++) {
             char letter = word[i];
-            boolean isBlank = isBlank(i, move, blankFields);
+            boolean isBlank = isBlank(i, move, board.getBlankFields());
             int letterPoints = isBlank ? 0 : alphabet.getPoints(letter);
             int crossWordMultiplier = 1;
             int x = getXBasedOnMoveDirection(move);
@@ -57,7 +68,7 @@ public class PointCalculator {
                 }
                 points += calculateCrossWordPoints(
                         x, y, letterPoints, crossWordMultiplier,
-                        board, alphabet, getBlankIndices(blankFields, move, y));
+                        board, alphabet, getBlankIndices(board.getBlankFields(), move, y));
             }
             wordPoints += letterPoints;
         }

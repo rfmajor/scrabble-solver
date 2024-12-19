@@ -46,8 +46,13 @@ public class SpecialFields {
         return tripleWordFields.contains(new Field(x, y));
     }
 
-    public static SpecialFields loadDefault() throws IOException { return objectMapper.readValue(
-                SpecialFields.class.getClassLoader().getResourceAsStream(DEFAULT_FIELDS_FILENAME),
-                SpecialFields.class);
+    public static SpecialFields loadDefault() {
+        try {
+            return objectMapper.readValue(
+                    SpecialFields.class.getClassLoader().getResourceAsStream(DEFAULT_FIELDS_FILENAME),
+                    SpecialFields.class);
+        } catch (IOException e) {
+            throw new IllegalStateException("Missing the default configuration file", e);
+        }
     }
 }

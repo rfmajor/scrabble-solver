@@ -15,6 +15,7 @@ import com.rfmajor.scrabblesolver.common.scrabble.Board;
 import com.rfmajor.scrabblesolver.common.scrabble.Direction;
 import com.rfmajor.scrabblesolver.common.scrabble.Move;
 import com.rfmajor.scrabblesolver.common.scrabble.Rack;
+import com.rfmajor.scrabblesolver.common.scrabble.SpecialFields;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Named;
@@ -66,9 +67,12 @@ class MoveAlgorithmExecutorTest {
     @BeforeAll
     void setUpClass() {
         board = new Board();
+        MovePostProcessor movePostProcessor = new MovePostProcessor();
+        PointCalculator pointCalculator = new PointCalculator(SpecialFields.loadDefault());
+
         Alphabet alphabet = new Alphabet(
                 TestUtils.mapStringToLettersList("abcdefghijklmnopqrstuvwxyz#"),
-                Collections.emptyList(),
+                List.of(1, 3, 3, 2, 1, 4, 2, 4, 1, 8, 5, 1, 3, 1, 1, 3, 10, 1, 1, 1, 1, 4, 4, 8, 4, 10),
                 Collections.emptyList()
         );
         List<String> words = List.of("able", "cable", "care", "abler", "ar", "be");
@@ -83,14 +87,18 @@ class MoveAlgorithmExecutorTest {
         Gaddag<Long> compressedGaddag = expandedGaddagCompressor.minimize((ExpandedGaddag) (expandedGaddag));
         Gaddag<Long> compressedByteGaddag = expandedGaddagByteArrayCompressor.minimize((ExpandedGaddag) expandedGaddag);
 
-        expandedMoveAlgorithmExecutor = new MoveAlgorithmExecutor<>(expandedGaddag);
         expandedCrossSetCalculator = new CrossSetCalculator<>(expandedGaddag);
-        simpleMoveAlgorithmExecutor = new MoveAlgorithmExecutor<>(simpleGaddag);
+        expandedMoveAlgorithmExecutor = new MoveAlgorithmExecutor<>(expandedGaddag,
+                movePostProcessor, pointCalculator, expandedCrossSetCalculator);
         simpleCrossSetCalculator = new CrossSetCalculator<>(simpleGaddag);
-        compressedMoveAlgorithmExecutor = new MoveAlgorithmExecutor<>(compressedGaddag);
+        simpleMoveAlgorithmExecutor = new MoveAlgorithmExecutor<>(simpleGaddag,
+                movePostProcessor, pointCalculator, simpleCrossSetCalculator);
         compressedCrossSetCalculator = new CrossSetCalculator<>(compressedGaddag);
-        compressedByteMoveAlgorithmExecutor = new MoveAlgorithmExecutor<>(compressedByteGaddag);
+        compressedMoveAlgorithmExecutor = new MoveAlgorithmExecutor<>(compressedGaddag,
+                movePostProcessor, pointCalculator, compressedCrossSetCalculator);
         compressedByteCrossSetCalculator = new CrossSetCalculator<>(compressedByteGaddag);
+        compressedByteMoveAlgorithmExecutor = new MoveAlgorithmExecutor<>(compressedByteGaddag,
+                movePostProcessor, pointCalculator, compressedByteCrossSetCalculator);
     }
 
     @BeforeEach

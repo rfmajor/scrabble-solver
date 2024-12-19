@@ -10,32 +10,28 @@
       "startX": 14,
       "startY": 11,
       "expected": [
-        {"word": "cable", "x": 14, "y": 10, "points": 0, "blanks": []},
-        {"word": "able", "x": 14, "y": 11, "points": 0, "blanks": []}
+        {"word": "cable", "x": 14, "y": 10, "points": 9, "blanks": []}
       ]
     },
     {
       "startX": 14,
       "startY": 12,
       "expected": [
-        {"word": "cable", "x": 14, "y": 10, "points": 0, "blanks": []},
-        {"word": "able", "x": 14, "y": 11, "points": 0, "blanks": []}
+        {"word": "cable", "x": 14, "y": 10, "points": 9, "blanks": []}
       ]
     },
     {
       "startX": 14,
       "startY": 13,
       "expected": [
-        {"word": "cable", "x": 14, "y": 10, "points": 0, "blanks": []},
-        {"word": "able", "x": 14, "y": 11, "points": 0, "blanks": []}
+        {"word": "cable", "x": 14, "y": 10, "points": 9, "blanks": []}
       ]
     },
     {
       "startX": 14,
       "startY": 14,
       "expected": [
-        {"word": "cable", "x": 14, "y": 10, "points": 0, "blanks": []},
-        {"word": "able", "x": 14, "y": 11, "points": 0, "blanks": []}
+        {"word": "cable", "x": 14, "y": 10, "points": 9, "blanks": []}
       ]
     }
   ]

@@ -30,7 +30,7 @@
       "startX": 14,
       "startY": 14,
       "expected": [
-        {"word": "care", "x": 14, "y": 11, "points": 0, "blanks": []}
+        {"word": "care", "x": 14, "y": 11, "points": 9, "blanks": []}
       ]
     }
   ]

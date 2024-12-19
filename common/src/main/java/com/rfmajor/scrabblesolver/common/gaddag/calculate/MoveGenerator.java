@@ -1,6 +1,5 @@
 package com.rfmajor.scrabblesolver.common.gaddag.calculate;
 
-import com.rfmajor.scrabblesolver.common.gaddag.model.Gaddag;
 import com.rfmajor.scrabblesolver.common.scrabble.Board;
 import com.rfmajor.scrabblesolver.common.scrabble.Direction;
 import com.rfmajor.scrabblesolver.common.scrabble.Field;
@@ -19,11 +18,6 @@ public class MoveGenerator<A> {
     private final CrossSetCalculator<A> crossSetCalculator;
     private final MovePostProcessor movePostProcessor;
 
-    public MoveGenerator(Gaddag<A> gaddag, CrossSetCalculator<A> crossSetCalculator, MovePostProcessor movePostProcessor) {
-        this.moveAlgorithmExecutor = new MoveAlgorithmExecutor<>(gaddag);
-        this.crossSetCalculator = crossSetCalculator;
-        this.movePostProcessor = movePostProcessor;
-    }
 
     public List<MoveGroup> generate(Rack rack, Board board) {
         Set<Move> moves = new HashSet<>();

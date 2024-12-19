@@ -10,21 +10,21 @@
       "startX": 10,
       "startY": 0,
       "expected": [
-        {"word": "care", "x": 10, "y": 0, "points": 0, "blanks": []}
+        {"word": "care", "x": 10, "y": 0, "points": 15, "blanks": []}
       ]
     },
     {
       "startX": 11,
       "startY": 0,
       "expected": [
-        {"word": "ar", "x": 11, "y": 0, "points": 0, "blanks": []}
+        {"word": "ar", "x": 11, "y": 0, "points": 2, "blanks": []}
       ]
     },
     {
       "startX": 12,
       "startY": 0,
       "expected": [
-        {"word": "be", "x": 12, "y": 0, "points": 0, "blanks": []}
+        {"word": "be", "x": 12, "y": 0, "points": 4, "blanks": []}
       ]
     },
     {
