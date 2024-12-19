@@ -34,15 +34,14 @@ import java.util.stream.Stream;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class MoveAlgorithmExecutorTest {
+class MoveGeneratorTest {
     private Board board;
-    private MoveAlgorithmExecutor<Long> expandedMoveAlgorithmExecutor;
-    private MoveAlgorithmExecutor<Arc> simpleMoveAlgorithmExecutor;
-    private MoveAlgorithmExecutor<Long> compressedMoveAlgorithmExecutor;
-    private MoveAlgorithmExecutor<Long> compressedByteMoveAlgorithmExecutor;
+    private MoveGenerator<Long> expandedMoveGenerator;
+    private MoveGenerator<Arc> simpleMoveGenerator;
+    private MoveGenerator<Long> compressedMoveGenerator;
+    private MoveGenerator<Long> compressedByteMoveGenerator;
     private CrossSetCalculator<Long> expandedCrossSetCalculator;
     private CrossSetCalculator<Arc> simpleCrossSetCalculator;
     private CrossSetCalculator<Long> compressedCrossSetCalculator;
@@ -61,6 +60,7 @@ class MoveAlgorithmExecutorTest {
             "/moveGenerator/horizontal_able_lowerLeft.json",
             "/moveGenerator/horizontal_able_upperRight.json",
             "/moveGenerator/horizontal_able_lowerRight.json",
+            "/moveGenerator/vertical_able_middle_with_blanks.json",
     };
 
 
@@ -88,16 +88,16 @@ class MoveAlgorithmExecutorTest {
         Gaddag<Long> compressedByteGaddag = expandedGaddagByteArrayCompressor.minimize((ExpandedGaddag) expandedGaddag);
 
         expandedCrossSetCalculator = new CrossSetCalculator<>(expandedGaddag);
-        expandedMoveAlgorithmExecutor = new MoveAlgorithmExecutor<>(expandedGaddag,
+        expandedMoveGenerator = new MoveGenerator<>(expandedGaddag,
                 movePostProcessor, pointCalculator, expandedCrossSetCalculator);
         simpleCrossSetCalculator = new CrossSetCalculator<>(simpleGaddag);
-        simpleMoveAlgorithmExecutor = new MoveAlgorithmExecutor<>(simpleGaddag,
+        simpleMoveGenerator = new MoveGenerator<>(simpleGaddag,
                 movePostProcessor, pointCalculator, simpleCrossSetCalculator);
         compressedCrossSetCalculator = new CrossSetCalculator<>(compressedGaddag);
-        compressedMoveAlgorithmExecutor = new MoveAlgorithmExecutor<>(compressedGaddag,
+        compressedMoveGenerator = new MoveGenerator<>(compressedGaddag,
                 movePostProcessor, pointCalculator, compressedCrossSetCalculator);
         compressedByteCrossSetCalculator = new CrossSetCalculator<>(compressedByteGaddag);
-        compressedByteMoveAlgorithmExecutor = new MoveAlgorithmExecutor<>(compressedByteGaddag,
+        compressedByteMoveGenerator = new MoveGenerator<>(compressedByteGaddag,
                 movePostProcessor, pointCalculator, compressedByteCrossSetCalculator);
     }
 
@@ -109,31 +109,34 @@ class MoveAlgorithmExecutorTest {
     @ParameterizedTest
     @MethodSource("getAllTestSets")
     void executeTestCases_simpleGaddag(TestSet testSet) {
-        executeTestCase(testSet, simpleMoveAlgorithmExecutor, simpleCrossSetCalculator);
+        executeTestCase(testSet, simpleMoveGenerator, simpleCrossSetCalculator);
     }
 
     @ParameterizedTest
     @MethodSource("getAllTestSets")
     void executeTestCases_expandedGaddag(TestSet testSet) {
-        executeTestCase(testSet, expandedMoveAlgorithmExecutor, expandedCrossSetCalculator);
+        executeTestCase(testSet, expandedMoveGenerator, expandedCrossSetCalculator);
     }
 
     @ParameterizedTest
     @MethodSource("getAllTestSets")
     void executeTestCases_compressedGaddag(TestSet testSet) {
-        executeTestCase(testSet, compressedMoveAlgorithmExecutor, compressedCrossSetCalculator);
+        executeTestCase(testSet, compressedMoveGenerator, compressedCrossSetCalculator);
     }
 
     @ParameterizedTest
     @MethodSource("getAllTestSets")
     void executeTestCases_compressedByteGaddag(TestSet testSet) {
-        executeTestCase(testSet, compressedByteMoveAlgorithmExecutor, compressedByteCrossSetCalculator);
+        executeTestCase(testSet, compressedByteMoveGenerator, compressedByteCrossSetCalculator);
     }
 
     private <A> void executeTestCase(TestSet testSet,
-                                     MoveAlgorithmExecutor<A> algorithmExecutor,
+                                     MoveGenerator<A> algorithmExecutor,
                                      CrossSetCalculator<A> crossSetCalculator) {
         assertNotNull(testSet);
+        if (testSet.rack.equals("aer$")) {
+            System.out.println();
+        }
 
         for (WordSetup setup : testSet.wordsSetup) {
             if (setup.direction == Direction.ACROSS) {
@@ -160,32 +163,33 @@ class MoveAlgorithmExecutorTest {
 
     private static void assertAllMovesAreContained(Set<ExpectedMove> expectedMoves, List<Move> actualMoves) {
         assertAll(expectedMoves.stream()
-                .map(expectedMove -> () -> assertTrue(moveIsContained(expectedMove, actualMoves),
-                        String.format("Move %s is not contained within the results", expectedMove)))
+                .map(expectedMove -> () -> moveIsContained(expectedMove, actualMoves))
         );
     }
 
-    private static boolean moveIsContained(ExpectedMove expectedMove, List<Move> actualMoves) {
+    private static void moveIsContained(ExpectedMove expectedMove, List<Move> actualMoves) {
         for (Move actualMove : actualMoves) {
-            if (expectedMove.word.equals(actualMove.getWord()) && expectedMove.x == actualMove.getX() &&
-                    expectedMove.y == actualMove.getY() && expectedMove.points == actualMove.getPoints() &&
-                    expectedMove.blanks.equals(actualMove.getBlanks())) {
-                return true;
+            if (expectedMove.word.equals(actualMove.getWord()) &&
+                    expectedMove.x == actualMove.getX() &&
+                    expectedMove.y == actualMove.getY()) {
+                assertEquals(expectedMove.points, actualMove.getPoints());
+                assertEquals(expectedMove.blanks, actualMove.getBlanks());
+                return;
             }
         }
-        return false;
+        throw new AssertionError(String.format("No actual move found for %s", expectedMove.toString()));
     }
 
     private static Stream<Arguments> getAllTestSets() {
         return Arrays.stream(TEST_FILENAMES)
-                .map(MoveAlgorithmExecutorTest::loadTestSetFromFile)
+                .map(MoveGeneratorTest::loadTestSetFromFile)
                 .map(testSet -> Named.of(testSet.title, testSet))
                 .map(Arguments::of);
     }
 
     private static TestSet loadTestSetFromFile(String filename) {
         try {
-            return objectMapper.readValue(MoveAlgorithmExecutorTest.class.getResourceAsStream(filename), TestSet.class);
+            return objectMapper.readValue(MoveGeneratorTest.class.getResourceAsStream(filename), TestSet.class);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

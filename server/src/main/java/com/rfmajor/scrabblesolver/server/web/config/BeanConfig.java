@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.rfmajor.scrabblesolver.common.gaddag.calculate.CrossSetCalculator;
+import com.rfmajor.scrabblesolver.common.gaddag.calculate.MoveGenerator;
 import com.rfmajor.scrabblesolver.common.gaddag.calculate.MovePostProcessor;
 import com.rfmajor.scrabblesolver.common.gaddag.calculate.PointCalculator;
 import com.rfmajor.scrabblesolver.common.gaddag.export.GaddagFileReader;
@@ -56,5 +57,12 @@ public class BeanConfig {
     @Bean
     public MovePostProcessor movePostProcessor() {
         return new MovePostProcessor();
+    }
+
+    @Bean
+    public MoveGenerator<Long> moveAlgorithmExecutor(Gaddag<Long> gaddag, MovePostProcessor movePostProcessor,
+                                                     PointCalculator pointCalculator,
+                                                     CrossSetCalculator<Long> crossSetCalculator) {
+        return new MoveGenerator<>(gaddag, movePostProcessor, pointCalculator, crossSetCalculator);
     }
 }

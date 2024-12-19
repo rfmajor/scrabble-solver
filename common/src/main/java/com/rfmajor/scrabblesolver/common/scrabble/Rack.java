@@ -16,7 +16,7 @@ public class Rack {
     private int size;
     @Getter
     private final int maxSize;
-    public static final char BLANK = ' ';
+    public static final char BLANK = '$';
     public static final int DEFAULT_MAX_SIZE = 7;
 
     public Rack() {

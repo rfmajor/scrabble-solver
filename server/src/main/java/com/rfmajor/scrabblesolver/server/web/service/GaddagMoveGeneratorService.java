@@ -18,6 +18,6 @@ public class GaddagMoveGeneratorService implements MoveGeneratorService {
     @Override
     public List<MoveGroup> generateMoves(GenerateMovesRequest request) {
         Rack rack = new Rack(request.getRackLetters());
-        return moveGenerator.generate(rack, boardMapper.fromDto(request.getBoard()));
+        return moveGenerator.generateAllPossibleMoves(rack, boardMapper.fromDto(request.getBoard()));
     }
 }
