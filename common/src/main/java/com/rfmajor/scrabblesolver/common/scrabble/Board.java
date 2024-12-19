@@ -2,44 +2,45 @@ package com.rfmajor.scrabblesolver.common.scrabble;
 
 import lombok.Data;
 
+import java.util.HashSet;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 /**
- * com.rfmajor.scrabblesolver.common.scrabble.Board represented by a 2-dimensional array
+ * Board represented by a 2-dimensional array
  * Indexed by x (row) and y (columns), where x == 0 is the first row from the top and
- * y == 0 is the first column from the left. Example - (1, 2) coordinates on a 5x5 board:
+ * y == 0 is the first column from the left. Example, (1, 2) coordinates on a 5x5 board:
  *
- * 0 0 0 0 0
- * 0 0 X 0 0
- * 0 0 0 0 0
- * 0 0 0 0 0
- * 0 0 0 0 0
+ *     (y)--------->
+ * (x)
+ *  |     0 0 0 0 0
+ *  |     0 0 X 0 0
+ *  |     0 0 0 0 0
+ *  |     0 0 0 0 0
+ *  |     0 0 0 0 0
+ *  v
  */
 
 @Data
 public class Board {
-    private char[][] fields;
-    private char emptyChar;
+    private final char[][] fields;
+    private final Set<Field> blankFields;
 
     public Board() {
         this.fields = new char[DEFAULT_SIZE][DEFAULT_SIZE];
-        this.emptyChar = DEFAULT_EMPTY_CHAR;
+        this.blankFields = new HashSet<>();
     }
 
-    public Board(int size, char emptyChar) {
-        this.fields = new char[size][size];
-        this.emptyChar = emptyChar;
-        fillBoardWithEmptyChars();
-    }
-
-    public Board(char[][] fields, char emptyChar) {
+    public Board(char[][] fields, Set<Field> blankFields) {
         this.fields = fields;
-        this.emptyChar = emptyChar;
+        this.blankFields = blankFields;
     }
 
     public static final int DEFAULT_SIZE = 15;
-    private static final char DEFAULT_EMPTY_CHAR = '\u0000';
 
     public void clear() {
         fillBoardWithEmptyChars();
+        blankFields.clear();
     }
 
     public char getField(int x, int y) {
@@ -50,7 +51,7 @@ public class Board {
      * Check if the field is empty without validating indices
      */
     public boolean isEmpty(int x, int y) {
-        return fields[x][y] == emptyChar;
+        return fields[x][y] == 0;
     }
 
     /**
@@ -74,7 +75,7 @@ public class Board {
     public boolean isEmpty() {
         for (int i = 0; i < length(); i++) {
             for (int j = 0; j < length(); j++) {
-                if (fields[i][j] != emptyChar) {
+                if (fields[i][j] != 0) {
                     return false;
                 }
             }
@@ -83,11 +84,11 @@ public class Board {
     }
 
     public boolean hasLettersAbove(int row, int column) {
-        return row > 0 && fields[row - 1][column] != emptyChar;
+        return row > 0 && fields[row - 1][column] != 0;
     }
 
     public boolean hasLettersBelow(int row, int column) {
-        return row < length() - 1 && fields[row + 1][column] != emptyChar;
+        return row < length() - 1 && fields[row + 1][column] != 0;
     }
 
     public String readWordUpwards(int row, int column, char delimiter) {
@@ -100,8 +101,8 @@ public class Board {
 
     private String readWordUpwards(int row, int column, boolean appendDelimiter, char delimiter, boolean reversed) {
         StringBuilder stringBuilder = new StringBuilder();
-        for (; row >= 0 && fields[row][column] != emptyChar; row--) {
-            stringBuilder.append(fields[row][column]);
+        for (int i = row; i >= 0 && fields[i][column] != 0; i--) {
+            stringBuilder.append(fields[i][column]);
         }
         if (appendDelimiter) {
             stringBuilder.append(delimiter);
@@ -115,8 +116,8 @@ public class Board {
 
     public String readWordDownwards(int row, int column, boolean reversed) {
         StringBuilder stringBuilder = new StringBuilder();
-        for (; row < length() && fields[row][column] != emptyChar; row++) {
-            stringBuilder.append(fields[row][column]);
+        for (int i = row; i < length() && fields[i][column] != 0; i++) {
+            stringBuilder.append(fields[i][column]);
         }
         if (reversed) {
             stringBuilder.reverse();
@@ -143,13 +144,18 @@ public class Board {
                 transposedFields[j][i] = fields[i][j];
             }
         }
-        return new Board(transposedFields, emptyChar);
+
+        Set<Field> transposedBlankFields = blankFields.stream()
+                .map(field -> new Field(field.column(), field.row()))
+                .collect(Collectors.toSet());
+
+        return new Board(transposedFields, transposedBlankFields);
     }
 
     private void fillBoardWithEmptyChars() {
         for (int i = 0; i < length(); i++) {
             for (int j = 0; j < length(); j++) {
-                fields[i][j] = emptyChar;
+                fields[i][j] = 0;
             }
         }
     }

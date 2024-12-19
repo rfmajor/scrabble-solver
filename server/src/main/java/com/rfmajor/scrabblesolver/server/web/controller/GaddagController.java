@@ -1,7 +1,7 @@
 package com.rfmajor.scrabblesolver.server.web.controller;
 
+import com.rfmajor.scrabblesolver.common.scrabble.MoveGroup;
 import com.rfmajor.scrabblesolver.server.web.service.GenerateMovesRequest;
-import com.rfmajor.scrabblesolver.server.web.service.MoveDto;
 import com.rfmajor.scrabblesolver.server.web.service.MoveGeneratorService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -16,7 +16,7 @@ public class GaddagController {
     private final MoveGeneratorService moveGeneratorService;
 
     @PostMapping("/generate")
-    public List<MoveDto> generate(@RequestBody GenerateMovesRequest request) {
+    public List<MoveGroup> generate(@RequestBody GenerateMovesRequest request) {
         return moveGeneratorService.generateMoves(request);
     }
 }

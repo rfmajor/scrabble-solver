@@ -22,7 +22,7 @@ public interface MoveMapper {
     static List<int[]> fieldToListOfIntArrays(Set<Field> fields) {
         List<int[]> mappedFields = new ArrayList<>();
         for (Field field : fields) {
-            mappedFields.add(new int[]{field.getRow(), field.getColumn()});
+            mappedFields.add(new int[]{field.row(), field.column()});
         }
         return mappedFields;
     }

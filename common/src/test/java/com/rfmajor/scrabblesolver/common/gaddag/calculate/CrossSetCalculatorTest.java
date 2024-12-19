@@ -23,7 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class CrossSetCalculatorTest {
     private Alphabet alphabet;
     private Board board;
-    private CrossSetCalculator crossSetCalculator;
+    private CrossSetCalculator<Arc> crossSetCalculator;
 
     private static final int ROW = 1;
     private static final int COLUMN = 3;
@@ -40,7 +40,7 @@ class CrossSetCalculatorTest {
         Gaddag<Arc> gaddag = gaddagObjectConverter.convert(
                 List.of("pa", "able", "payable", "parable", "pay", "par", "part", "park", "cable"),
                 alphabet);
-        crossSetCalculator = new CrossSetCalculator(board, gaddag);
+        crossSetCalculator = new CrossSetCalculator<>(gaddag);
     }
 
     @BeforeEach
@@ -54,8 +54,10 @@ class CrossSetCalculatorTest {
         int column = 3;
         String word = "par";
         TestUtils.addWordToBoardVertically(word, row, column, board);
-        crossSetCalculator.computeCrossSets(row + word.length());
-        int crossSet = crossSetCalculator.getCrossSet(row + word.length(), column);
+
+        FieldSet fieldSet = crossSetCalculator.computeCrossSetsAndAnchors(row + word.length(), column, board);
+
+        int crossSet = fieldSet.getCrossSet(row + word.length(), column);
         assertTrue(BitSetUtils.containsOnly(crossSet, alphabet.getIndex('k'), alphabet.getIndex('t')));
     }
 
@@ -63,8 +65,10 @@ class CrossSetCalculatorTest {
     void givenWord_whenComputeCrossSetsAbove_thenReturnCorrectCrossSet() {
         String word = "able";
         TestUtils.addWordToBoardVertically(word, ROW, COLUMN, board);
-        crossSetCalculator.computeCrossSets(ROW - 1);
-        int crossSet = crossSetCalculator.getCrossSet(ROW - 1, COLUMN);
+
+        FieldSet fieldSet = crossSetCalculator.computeCrossSetsAndAnchors(ROW - 1, COLUMN, board);
+
+        int crossSet = fieldSet.getCrossSet(ROW - 1, COLUMN);
         assertTrue(BitSetUtils.containsOnly(crossSet, alphabet.getIndex('c')));
     }
 
@@ -74,8 +78,10 @@ class CrossSetCalculatorTest {
         String secondWord = "able";
         TestUtils.addWordToBoardVertically(firstWord, ROW, COLUMN, board);
         TestUtils.addWordToBoardVertically(secondWord, ROW + firstWord.length() + 1, COLUMN, board);
-        crossSetCalculator.computeCrossSets(ROW + firstWord.length());
-        int crossSet = crossSetCalculator.getCrossSet(ROW + firstWord.length(), COLUMN);
+
+        FieldSet fieldSet = crossSetCalculator.computeCrossSetsAndAnchors(ROW + firstWord.length(), COLUMN, board);
+
+        int crossSet = fieldSet.getCrossSet(ROW + firstWord.length(), COLUMN);
         assertTrue(BitSetUtils.containsOnly(crossSet, alphabet.getIndex('y'), alphabet.getIndex('r')));
     }
 
@@ -83,8 +89,10 @@ class CrossSetCalculatorTest {
     void givenNonCompletableWord_whenComputeCrossSetsBelow_thenReturn0() {
         String word = "payable";
         TestUtils.addWordToBoardVertically(word, ROW, COLUMN, board);
-        crossSetCalculator.computeCrossSets(ROW + word.length());
-        int crossSet = crossSetCalculator.getCrossSet(ROW + word.length(), COLUMN);
+
+        FieldSet fieldSet = crossSetCalculator.computeCrossSetsAndAnchors(ROW + word.length(), COLUMN, board);
+
+        int crossSet = fieldSet.getCrossSet(ROW + word.length(), COLUMN);
         assertEquals(0, crossSet);
     }
 
@@ -92,8 +100,10 @@ class CrossSetCalculatorTest {
     void givenNonCompletableWord_whenComputeCrossSetsAbove_thenReturn0() {
         String word = "part";
         TestUtils.addWordToBoardVertically(word, ROW, COLUMN, board);
-        crossSetCalculator.computeCrossSets(ROW - 1);
-        int crossSet = crossSetCalculator.getCrossSet(ROW - 1, COLUMN);
+
+        FieldSet fieldSet = crossSetCalculator.computeCrossSetsAndAnchors(ROW - 1, COLUMN, board);
+
+        int crossSet = fieldSet.getCrossSet(ROW - 1, COLUMN);
         assertEquals(0, crossSet);
     }
 
@@ -101,21 +111,25 @@ class CrossSetCalculatorTest {
     void givenWord_whenComputeAnchors_thenReturnCorrectVerticalAnchors() {
         String word = "part";
         TestUtils.addWordToBoardVertically(word, ROW, COLUMN, board);
-        crossSetCalculator.computeAnchors(COLUMN);
-        assertTrue(areAnchorsPresent(word, ROW));
+
+        FieldSet fieldSet = crossSetCalculator.computeCrossSetsAndAnchors(ROW, COLUMN, board);
+
+        assertTrue(areAnchorsPresent(word, ROW, fieldSet));
     }
 
     @Test
     void givenWordStartingFrom0Row_whenComputeAnchors_thenReturnCorrectVerticalAnchors() {
         String word = "part";
         TestUtils.addWordToBoardVertically(word, 0, COLUMN, board);
-        crossSetCalculator.computeAnchors(COLUMN);
-        assertTrue(areAnchorsPresent(word, 0));
+
+        FieldSet fieldSet = crossSetCalculator.computeCrossSetsAndAnchors(ROW, COLUMN, board);
+
+        assertTrue(areAnchorsPresent(word, 0, fieldSet));
     }
 
-    private boolean areAnchorsPresent(String word, int row) {
+    private boolean areAnchorsPresent(String word, int row, FieldSet fieldSet) {
         for (int i = Math.max(0, row - 1); i < row + word.length() + 1; i++) {
-            if (!crossSetCalculator.isAnchor(i, COLUMN)) {
+            if (!fieldSet.isAnchor(i, COLUMN)) {
                 return false;
             }
         }

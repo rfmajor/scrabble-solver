@@ -1,8 +1,11 @@
 package com.rfmajor.scrabblesolver.common.scrabble;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 import lombok.Builder;
 import lombok.Data;
 
+import java.io.IOException;
 import java.util.Set;
 
 @Data
@@ -12,6 +15,20 @@ public class SpecialFields {
     private final Set<Field> tripleLetterFields;
     private final Set<Field> doubleWordFields;
     private final Set<Field> tripleWordFields;
+
+    public static final String DOUBLE_LETTER = "doubleLetter";
+    public static final String TRIPLE_LETTER = "tripleLetter";
+    public static final String DOUBLE_WORD = "doubleWord";
+    public static final String TRIPLE_WORD = "tripleWord";
+
+    private static final ObjectMapper objectMapper = new ObjectMapper();
+    private static final String DEFAULT_FIELDS_FILENAME = "specialFields.json";
+
+    static {
+        SimpleModule module = new SimpleModule();
+        module.addDeserializer(SpecialFields.class, new SpecialFieldsDeserializer());
+        objectMapper.registerModule(module);
+    }
 
     public boolean isDoubleLetter(int x, int y) {
         return doubleLetterFields.contains(new Field(x, y));
@@ -27,5 +44,15 @@ public class SpecialFields {
 
     public boolean isTripleWord(int x, int y) {
         return tripleWordFields.contains(new Field(x, y));
+    }
+
+    public static SpecialFields loadDefault() {
+        try {
+            return objectMapper.readValue(
+                    SpecialFields.class.getClassLoader().getResourceAsStream(DEFAULT_FIELDS_FILENAME),
+                    SpecialFields.class);
+        } catch (IOException e) {
+            throw new IllegalStateException("Missing the default configuration file", e);
+        }
     }
 }

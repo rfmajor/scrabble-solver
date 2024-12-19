@@ -50,8 +50,26 @@ public class Alphabet {
         return indicesToLetters[index];
     }
 
+    @Override
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+
+        for (int i = 0; i < indicesToLetters.length - 1; i++) {
+            char letter = indicesToLetters[i];
+            int points = indicesToPoints[i];
+            int quantities = indicesToQuantities[i];
+            builder.append(String.format("%s: [id = %d, points = %d, quantities = %d]\n",
+                    letter, i, points, quantities));
+        }
+        builder.append(String.format("%s: %d\n", getDelimiter(), getDelimiterIndex()));
+        return builder.toString();
+    }
+
     public int getPoints(char letter) {
         int index = lettersToIndices.get(letter);
+        if (index == getDelimiterIndex()) {
+            throw new IllegalArgumentException("Delimiter can't have points");
+        }
         return indicesToPoints[index];
     }
 
@@ -86,6 +104,7 @@ public class Alphabet {
 
     public List<Character> getAllowedLetters(int letterSet) {
         return lettersToIndices.keySet().stream()
+                .filter(letter -> getIndex(letter) != getDelimiterIndex())
                 .filter(letter -> BitSetUtils.contains(letterSet, getIndex(letter)))
                 .toList();
     }
@@ -99,7 +118,8 @@ public class Alphabet {
 
         System.arraycopy(indicesToLettersBytes, 0, bytes, 0, indicesToLettersBytes.length);
         System.arraycopy(indicesToPointsBytes, 0, bytes, indicesToLettersBytes.length, indicesToPointsBytes.length);
-        System.arraycopy(indicesToQuantitiesBytes, 0, bytes, indicesToPointsBytes.length, indicesToQuantitiesBytes.length);
+        System.arraycopy(indicesToQuantitiesBytes, 0, bytes,
+                indicesToLettersBytes.length + indicesToPointsBytes.length, indicesToQuantitiesBytes.length);
 
         return bytes;
     }

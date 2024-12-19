@@ -2,42 +2,46 @@ package com.rfmajor.scrabblesolver.server.web.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
-import com.rfmajor.scrabblesolver.common.scrabble.SpecialFields;
+import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.rfmajor.scrabblesolver.common.gaddag.calculate.CrossSetCalculator;
+import com.rfmajor.scrabblesolver.common.gaddag.calculate.MoveGenerator;
+import com.rfmajor.scrabblesolver.common.gaddag.calculate.MovePostProcessor;
 import com.rfmajor.scrabblesolver.common.gaddag.calculate.PointCalculator;
-import com.rfmajor.scrabblesolver.common.gaddag.convert.ExpandedGaddagConverter;
-import com.rfmajor.scrabblesolver.common.gaddag.convert.SimpleGaddagConverter;
-import com.rfmajor.scrabblesolver.gaddag.converter.input.DictionaryReader;
-import com.rfmajor.scrabblesolver.gaddag.converter.input.SpecialFieldsReader;
+import com.rfmajor.scrabblesolver.common.gaddag.export.GaddagFileReader;
+import com.rfmajor.scrabblesolver.common.gaddag.model.Gaddag;
+import com.rfmajor.scrabblesolver.common.scrabble.Alphabet;
+import com.rfmajor.scrabblesolver.common.scrabble.SpecialFields;
+import com.rfmajor.scrabblesolver.common.scrabble.SpecialFieldsDeserializer;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
-import java.io.IOException;
 
 @Configuration
 public class BeanConfig {
     @Bean
-    public SimpleGaddagConverter simpleGaddagConverter() {
-        return new SimpleGaddagConverter();
-    }
-
-    @Bean
-    public ExpandedGaddagConverter expandedGaddagConverter() {
-        return new ExpandedGaddagConverter();
-    }
-
-    @Bean
     public ObjectMapper defaultObjectMapper() {
-        return new JsonMapper();
+        ObjectMapper mapper = new JsonMapper();
+        SimpleModule module = new SimpleModule();
+
+        module.addDeserializer(SpecialFields.class, new SpecialFieldsDeserializer());
+        mapper.registerModule(module);
+
+        return mapper;
     }
 
     @Bean
-    public SpecialFieldsReader specialFieldsReader() {
-        return new SpecialFieldsReader();
+    public SpecialFields specialFields() {
+        return SpecialFields.loadDefault();
     }
 
     @Bean
-    public SpecialFields specialFields(SpecialFieldsReader specialFieldsReader) throws IOException {
-        return specialFieldsReader.read();
+    public Gaddag<Long> gaddag(@Value("${gaddag.directory}") String directory) {
+        return new GaddagFileReader().read(directory);
+    }
+
+    @Bean
+    public Alphabet alphabet(Gaddag<Long> gaddag) {
+        return gaddag.getAlphabet();
     }
 
     @Bean
@@ -46,7 +50,19 @@ public class BeanConfig {
     }
 
     @Bean
-    public DictionaryReader dictionaryReader() {
-        return new DictionaryReader();
+    public CrossSetCalculator<Long> crossSetCalculator(Gaddag<Long> gaddag) {
+        return new CrossSetCalculator<>(gaddag);
+    }
+
+    @Bean
+    public MovePostProcessor movePostProcessor() {
+        return new MovePostProcessor();
+    }
+
+    @Bean
+    public MoveGenerator<Long> moveAlgorithmExecutor(Gaddag<Long> gaddag, MovePostProcessor movePostProcessor,
+                                                     PointCalculator pointCalculator,
+                                                     CrossSetCalculator<Long> crossSetCalculator) {
+        return new MoveGenerator<>(gaddag, movePostProcessor, pointCalculator, crossSetCalculator);
     }
 }

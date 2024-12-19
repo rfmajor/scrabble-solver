@@ -13,7 +13,6 @@ import org.junit.jupiter.api.Test;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.Collections;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -30,8 +29,8 @@ class GaddagByteStreamTest {
 
         Alphabet alphabet = new Alphabet(
                 TestUtils.mapStringToLettersList("abcdefghijklmnopqrstuvwxyz#"),
-                Collections.emptyList(),
-                Collections.emptyList()
+                List.of(1, 2, 3, 4, 1, 5, 1, 3, 5, 6, 2, 5, 1, 1, 2, 3, 4, 1, 5, 1, 3, 5, 6, 2, 5, 1),
+                List.of(1, 2, 1, 3, 1, 6, 1, 3, 3, 6, 2, 3, 1, 2, 2, 2, 2, 1, 3, 1, 3, 6, 2, 2, 2, 1)
         );
         List<String> words = List.of("pa", "pi", "op", "able", "payable", "parable", "pay", "par", "part", "park");
 
