@@ -4,4 +4,5 @@ include 'gaddag-converter'
 include 'server'
 include 'detection'
 include 'common'
+include 'scrabble-frontend'
 
