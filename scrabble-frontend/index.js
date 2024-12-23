@@ -5,7 +5,8 @@ const COLORS = {
     "tripleWord": "#e80d0d",
     "borderColor": "#000000",
     "empty": "#095e12",
-    "board": "#043608"
+    "board": "#043608",
+    "coords": "#ffffff"
 }
 const BOARD_LENGTH = 15
 const CELL_SIZE_PX = 40
@@ -55,7 +56,36 @@ async function putLetter(x, y, letter, canvas) {
     img.onload = async function () {
         ctx.drawImage(img, cell.x, cell.y, cell.w, cell.h)
     }
-    CELLS.add(cell.x, cell.y)
+    CELLS.add(`${cell.x},${cell.y}`)
+}
+
+function putHorizontalCoords(canvas) {
+    let ctx = canvas.getContext("2d")
+    ctx.font = "bold 20px arial"
+    ctx.fillStyle = COLORS["coords"]
+    ctx.textAlign = "left"
+    ctx.textBaseline = "bottom"
+    const beginning = 'A'.charCodeAt(0)
+    for (let i = 0; i < 15; i++) {
+        let letter = String.fromCharCode(beginning + i)
+        let cell = getCellCoordsAndWidth(i, 0)
+        let text = ctx.measureText(letter);
+        ctx.fillText(letter, cell.x + ((cell.w / 2) - (text.width / 2)), cell.y - CELL_SIZE_PX / 4)
+    }
+}
+
+function putVerticalCoords(canvas) {
+    let ctx = canvas.getContext("2d")
+    ctx.font = "bold 20px arial"
+    ctx.fillStyle = COLORS["coords"]
+    ctx.textAlign = "left"
+    ctx.textBaseline = "top"
+    for (let i = 0; i < 15; i++) {
+        let letter = (i + 1) + ''
+        let cell = getCellCoordsAndWidth(0, i)
+        let text = ctx.measureText(letter);
+        ctx.fillText(letter, cell.x - CELL_SIZE_PX + ((cell.w / 2) - (text.width / 2)), cell.y + CELL_SIZE_PX / 4)
+    }
 }
 
 window.onload = async function() {
@@ -86,14 +116,8 @@ window.onload = async function() {
         }
     }
 
-    ctx.font = "20px arial"
-    ctx.fillStyle = "white"
-    ctx.textAlign = "left"
-    ctx.textBaseline = "top"
-    let cell = getCellCoordsAndWidth(2, 0)
-    let letter = "C"
-    let text = ctx.measureText(letter);
-    ctx.fillText(letter, cell.x + ((cell.w / 2) - (text.width / 2)), cell.y - CELL_SIZE_PX)
+    putHorizontalCoords(CANVAS)
+    putVerticalCoords(CANVAS)
 
     await putLetter(8, 7, 'e', CANVAS)
     await putLetter(7, 7, 'w', CANVAS)
