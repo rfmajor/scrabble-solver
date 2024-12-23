@@ -124,4 +124,10 @@ window.onload = async function() {
     await putLetter(9, 7, 'ź', CANVAS)
     await putLetter(10, 7, 'blank', CANVAS)
     await putLetter(11, 7, 'e', CANVAS)
+
+    await putLetter(7, 8, 'e', CANVAS)
+    await putLetter(7, 9, 's', CANVAS)
+    await putLetter(7, 10, 'z', CANVAS)
+    await putLetter(7, 11, 'ł', CANVAS)
+    await putLetter(7, 12, 'o', CANVAS)
 }
