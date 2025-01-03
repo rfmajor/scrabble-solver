@@ -8,7 +8,7 @@ version = '0.0.1-SNAPSHOT'
 
 task fatJar(type: Jar) {
     manifest {
-        attributes 'Main-Class': "com.rfmajor.scrabblesolver.movegen.Main"
+        attributes 'Main-Class': "com.rfmajor.scrabblesolver.gaddag.converter.Main"
     }
     archiveBaseName = 'all-in-one-jar'
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
