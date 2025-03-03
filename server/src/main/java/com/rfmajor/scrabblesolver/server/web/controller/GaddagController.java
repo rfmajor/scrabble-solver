@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
-@RestController
+//@RestController
 @RequiredArgsConstructor
 public class GaddagController {
     private final MoveGeneratorService moveGeneratorService;

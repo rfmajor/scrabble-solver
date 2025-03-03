@@ -1,5 +1,6 @@
 [versions]
 spring-boot = "3.3.3"
+spring = "6.2.1"
 io-spring-dependency-management = "1.1.0"
 lombok = "1.18.36"
 mapstruct = "1.5.5.Final"
@@ -8,6 +9,8 @@ junit = "5.11.3"
 guava = "33.3.1-jre"
 slf4j = "2.0.16"
 jackson = "2.18.1"
+tyrus = "2.2.0"
+jakarta = "2.0.1"
 [plugins]
 spring-boot = {id='org.springframework.boot', version.ref="spring-boot"}
 io-spring-dependency-management = {id='io.spring.dependency-management', version.ref="io-spring-dependency-management"}
@@ -22,10 +25,18 @@ mapstruct-processor = {module = 'org.mapstruct:mapstruct-processor', version.ref
 lombok-mapstruct-binding = {module = 'org.projectlombok:lombok-mapstruct-binding', version.ref="lombok-mapstruct-binding"}
 spring-boot-starter = {module = 'org.springframework.boot:spring-boot-starter', version.ref="spring-boot"}
 spring-boot-starter-web = {module = 'org.springframework.boot:spring-boot-starter-web', version.ref="spring-boot"}
+spring-boot-starter-websocket = {module = 'org.springframework.boot:spring-boot-starter-websocket', version.ref="spring-boot"}
 spring-boot-starter-test = {module = 'org.springframework.boot:spring-boot-starter-test', version.ref="spring-boot"}
+spring-websocket = {module = 'org.springframework:spring-websocket', version.ref="spring"}
+spring-messaging = {module = 'org.springframework:spring-messaging', version.ref="spring"}
 slf4j = {module = 'org.slf4j:slf4j-api', version.ref="slf4j"}
+tyrus-server = {module = 'org.glassfish.tyrus:tyrus-server', version.ref="tyrus"}
+tyrus-container-grizzly-server = {module = 'org.glassfish.tyrus:tyrus-container-grizzly-server', version.ref="tyrus"}
 jackson-databind = {module = 'com.fasterxml.jackson.core:jackson-databind', version.ref="jackson"}
 jackson-annotations = {module = 'com.fasterxml.jackson.core:jackson-annotations', version.ref="jackson"}
+jakarta-inject = {module = 'jakarta.inject:jakarta.inject-api', version.ref="jakarta"}
+
 [bundles]
 jackson = ["jackson-databind", "jackson-annotations"]
 junit = ["junit-api", "junit-params", "junit-engine"]
+tyrus = ["tyrus-server", "tyrus-container-grizzly-server"]

@@ -130,4 +130,17 @@ window.onload = async function() {
     await putLetter(7, 10, 'z', CANVAS)
     await putLetter(7, 11, 'ł', CANVAS)
     await putLetter(7, 12, 'o', CANVAS)
+
+    function readFile(file) {
+        let reader = new FileReader();
+        reader.onload = readSuccess;
+        function readSuccess(evt) {
+            document.getElementById("cameraInput").src = evt.target.result
+        }
+        reader.readAsDataURL(file);
+    }
+
+    document.getElementById('cameraInput').onchange = function(e) {
+        readFile(e.target.files[0]);
+    };
 }
