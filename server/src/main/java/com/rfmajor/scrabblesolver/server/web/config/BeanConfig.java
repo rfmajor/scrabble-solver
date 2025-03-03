@@ -12,9 +12,16 @@ import com.rfmajor.scrabblesolver.common.gaddag.model.Gaddag;
 import com.rfmajor.scrabblesolver.common.scrabble.Alphabet;
 import com.rfmajor.scrabblesolver.common.scrabble.SpecialFields;
 import com.rfmajor.scrabblesolver.common.scrabble.SpecialFieldsDeserializer;
+import com.rfmajor.scrabblesolver.server.web.websocket.Room;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 @Configuration
 public class BeanConfig {
@@ -64,5 +71,20 @@ public class BeanConfig {
                                                      PointCalculator pointCalculator,
                                                      CrossSetCalculator<Long> crossSetCalculator) {
         return new MoveGenerator<>(gaddag, movePostProcessor, pointCalculator, crossSetCalculator);
+    }
+
+    @Bean
+    public Random random() {
+        return new Random();
+    }
+
+    @Bean
+    public ObjectMapper objectMapper() {
+        return new ObjectMapper();
+    }
+
+    @Bean
+    public ConcurrentMap<String, Room> activeRooms() {
+        return new ConcurrentHashMap<>();
     }
 }
