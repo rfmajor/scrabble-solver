@@ -18,7 +18,7 @@ task fatJar(type: Jar) {
 
 dependencies {
     implementation project(':common')
-    implementation(libs.slf4j)
+    implementation(libs.bundles.slf4j)
     implementation(libs.bundles.jackson)
     implementation(libs.guava)
     compileOnly(libs.lombok)

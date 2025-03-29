@@ -24,8 +24,8 @@ import static com.rfmajor.scrabblesolver.common.gaddag.utils.ExpandedGaddagUtils
 // actual bytes: 24 + 16 = 40 (multiple of 5)
 // 40 / 8 = 5 => 5 times larger array, 5 times faster index growth
 public class ExpandedGaddagByteArrayCompressor {
-    private static final int INITIAL_SIZE = 80; // 16 5-byte words
-    private static final int INDEX_MULTIPLIER = 5; // each word is 5 bytes
+    private static final int INITIAL_SIZE = 80;
+    private static final int INDEX_MULTIPLIER = 5;
     private static final Logger log = LoggerFactory.getLogger(ExpandedGaddagByteArrayCompressor.class);
 
     public CompressedByteGaddag minimize(ExpandedGaddag expandedGaddag) {
@@ -55,7 +55,7 @@ public class ExpandedGaddagByteArrayCompressor {
 
         compressArray(valueHolder.arcStateIdx, valueHolder);
 
-        System.out.printf("Arcs and states: %d, letter sets: %d\n", valueHolder.arcsAndStates.length / 5, expandedGaddag.getLetterSets().length);
+        log.info("Arcs and states: {}, letter sets: {}\n", valueHolder.arcsAndStates.length / 5, expandedGaddag.getLetterSets().length);
         // iterate over the arcs and set their destination state ids to the new ids
         int i = 0;
         while (i < valueHolder.arcsAndStates.length) {

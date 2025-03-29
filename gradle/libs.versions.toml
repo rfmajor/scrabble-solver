@@ -29,7 +29,8 @@ spring-boot-starter-websocket = {module = 'org.springframework.boot:spring-boot-
 spring-boot-starter-test = {module = 'org.springframework.boot:spring-boot-starter-test', version.ref="spring-boot"}
 spring-websocket = {module = 'org.springframework:spring-websocket', version.ref="spring"}
 spring-messaging = {module = 'org.springframework:spring-messaging', version.ref="spring"}
-slf4j = {module = 'org.slf4j:slf4j-api', version.ref="slf4j"}
+slf4j-api = {module = 'org.slf4j:slf4j-api', version.ref="slf4j"}
+slf4j-simple = {module = 'org.slf4j:slf4j-api', version.ref="slf4j"}
 tyrus-server = {module = 'org.glassfish.tyrus:tyrus-server', version.ref="tyrus"}
 tyrus-container-grizzly-server = {module = 'org.glassfish.tyrus:tyrus-container-grizzly-server', version.ref="tyrus"}
 jackson-databind = {module = 'com.fasterxml.jackson.core:jackson-databind', version.ref="jackson"}
@@ -40,3 +41,4 @@ jakarta-inject = {module = 'jakarta.inject:jakarta.inject-api', version.ref="jak
 jackson = ["jackson-databind", "jackson-annotations"]
 junit = ["junit-api", "junit-params", "junit-engine"]
 tyrus = ["tyrus-server", "tyrus-container-grizzly-server"]
+slf4j = ["slf4j-api", "slf4j-simple"]

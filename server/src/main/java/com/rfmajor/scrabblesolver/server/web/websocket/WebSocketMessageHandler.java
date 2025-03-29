@@ -2,6 +2,8 @@ package com.rfmajor.scrabblesolver.server.web.websocket;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.socket.BinaryMessage;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.WebSocketSession;
@@ -16,15 +18,17 @@ public class WebSocketMessageHandler extends BinaryWebSocketHandler {
     private final List<MessageProcessor> messageProcessors;
     private final ObjectMapper objectMapper;
 
+    private static final Logger log = LoggerFactory.getLogger(WebSocketMessageHandler.class);
+
     @Override
     public void afterConnectionEstablished(WebSocketSession session) {
-        System.out.printf("Opened session %s to the remote url: %s\n", session.getId(), session.getRemoteAddress());
+        log.info("Opened session {} to the remote url: {}", session.getId(), session.getRemoteAddress());
         sessionRegistry.put(session.getId(), session);
     }
 
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
-        System.out.printf("Closed session %s to the remote url: %s\n", session.getId(), session.getRemoteAddress());
+        log.info("Closed session {} to the remote url: {}", session.getId(), session.getRemoteAddress());
         sessionRegistry.remove(session.getId());
     }
 

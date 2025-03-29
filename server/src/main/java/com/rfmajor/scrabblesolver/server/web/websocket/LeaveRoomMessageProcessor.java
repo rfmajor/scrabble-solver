@@ -2,6 +2,8 @@ package com.rfmajor.scrabblesolver.server.web.websocket;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.BinaryMessage;
 import org.springframework.web.socket.WebSocketSession;
@@ -14,6 +16,8 @@ public class LeaveRoomMessageProcessor implements MessageProcessor {
     private final RoomServiceImpl roomService;
     private final ObjectMapper objectMapper;
 
+    private static final Logger log = LoggerFactory.getLogger(LeaveRoomMessageProcessor.class);
+
     @Override
     public void process(Object data, WebSocketSession session) throws IOException {
         if (!(data instanceof String roomId)) {
@@ -24,6 +28,7 @@ public class LeaveRoomMessageProcessor implements MessageProcessor {
             roomService.leaveRoom(roomId, session.getId());
             sendResponse(session, true);
         } catch (Exception e) {
+            log.error("Error while processing leave room", e);
             sendResponse(session, false);
         }
     }
