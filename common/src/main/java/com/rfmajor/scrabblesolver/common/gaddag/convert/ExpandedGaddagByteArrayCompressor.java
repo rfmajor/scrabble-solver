@@ -5,6 +5,8 @@ import com.rfmajor.scrabblesolver.common.gaddag.model.ExpandedGaddag;
 import com.rfmajor.scrabblesolver.common.gaddag.utils.BitSetUtils;
 import com.rfmajor.scrabblesolver.common.gaddag.utils.ExpandedGaddagUtils;
 import lombok.AllArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
 
@@ -16,12 +18,15 @@ import static com.rfmajor.scrabblesolver.common.gaddag.utils.ExpandedGaddagUtils
 import static com.rfmajor.scrabblesolver.common.gaddag.utils.ExpandedGaddagUtils.DEST_ID_START;
 
 
+// letter sets max id: 14 bits
+// states max id: 24 bits
 // needed bytes: 24 + 14 = 38
-// actual bytes: 24 + 16 = 40
-// 40 / 8 = 5 => 5 times larger array, 5 times larger index growth
+// actual bytes: 24 + 16 = 40 (multiple of 5)
+// 40 / 8 = 5 => 5 times larger array, 5 times faster index growth
 public class ExpandedGaddagByteArrayCompressor {
-    private static final int INITIAL_SIZE = 80;
-    private static final int INDEX_MULTIPLIER = 5;
+    private static final int INITIAL_SIZE = 80; // 16 5-byte words
+    private static final int INDEX_MULTIPLIER = 5; // each word is 5 bytes
+    private static final Logger log = LoggerFactory.getLogger(ExpandedGaddagByteArrayCompressor.class);
 
     public CompressedByteGaddag minimize(ExpandedGaddag expandedGaddag) {
         ValueHolder valueHolder = new ValueHolder(new byte[INITIAL_SIZE], 0,

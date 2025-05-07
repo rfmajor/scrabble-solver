@@ -44,17 +44,11 @@ class GaddagByteStreamTest {
     @Test
     void testGaddagIsUnchangedAfterExportingAndImporting() throws IOException {
         ByteArrayOutputStream gaddagOutputStream = new ByteArrayOutputStream();
-        ByteArrayOutputStream metadataOutputStream = new ByteArrayOutputStream();
-
-        outputStreamWriter.writeToOutputStreams(compressedByteGaddag, gaddagOutputStream, metadataOutputStream);
-
+        outputStreamWriter.writeToOutputStream(compressedByteGaddag, gaddagOutputStream);
         byte[] gaddagBytes = gaddagOutputStream.toByteArray();
-        byte[] metadataBytes = metadataOutputStream.toByteArray();
 
         ByteArrayInputStream gaddagInputStream = new ByteArrayInputStream(gaddagBytes);
-        ByteArrayInputStream metadataInputStream = new ByteArrayInputStream(metadataBytes);
-
-        CompressedByteGaddag actualGaddag = inputStreamReader.readFromInputStreams(gaddagInputStream, metadataInputStream);
+        CompressedByteGaddag actualGaddag = inputStreamReader.readFromInputStream(gaddagInputStream);
 
         assertEquals(compressedByteGaddag, actualGaddag);
     }

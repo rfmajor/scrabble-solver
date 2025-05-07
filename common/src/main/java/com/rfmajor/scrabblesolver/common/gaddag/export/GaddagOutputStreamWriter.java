@@ -6,11 +6,10 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.nio.charset.StandardCharsets;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import static com.rfmajor.scrabblesolver.common.gaddag.export.GaddagFileExporter.METADATA_ENTRIES;
 import static com.rfmajor.scrabblesolver.common.gaddag.utils.ByteStreamUtils.ALPHABET;
 import static com.rfmajor.scrabblesolver.common.gaddag.utils.ByteStreamUtils.ARCS_AND_STATES;
 import static com.rfmajor.scrabblesolver.common.gaddag.utils.ByteStreamUtils.DELIMITER;
@@ -19,11 +18,10 @@ import static com.rfmajor.scrabblesolver.common.gaddag.utils.ByteStreamUtils.ROO
 
 @Slf4j
 public class GaddagOutputStreamWriter {
-    public void writeToOutputStreams(CompressedByteGaddag compressedByteGaddag,
-                                     OutputStream gaddagOutputStream,
-                                     OutputStream metadataOutputStream) throws IOException {
-        Map<String, Integer> lengthsMap = new LinkedHashMap<>();
+    public void writeToOutputStream(CompressedByteGaddag compressedByteGaddag,
+                                    OutputStream gaddagOutputStream) throws IOException {
         Map<String, byte[]> byteData = new LinkedHashMap<>();
+        Map<String, Integer> byteMetadata = new LinkedHashMap<>();
 
         byteData.put(ROOT_ARC, ByteStreamUtils.longToBytes(compressedByteGaddag.getRootArc()));
         byteData.put(ALPHABET, compressedByteGaddag.getAlphabet().asByteArray());
@@ -31,18 +29,27 @@ public class GaddagOutputStreamWriter {
         byteData.put(LETTER_SETS, ByteStreamUtils.intArrayToBytes(compressedByteGaddag.getLetterSets()));
         byteData.put(ARCS_AND_STATES, compressedByteGaddag.getArcsAndStates());
 
-        try (gaddagOutputStream) {
-            for (String name : byteData.keySet()) {
-                byte[] bytes = byteData.get(name);
-                lengthsMap.put(name, bytes.length);
-                gaddagOutputStream.write(bytes, 0, bytes.length);
-            }
+        // header of the file, size: 5 * 4 bytes = 20 bytes
+        for (String name : METADATA_ENTRIES) {
+            byteMetadata.put(name, byteData.get(name).length);
         }
 
-        try (OutputStreamWriter outputStreamWriter = new OutputStreamWriter(metadataOutputStream, StandardCharsets.UTF_8)) {
-            for (String name : lengthsMap.keySet()) {
-                outputStreamWriter.write(String.format("%s=%d\n", name, lengthsMap.get(name)));
-            }
+        try (gaddagOutputStream) {
+            byteMetadata.forEach((name, metadata) -> {
+                byte[] metadataBytes = ByteStreamUtils.intToBytes(metadata);
+                try {
+                    gaddagOutputStream.write(metadataBytes);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            });
+            byteData.forEach((name, bytes) -> {
+                try {
+                    gaddagOutputStream.write(bytes);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            });
         }
     }
 }

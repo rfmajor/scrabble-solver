@@ -4,14 +4,13 @@ import com.rfmajor.scrabblesolver.common.gaddag.model.CompressedByteGaddag;
 import com.rfmajor.scrabblesolver.common.gaddag.utils.ByteStreamUtils;
 import com.rfmajor.scrabblesolver.common.scrabble.Alphabet;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import static com.rfmajor.scrabblesolver.common.gaddag.export.GaddagFileExporter.METADATA_ENTRIES;
 import static com.rfmajor.scrabblesolver.common.gaddag.utils.ByteStreamUtils.ALPHABET;
 import static com.rfmajor.scrabblesolver.common.gaddag.utils.ByteStreamUtils.ARCS_AND_STATES;
 import static com.rfmajor.scrabblesolver.common.gaddag.utils.ByteStreamUtils.DELIMITER;
@@ -19,13 +18,22 @@ import static com.rfmajor.scrabblesolver.common.gaddag.utils.ByteStreamUtils.LET
 import static com.rfmajor.scrabblesolver.common.gaddag.utils.ByteStreamUtils.ROOT_ARC;
 
 public class GaddagInputStreamReader {
-    public CompressedByteGaddag readFromInputStreams(InputStream gaddagInputStream, InputStream metadataInputStream)
+    private static final int METADATA_ENTRY_SIZE_BYTES = 4;
+
+    public CompressedByteGaddag readFromInputStream(InputStream gaddagInputStream)
             throws IOException {
-        Map<String, Integer> metadata = readMetadataStream(metadataInputStream);
         Map<String, byte[]> dataInBytes = new LinkedHashMap<>();
+        Map<String, Integer> metadata = new LinkedHashMap<>();
 
         try (gaddagInputStream) {
-            for (String name : metadata.keySet()) {
+            // read the metadata bytes first
+            for (String name : METADATA_ENTRIES) {
+                byte[] length = gaddagInputStream.readNBytes(METADATA_ENTRY_SIZE_BYTES);
+                metadata.put(name, ByteStreamUtils.bytesToInt(length));
+            }
+
+            // read the data
+            for (String name : METADATA_ENTRIES) {
                 byte[] data = gaddagInputStream.readNBytes(metadata.get(name));
                 dataInBytes.put(name, data);
             }
@@ -38,19 +46,6 @@ public class GaddagInputStreamReader {
         byte[] arcsAndStatesBytes = dataInBytes.get(ARCS_AND_STATES);
 
         return new CompressedByteGaddag(rootArc, alphabet, delimiter, arcsAndStatesBytes, letterSets);
-    }
-
-    private Map<String, Integer> readMetadataStream(InputStream metadataStream) throws IOException {
-        Map<String, Integer> metadata = new LinkedHashMap<>();
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(metadataStream))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                String[] parts = line.split("=");
-                metadata.put(parts[0], Integer.parseInt(parts[1]));
-            }
-        }
-
-        return metadata;
     }
 
     private Alphabet readAlphabet(byte[] alphabetBytes) {
