@@ -4,18 +4,15 @@ import com.rfmajor.scrabblesolver.common.gaddag.convert.ExpandedGaddagByteArrayC
 import com.rfmajor.scrabblesolver.common.gaddag.convert.ExpandedGaddagConverter;
 import com.rfmajor.scrabblesolver.common.gaddag.export.FileWordIterable;
 import com.rfmajor.scrabblesolver.common.gaddag.export.GaddagFileExporter;
-import com.rfmajor.scrabblesolver.common.gaddag.export.GaddagFileReader;
 import com.rfmajor.scrabblesolver.common.gaddag.model.CompressedByteGaddag;
 import com.rfmajor.scrabblesolver.common.gaddag.model.ExpandedGaddag;
 import com.rfmajor.scrabblesolver.common.gaddag.model.Gaddag;
 import com.rfmajor.scrabblesolver.common.scrabble.Alphabet;
-import com.rfmajor.scrabblesolver.common.scrabble.Board;
 import com.rfmajor.scrabblesolver.gaddag.converter.input.AlphabetReader;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.List;
 
 @Slf4j
 public class Main {
