@@ -10,20 +10,17 @@ import java.nio.file.Paths;
 import java.util.zip.GZIPInputStream;
 
 import static com.rfmajor.scrabblesolver.common.gaddag.utils.ByteStreamUtils.GADDAG_FILENAME;
-import static com.rfmajor.scrabblesolver.common.gaddag.utils.ByteStreamUtils.METADATA_FILENAME;
 
 @Slf4j
 public class GaddagFileReader implements GaddagReader {
     @Override
     public CompressedByteGaddag read(String directoryPath) {
         Path gaddagFile = Paths.get(directoryPath, GADDAG_FILENAME);
-        Path metadataFile = Paths.get(directoryPath, METADATA_FILENAME);
 
         GaddagInputStreamReader gaddagInputStreamReader = new GaddagInputStreamReader();
         try {
-            return gaddagInputStreamReader.readFromInputStreams(
-                    new GZIPInputStream(new FileInputStream(gaddagFile.toFile())),
-                    new FileInputStream(metadataFile.toFile())
+            return gaddagInputStreamReader.readFromInputStream(
+                    new GZIPInputStream(new FileInputStream(gaddagFile.toFile()))
             );
         } catch (IOException e) {
             log.error("Unable to load the gaddag files", e);

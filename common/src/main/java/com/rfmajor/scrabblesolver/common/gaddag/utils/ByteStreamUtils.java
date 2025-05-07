@@ -33,6 +33,14 @@ public final class ByteStreamUtils {
         return byteArray;
     }
 
+    public static byte[] intToBytes(long value) {
+        byte[] bytes = new byte[4];
+        for (int i = 0; i < bytes.length; i++) {
+            bytes[i] = (byte) (value >> (8 * i));
+        }
+        return bytes;
+    }
+
     public static byte[] longToBytes(long value) {
         byte[] bytes = new byte[8];
         for (int i = 0; i < bytes.length; i++) {
@@ -89,6 +97,17 @@ public final class ByteStreamUtils {
         long result = 0;
         for (int i = 0; i < bytes.length; i++) {
             result |= Byte.toUnsignedLong(bytes[i]) << (8 * i);
+        }
+        return result;
+    }
+
+    public static int bytesToInt(byte[] bytes) {
+        if (bytes.length != 4) {
+            throw new IllegalArgumentException("Int type needs to be 4 bytes long");
+        }
+        int result = 0;
+        for (int i = 0; i < bytes.length; i++) {
+            result |= Byte.toUnsignedInt(bytes[i]) << (8 * i);
         }
         return result;
     }
