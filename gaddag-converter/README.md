@@ -7,5 +7,5 @@
 2. Run:
 
 ```bash
-java -Xmx6g -jar gaddag-converter/build/libs/all-in-one-jar-0.0.1-SNAPSHOT.jar 16
+java -Xmx6g -jar gaddag-converter/build/libs/all-in-one-jar-0.0.1-SNAPSHOT.jar output/alphabet.json output/slowa.txt output/gaddag
 ```

@@ -11,38 +11,56 @@ import com.rfmajor.scrabblesolver.common.gaddag.model.Gaddag;
 import com.rfmajor.scrabblesolver.common.scrabble.Alphabet;
 import com.rfmajor.scrabblesolver.common.scrabble.Board;
 import com.rfmajor.scrabblesolver.gaddag.converter.input.AlphabetReader;
+import lombok.extern.slf4j.Slf4j;
 
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.List;
 
+@Slf4j
 public class Main {
+    private static final int ARGS_ALPHABET_FILE = 0;
+    private static final int ARGS_DICTIONARY_FILE = 1;
+    private static final int ARGS_GADDAG_FILE = 2;
+    private static final int ARGS_MAX_WORD_LENGTH = 3;
+
+    private static final int MIN_ARGS_LENGTH = 3;
+    private static final int DEFAULT_MAX_WORD_LENGTH = 15;
+
     public static void main(String[] args) throws IOException {
-//        executeRead(args);
-        executeCompression(args);
+        Args parsedArgs = readArgs(args);
+        executeCompression(parsedArgs.alphabetFile, parsedArgs.dictionaryFile,
+                parsedArgs.gaddagFile, parsedArgs.maxWordLength);
     }
 
-    public static List<Character> mapStringToLettersList(String letters) {
-        return letters.chars().mapToObj(c -> (char) c).toList();
+    private static Args readArgs(String[] args) {
+        if (args.length < MIN_ARGS_LENGTH) {
+            throw new IllegalArgumentException("At least " + MIN_ARGS_LENGTH + " arguments required but got " + args.length);
+        }
+
+        int maxWordLength = DEFAULT_MAX_WORD_LENGTH;
+        if (args.length >= ARGS_MAX_WORD_LENGTH + 1) {
+            try {
+                maxWordLength = Integer.parseInt(args[ARGS_MAX_WORD_LENGTH]);
+            } catch (NumberFormatException e) {
+                log.warn("Invalid max word length: {}. Defaulting to {}", args[ARGS_MAX_WORD_LENGTH], DEFAULT_MAX_WORD_LENGTH);
+            }
+        }
+
+        return new Args(args[ARGS_ALPHABET_FILE], args[ARGS_DICTIONARY_FILE], args[ARGS_GADDAG_FILE], maxWordLength);
     }
 
-    private static void executeRead(String[] args) {
-        GaddagFileReader reader = new GaddagFileReader();
-        CompressedByteGaddag gaddag = reader.read("output");
-    }
-
-    private static void executeCompression(String[] args) throws IOException {
-        final int maxLength = Integer.parseInt(args[0]);
-        Board board = new Board();
-        Alphabet alphabet = new AlphabetReader().readFromFile("output/alphabet.json");
-        System.out.println(alphabet.toString());
+    private static void executeCompression(String alphabetFile, String dictionaryFile,
+                                           String gaddagFile, int maxWordLength) throws IOException {
+        Alphabet alphabet = new AlphabetReader().readFromFile(alphabetFile);
 
         ExpandedGaddagConverter expandedGaddagConverter = new ExpandedGaddagConverter();
         Gaddag<Long> expandedGaddag;
         ExpandedGaddagByteArrayCompressor expandedGaddagByteArrayCompressor = new ExpandedGaddagByteArrayCompressor();
 
-        try (FileWordIterable fileWordIterable = new FileWordIterable(Main.class.getResourceAsStream("/slowa.txt"))) {
+        try (FileWordIterable fileWordIterable = new FileWordIterable(new FileInputStream(dictionaryFile))) {
             expandedGaddag = expandedGaddagConverter.convert(fileWordIterable, alphabet, word -> {
-                boolean correctLength = word.length() < maxLength;
+                boolean correctLength = word.length() <= maxWordLength;
                 boolean validChars = true;
                 for (int i = 0; i < word.length(); i++) {
                     if (!alphabet.containsLetter(word.charAt(i))) {
@@ -57,6 +75,13 @@ public class Main {
         }
         CompressedByteGaddag compressedGaddag = expandedGaddagByteArrayCompressor.minimize((ExpandedGaddag) expandedGaddag);
         GaddagFileExporter writer = new GaddagFileExporter();
-        writer.export(compressedGaddag, "output");
+        writer.export(compressedGaddag, gaddagFile);
     }
+
+    private record Args(
+            String alphabetFile,
+            String dictionaryFile,
+            String gaddagFile,
+            int maxWordLength
+    ) {}
 }
