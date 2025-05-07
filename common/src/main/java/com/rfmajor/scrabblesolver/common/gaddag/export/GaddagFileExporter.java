@@ -30,15 +30,15 @@ public class GaddagFileExporter implements GaddagExporter {
     );
 
     @Override
-    public void export(CompressedByteGaddag compressedByteGaddag, String directoryPath) {
-        Path gaddagFile = Paths.get(directoryPath, GADDAG_FILENAME);
+    public void export(CompressedByteGaddag compressedByteGaddag, String filePath) {
+        Path gaddagFile = Path.of(filePath);
 
         GaddagOutputStreamWriter writer = new GaddagOutputStreamWriter();
         try {
             writer.writeToOutputStream(compressedByteGaddag,
                     new GZIPOutputStream(new FileOutputStream(new File(gaddagFile.toUri()))));
         } catch (IOException e) {
-            log.error("Unable to save the gaddag files", e);
+            log.error("Unable to save the gaddag file", e);
             throw new RuntimeException(e);
         }
     }
