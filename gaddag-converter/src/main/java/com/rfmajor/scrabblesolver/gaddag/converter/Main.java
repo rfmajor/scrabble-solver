@@ -40,8 +40,10 @@ public class Main {
             try {
                 maxWordLength = Integer.parseInt(args[ARGS_MAX_WORD_LENGTH]);
             } catch (NumberFormatException e) {
-                log.warn("Invalid max word length: {}. Defaulting to {}", args[ARGS_MAX_WORD_LENGTH], DEFAULT_MAX_WORD_LENGTH);
+                log.warn("Invalid max word length: {}. Using default {}", args[ARGS_MAX_WORD_LENGTH], DEFAULT_MAX_WORD_LENGTH);
             }
+        } else {
+            log.info("No max word length specified. Using default {}", maxWordLength);
         }
 
         return new Args(args[ARGS_ALPHABET_FILE], args[ARGS_DICTIONARY_FILE], args[ARGS_GADDAG_FILE], maxWordLength);
@@ -70,9 +72,24 @@ public class Main {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+        logStats(expandedGaddag);
+
         CompressedByteGaddag compressedGaddag = expandedGaddagByteArrayCompressor.minimize((ExpandedGaddag) expandedGaddag);
+        logStats(compressedGaddag);
+
         GaddagFileExporter writer = new GaddagFileExporter();
         writer.export(compressedGaddag, gaddagFile);
+    }
+
+    private static void logStats(Gaddag<Long> gaddag) {
+        if (gaddag instanceof ExpandedGaddag expandedGaddag) {
+            ExpandedGaddag.Stats stats = expandedGaddag.getStats();
+            log.info("Expanded gaddag stats: {}", stats);
+        } else if (gaddag instanceof CompressedByteGaddag compressedGaddag) {
+            CompressedByteGaddag.Stats stats = compressedGaddag.getStats();
+            log.info("Compressed gaddag stats: {}", stats);
+        }
+
     }
 
     private record Args(

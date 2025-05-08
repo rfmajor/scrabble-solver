@@ -150,7 +150,7 @@ public class ExpandedGaddagConverter implements GaddagConverter<Long> {
             if (load > loadFactor) {
                 int oldLength = arcs.length;
                 int newLength = oldLength * 2;
-                System.out.printf(("Allocating %s states\n"), newLength);
+                log.info("Allocating {} states", newLength);
                 if (newLength > maximumStates) {
                     throw new RuntimeException(String.format("Exceeded the maximum states space (tried to allocate %d)", newLength));
                 }

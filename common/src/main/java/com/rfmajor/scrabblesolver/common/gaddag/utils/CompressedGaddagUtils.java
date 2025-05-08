@@ -8,11 +8,23 @@ public final class CompressedGaddagUtils {
 
     public static final int INDEX_MULTIPLIER = 5;
 
+    /**
+     * Retrieves INDEX_MULTIPLIER bytes starting from a given index in the source array and converts them to a 64-bit
+     * long value.
+     * @param idx starting index in the source array
+     * @param arcsAndStates source array
+     */
     public static long getRecord(int idx, byte[] arcsAndStates) {
         byte[] subArray = getSubArray(idx, arcsAndStates);
         return mergeBytes(subArray);
     }
 
+    /**
+     * Copies the byte representation of a given value to the arcsAndStates array starting from a specified index.
+     * @param value value to be copied
+     * @param idx starting index in the destination array
+     * @param arcsAndStates destination array
+     */
     public static void setRecord(long value, int idx, byte[] arcsAndStates) {
         byte[] valueParts = divideValue(value);
         System.arraycopy(valueParts, 0, arcsAndStates, idx, valueParts.length);
