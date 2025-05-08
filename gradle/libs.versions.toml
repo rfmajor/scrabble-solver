@@ -23,9 +23,11 @@ lombok-mapstruct-binding = {module = 'org.projectlombok:lombok-mapstruct-binding
 spring-boot-starter = {module = 'org.springframework.boot:spring-boot-starter', version.ref="spring-boot"}
 spring-boot-starter-web = {module = 'org.springframework.boot:spring-boot-starter-web', version.ref="spring-boot"}
 spring-boot-starter-test = {module = 'org.springframework.boot:spring-boot-starter-test', version.ref="spring-boot"}
-slf4j = {module = 'org.slf4j:slf4j-api', version.ref="slf4j"}
+slf4j-api = {module = 'org.slf4j:slf4j-api', version.ref="slf4j"}
+slf4j-simple = {module = 'org.slf4j:slf4j-simple', version.ref="slf4j"}
 jackson-databind = {module = 'com.fasterxml.jackson.core:jackson-databind', version.ref="jackson"}
 jackson-annotations = {module = 'com.fasterxml.jackson.core:jackson-annotations', version.ref="jackson"}
 [bundles]
 jackson = ["jackson-databind", "jackson-annotations"]
 junit = ["junit-api", "junit-params", "junit-engine"]
+slf4j = ["slf4j-api", "slf4j-simple"]
