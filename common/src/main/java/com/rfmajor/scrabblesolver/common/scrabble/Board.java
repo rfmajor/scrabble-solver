@@ -152,6 +152,10 @@ public class Board {
         return new Board(transposedFields, transposedBlankFields);
     }
 
+    public boolean isBlank(int x, int y) {
+        return blankFields.contains(new Field(x, y));
+    }
+
     private void fillBoardWithEmptyChars() {
         for (int i = 0; i < length(); i++) {
             for (int j = 0; j < length(); j++) {

@@ -1,7 +1,10 @@
 {
-  "title": "Board with a vertical word 'able' in the middle, the rack containing [aer$] letters",
+  "title": "Board with a vertical word 'able' in the middle (blank 'a'), the rack containing [aer$] letters",
   "wordsSetup": [
     {"word": "able", "row": 7, "column": 7, "direction": "DOWN"}
+  ],
+  "blanksSetup": [
+    {"row": 7, "column": 7}
   ],
   "playDirection": "ACROSS",
   "rack": "aer$",
@@ -10,7 +13,7 @@
       "startX": 6,
       "startY": 7,
       "expected": [
-        {"word": "care", "x": 6, "y": 7, "points": 10, "blanks": [0]}
+        {"word": "care", "x": 6, "y": 7, "points": 9, "blanks": [0]}
       ]
     }
   ]

@@ -3,6 +3,7 @@
   "wordsSetup": [
     {"word": "able", "row": 4, "column": 4, "direction": "ACROSS"}
   ],
+  "blanksSetup": [],
   "playDirection": "ACROSS",
   "rack": "acer",
   "testCases": [

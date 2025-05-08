@@ -1,6 +1,7 @@
 {
   "title": "Empty board, the rack containing [acer] letters",
   "wordsSetup": [],
+  "blanksSetup": [],
   "playDirection": "ACROSS",
   "rack": "acer",
   "testCases": [

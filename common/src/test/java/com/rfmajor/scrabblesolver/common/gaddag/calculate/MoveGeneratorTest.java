@@ -13,6 +13,7 @@ import com.rfmajor.scrabblesolver.common.gaddag.model.Gaddag;
 import com.rfmajor.scrabblesolver.common.scrabble.Alphabet;
 import com.rfmajor.scrabblesolver.common.scrabble.Board;
 import com.rfmajor.scrabblesolver.common.scrabble.Direction;
+import com.rfmajor.scrabblesolver.common.scrabble.Field;
 import com.rfmajor.scrabblesolver.common.scrabble.Move;
 import com.rfmajor.scrabblesolver.common.scrabble.Rack;
 import com.rfmajor.scrabblesolver.common.scrabble.SpecialFields;
@@ -60,7 +61,18 @@ class MoveGeneratorTest {
             "/moveGenerator/horizontal_able_lowerLeft.json",
             "/moveGenerator/horizontal_able_upperRight.json",
             "/moveGenerator/horizontal_able_lowerRight.json",
-            "/moveGenerator/vertical_able_middle_with_blanks.json",
+            "/moveGenerator/horizontal_able_anywhere_blank.json",
+            "/moveGenerator/horizontal_able_lowerLeft_blank.json",
+            "/moveGenerator/horizontal_able_lowerRight_blank.json",
+            "/moveGenerator/horizontal_able_upperLeft_blank.json",
+            "/moveGenerator/horizontal_able_upperRight_blank.json",
+            "/moveGenerator/vertical_able_anywhere_blank.json",
+            "/moveGenerator/vertical_able_upperLeft_blank.json",
+            "/moveGenerator/vertical_able_lowerLeft_blank.json",
+            "/moveGenerator/vertical_able_upperRight_blank.json",
+            "/moveGenerator/vertical_able_lowerRight_blank.json",
+            "/moveGenerator/vertical_able_middle_blankRack.json",
+            "/moveGenerator/vertical_able_middle_blankRack_blank.json",
     };
 
 
@@ -70,6 +82,9 @@ class MoveGeneratorTest {
         MovePostProcessor movePostProcessor = new MovePostProcessor();
         PointCalculator pointCalculator = new PointCalculator(SpecialFields.loadDefault());
 
+        // Points per letter according to the english rules:
+        // abcdefghijklmnopqrstuvwxyz#
+        // 1332142418513113A11114484A (A == 10)
         Alphabet alphabet = new Alphabet(
                 TestUtils.mapStringToLettersList("abcdefghijklmnopqrstuvwxyz#"),
                 List.of(1, 3, 3, 2, 1, 4, 2, 4, 1, 8, 5, 1, 3, 1, 1, 3, 10, 1, 1, 1, 1, 4, 4, 8, 4, 10),
@@ -134,9 +149,6 @@ class MoveGeneratorTest {
                                      MoveGenerator<A> algorithmExecutor,
                                      CrossSetCalculator<A> crossSetCalculator) {
         assertNotNull(testSet);
-        if (testSet.rack.equals("aer$")) {
-            System.out.println();
-        }
 
         for (WordSetup setup : testSet.wordsSetup) {
             if (setup.direction == Direction.ACROSS) {
@@ -146,6 +158,10 @@ class MoveGeneratorTest {
             } else {
                 throw new AssertionError(String.format("Invalid direction: %s", setup.direction));
             }
+        }
+
+        for (BlankSetup setup : testSet.blanksSetup) {
+            board.getBlankFields().add(new Field(setup.row, setup.column));
         }
 
         FieldSet fieldSet = crossSetCalculator.computeAllCrossSetsAndAnchors(board);
@@ -195,12 +211,14 @@ class MoveGeneratorTest {
         }
     }
 
-    private record TestSet(String title, List<WordSetup> wordsSetup,
+    private record TestSet(String title, List<WordSetup> wordsSetup, List<BlankSetup> blanksSetup,
                            Direction playDirection, String rack, List<TestCase> testCases) {}
 
     private record TestCase(int startX, int startY, Set<ExpectedMove> expected) {}
 
     private record WordSetup(String word, int row, int column, Direction direction) {}
 
-    private record ExpectedMove(String word, int x, int y, int points, java.util.Set<Integer> blanks) {}
+    private record BlankSetup(int row, int column) {}
+
+    private record ExpectedMove(String word, int x, int y, int points, Set<Integer> blanks) {}
 }
