@@ -23,8 +23,8 @@ import java.util.stream.Collectors;
 
 @Data
 public class Board {
-    private final char[][] fields;
-    private final Set<Field> blankFields;
+    private char[][] fields;
+    private Set<Field> blankFields;
 
     public Board() {
         this.fields = new char[DEFAULT_SIZE][DEFAULT_SIZE];
@@ -152,10 +152,14 @@ public class Board {
         return new Board(transposedFields, transposedBlankFields);
     }
 
+    public boolean isBlank(int x, int y) {
+        return blankFields.contains(new Field(x, y));
+    }
+
     private void fillBoardWithEmptyChars() {
         for (int i = 0; i < length(); i++) {
             for (int j = 0; j < length(); j++) {
-                fields[i][j] = 0;
+                fields[i][j] = '\0';
             }
         }
     }

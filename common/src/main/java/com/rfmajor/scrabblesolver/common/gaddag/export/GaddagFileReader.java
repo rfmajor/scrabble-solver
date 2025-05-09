@@ -6,16 +6,13 @@ import lombok.extern.slf4j.Slf4j;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.zip.GZIPInputStream;
-
-import static com.rfmajor.scrabblesolver.common.gaddag.utils.ByteStreamUtils.GADDAG_FILENAME;
 
 @Slf4j
 public class GaddagFileReader implements GaddagReader {
     @Override
-    public CompressedByteGaddag read(String directoryPath) {
-        Path gaddagFile = Paths.get(directoryPath, GADDAG_FILENAME);
+    public CompressedByteGaddag read(String gaddagFilePath) {
+        Path gaddagFile = Path.of(gaddagFilePath);
 
         GaddagInputStreamReader gaddagInputStreamReader = new GaddagInputStreamReader();
         try {

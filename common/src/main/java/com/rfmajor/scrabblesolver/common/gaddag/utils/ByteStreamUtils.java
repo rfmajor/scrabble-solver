@@ -5,8 +5,6 @@ import lombok.NoArgsConstructor;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ByteStreamUtils {
-    public static final String GADDAG_FILENAME = "gaddag.dat";
-    public static final String METADATA_FILENAME = "metadata";
     public static final String ROOT_ARC = "rootArc";
     public static final String ALPHABET = "alphabet";
     public static final String DELIMITER = "delimiter";

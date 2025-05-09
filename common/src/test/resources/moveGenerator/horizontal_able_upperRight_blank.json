@@ -1,9 +1,11 @@
 {
-  "title": "Board with a horizontal word 'able' in the upper right corner, the rack containing [acer] letters",
+  "title": "Board with a horizontal word 'able' in the upper right corner (blank 'e'), the rack containing [acer] letters",
   "wordsSetup": [
     {"word": "able", "row": 0, "column": 11, "direction": "ACROSS"}
   ],
-  "blanksSetup": [],
+  "blanksSetup": [
+    {"row": 0, "column": 14}
+  ],
   "playDirection": "ACROSS",
   "rack": "acer",
   "testCases": [
@@ -11,28 +13,28 @@
       "startX": 0,
       "startY": 11,
       "expected": [
-        {"word": "cable", "x": 0, "y": 10, "points": 9, "blanks": []}
+        {"word": "cable", "x": 0, "y": 10, "points": 8, "blanks": [4]}
       ]
     },
     {
       "startX": 0,
       "startY": 12,
       "expected": [
-        {"word": "cable", "x": 0, "y": 10, "points": 9, "blanks": []}
+        {"word": "cable", "x": 0, "y": 10, "points": 8, "blanks": [4]}
       ]
     },
     {
       "startX": 0,
       "startY": 13,
       "expected": [
-        {"word": "cable", "x": 0, "y": 10, "points": 9, "blanks": []}
+        {"word": "cable", "x": 0, "y": 10, "points": 8, "blanks": [4]}
       ]
     },
     {
       "startX": 0,
       "startY": 14,
       "expected": [
-        {"word": "cable", "x": 0, "y": 10, "points": 9, "blanks": []}
+        {"word": "cable", "x": 0, "y": 10, "points": 8, "blanks": [4]}
       ]
     }
   ]

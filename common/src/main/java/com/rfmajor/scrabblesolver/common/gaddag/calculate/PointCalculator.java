@@ -19,8 +19,8 @@ import java.util.Set;
 public class PointCalculator {
     private final SpecialFields specialFields;
 
+    private static final char BLANK_INDICATOR = '0';
     public static final int FULL_RACK_BONUS = 50;
-
 
     public List<Move> calculatePoints(Collection<Move> moves, Board board, Alphabet alphabet, Rack rack) {
         Set<Move> validMoves = new HashSet<>(moves);
@@ -131,7 +131,9 @@ public class PointCalculator {
     private int calculateRawPoints(String word, Alphabet alphabet) {
         int points = 0;
         for (int i = 0; i < word.length(); i++) {
-            points += alphabet.getPoints(word.charAt(i));
+            if (word.charAt(i) != BLANK_INDICATOR) {
+                points += alphabet.getPoints(word.charAt(i));
+            }
         }
         return points;
     }
@@ -162,13 +164,15 @@ public class PointCalculator {
         for (int blankIndex : blankIndices) {
             int index = upwards ? startIndex - blankIndex : blankIndex - startIndex;
             if (index >= 0 && index < word.length()) {
-                stringBuilder.setCharAt(index, '0');
+                stringBuilder.setCharAt(index, BLANK_INDICATOR);
             }
         }
         return stringBuilder.toString();
     }
 
     private boolean isBlank(int index, Move move, Set<Field> blankFields) {
-        return move.isBlankLetter(index) || blankFields.contains(new Field(move.getX() + index, move.getY()));
+        // moves are processed as always being across (because if direction is down then the board is transposed),
+        // so only y can change
+        return move.isBlankLetter(index) || blankFields.contains(new Field(move.getX(), move.getY() + index));
     }
 }

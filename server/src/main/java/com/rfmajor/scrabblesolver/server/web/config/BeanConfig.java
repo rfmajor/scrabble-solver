@@ -35,8 +35,8 @@ public class BeanConfig {
     }
 
     @Bean
-    public Gaddag<Long> gaddag(@Value("${gaddag.directory}") String directory) {
-        return new GaddagFileReader().read(directory);
+    public Gaddag<Long> gaddag(@Value("${gaddag.file}") String gaddagFile) {
+        return new GaddagFileReader().read(gaddagFile);
     }
 
     @Bean

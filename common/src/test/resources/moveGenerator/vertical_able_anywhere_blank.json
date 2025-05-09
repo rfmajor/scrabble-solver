@@ -1,9 +1,11 @@
 {
-  "title": "Board with a vertical word 'able' somewhere on it, the rack containing [acer] letters",
+  "title": "Board with a vertical word 'able' somewhere on it (blank 'a'), the rack containing [acer] letters",
   "wordsSetup": [
     {"word": "able", "row": 4, "column": 4, "direction": "DOWN"}
   ],
-  "blanksSetup": [],
+  "blanksSetup": [
+    {"row": 4, "column": 4}
+  ],
   "playDirection": "ACROSS",
   "rack": "acer",
   "testCases": [
@@ -11,15 +13,15 @@
       "startX": 3,
       "startY": 4,
       "expected": [
-        {"word": "care", "x": 3, "y": 4, "points": 16, "blanks": []}
+        {"word": "care", "x": 3, "y": 4, "points": 15, "blanks": []}
       ]
     },
     {
       "startX": 4,
       "startY": 4,
       "expected": [
-        {"word": "care", "x": 4, "y": 3, "points": 6, "blanks": []},
-        {"word": "ar", "x": 4, "y": 4, "points": 2, "blanks": []}
+        {"word": "care", "x": 4, "y": 3, "points": 5, "blanks": [1]},
+        {"word": "ar", "x": 4, "y": 4, "points": 1, "blanks": [0]}
       ]
     },
     {
@@ -45,8 +47,8 @@
       "startX": 8,
       "startY": 4,
       "expected": [
-        {"word": "ar", "x": 8, "y": 3, "points": 9, "blanks": []},
-        {"word": "care", "x": 8, "y": 2, "points": 16, "blanks": []}
+        {"word": "ar", "x": 8, "y": 3, "points": 8, "blanks": []},
+        {"word": "care", "x": 8, "y": 2, "points": 15, "blanks": []}
       ]
     }
   ]

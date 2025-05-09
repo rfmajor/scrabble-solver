@@ -90,17 +90,18 @@ public class MoveGenerator<A> {
         /**
          * Generates the moves from left to right using the GADDAG move generation algorithm created by Steven Gordon.
          *
-         * @param offset - offset from the anchor square
-         * @param row - starting row
-         * @param column - starting column
-         * @param word - word being generated
-         * @param rack - rack which is used for the computation
-         * @param arc - starting arc
+         * @param offset offset from the anchor square
+         * @param row starting row
+         * @param column starting column
+         * @param word word being generated
+         * @param rack rack which is used for the computation
+         * @param arc starting arc
          **/
         private void generate(int offset, int row, int column, Word word, Rack rack, A arc) {
             if (board.isOccupiedByLetter(row, column + offset)) {
                 char letter = board.getField(row, column + offset);
-                goOn(offset, row, column, letter, word, rack, gaddag.findNextArc(arc, letter), arc, moves, false);
+                boolean isBlank = board.isBlank(row, column + offset);
+                goOn(offset, row, column, letter, word, rack, gaddag.findNextArc(arc, letter), arc, moves, isBlank);
             }
             else if (!rack.isEmpty()) {
                 for (char letter : rack.getAllowedLetters(fieldSet.getCrossSet(row, column + offset), alphabet)) {
