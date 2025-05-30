@@ -42,7 +42,7 @@ function submitBoard() {
     let rack = encodeURIComponent(document.getElementsByName("rack")[0].value)
     const req = new XMLHttpRequest()
     const boardNotation = encodeURIComponent(getBoardNotation())
-    const url = `http://localhost:8080/api/v1/moves?board=${boardNotation}&rack=${rack}`
+    const url = `http://localhost:8025/api/v1/moves?board=${boardNotation}&rack=${rack}`
     console.log(url)
     req.onload = (e) => {
         const response = req.response
