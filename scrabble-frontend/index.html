@@ -10,11 +10,41 @@
 <body>
     <script>
     </script>
-    <input type="file" capture="environment" accept="image/*" id="cameraInput" name="cameraInput">
-    <a href="options.html">Go to page 2</a>
+    <!-- <input type="file" capture="environment" accept="image/*" id="cameraInput" name="cameraInput"> -->
+    <!-- <a href="options.html">Go to page 2</a> -->
     <div class="content">
         <div class="game-container">
-            <canvas id="scrabble-canvas" width="900" height="900"></canvas>
+            <div class="canvas-container">
+                <canvas id="main-canvas" class="scrabble-canvas" width="696" height="696"></canvas>
+                <canvas id="tiles-canvas" class="scrabble-canvas" width="696" height="696"></canvas>
+                <canvas id="input-canvas" class="scrabble-canvas" width="696" height="696"></canvas>
+            </div>
+            <div class="right-section-container">
+                <div class="results-list-container">
+                    <h2 class="results-header">Possible moves</h2>
+                    <section>
+                        <ol id="results-list" class="results-list">
+                            <li>Item 1</li>
+                            <li>Item 2</li>
+                            <li>Item 3</li>
+                            <li>Item 4</li>
+                            <li>Item 5</li>
+                            <li>Item 6</li>
+                            <li>Item 7</li>
+                            <li>Item 8</li>
+                        </ol>
+                    </section>
+                </div>
+                <div class="rack-input-wrapper">
+                    <label class="rack-input-label">
+                        Rack
+                        <input class="rack-input" id="rack" name="rack" type="text" maxlength="7">
+                    </label>
+                </div>
+                <div class="submit-button-container">
+                    <button type="submit" class="submit-board-button" onclick="submitBoard()">Submit</button>
+                </div>
+            </div>
         </div>
     </div>
 </body>

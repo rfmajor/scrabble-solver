@@ -6,14 +6,27 @@ const COLORS = {
     "borderColor": "#000000",
     "empty": "#095e12",
     "board": "#043608",
-    "coords": "#ffffff"
+    "coords": "#ffffff",
+}
+const VI_COLORS = {
+    "INSERT": "#da2b2b",
+    "VERTICAL_INSERT": "#193bf3",
+    "NORMAL": "#ecdada"
 }
 const BOARD_LENGTH = 15
 const CELL_SIZE_PX = 40
 const BORDER_SIZE_PX = 1
 const BOARD_PADDING_PX = 40
 const BOARD_SIZE_PX = 16 * BORDER_SIZE_PX + 15 * CELL_SIZE_PX
-const CELLS = new Set()
+let CELLS = new Map()
+let CELLS_ARR = Array(BOARD_LENGTH).fill(0).map(_row => Array(BOARD_LENGTH).fill(''))
+let BLANKS = new Set()
+const CELLS_SNAPSHOTS = []
+const ALPHABET = new Set("aąbcćdeęfghijklłmnńoóprsśtuwyzźż".split(""))
+
+let currentCell = {x: 7, y: 7}
+let viMode = "NORMAL"
+let blankMode = false
 
 function getCellCoordsAndWidth(x, y) {
     // needs to include the border size:
@@ -47,16 +60,199 @@ async function fillCell(x, y, color, canvas) {
     ctx.fillRect(cell.x, cell.y, cell.w, cell.h)
 }
 
-async function putLetter(x, y, letter, canvas) {
+async function putLetter(x, y, letter, canvas, blank) {
+    if (x < 0 || y < 0 || x >= BOARD_LENGTH || y >= BOARD_LENGTH) {
+        return
+    }
     let ctx = canvas.getContext("2d")
     let cell = getCellCoordsAndWidth(x, y)
 
+    let imgName
+    if (blank) {
+        imgName = 'blank'
+        BLANKS.add(JSON.stringify({row: y, col: x}))
+    } else {
+        imgName = letter.toLowerCase()
+    }
     let img = new Image()
-    img.src = `./assets/letters/${letter.toLowerCase()}.gif`
+    img.src = `./assets/letters/${imgName}.gif`
     img.onload = async function () {
         ctx.drawImage(img, cell.x, cell.y, cell.w, cell.h)
     }
-    CELLS.add(`${cell.x},${cell.y}`)
+
+    // JS Canvas API coordinate system is transposed in relation to the scrabble coordinate system
+    CELLS_ARR[y][x] = letter
+}
+
+async function removeLetter(x, y, canvas) {
+    let ctx = canvas.getContext("2d")
+    let cell = getCellCoordsAndWidth(x, y)
+
+    ctx.clearRect(cell.x, cell.y, cell.w, cell.h)
+
+    BLANKS.delete(JSON.stringify({row: y, col: x}))
+    CELLS_ARR[y][x] = ''
+}
+
+async function highlightLetter(x, y, color, canvas, clearFirst) {
+    let ctx = canvas.getContext("2d")
+    let cell = getCellCoordsAndWidth(x, y)
+
+    if (clearFirst) {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+
+    ctx.shadowColor = "#000000";
+    ctx.shadowBlur = 100;
+    ctx.lineJoin = "bevel";
+    ctx.lineWidth = 5;
+    ctx.strokeStyle = color
+
+    ctx.strokeRect(cell.x, cell.y, cell.w, cell.h)
+}
+
+function recordSnapshot() {
+    CELLS_SNAPSHOTS.push(new Map(CELLS))
+}
+
+async function restoreSnapshot() {
+    if (CELLS_SNAPSHOTS.length > 0) {
+        CELLS = CELLS_SNAPSHOTS.pop()
+        await redrawFromCells(document.getElementById("tiles-canvas"))
+    }
+}
+
+async function redrawFromCells(tileCanvas) {
+    clearCanvas(tileCanvas)
+    for (let x = 0; x < BOARD_LENGTH; x++) {
+        for (let y = 0; y < BOARD_LENGTH; y++) {
+            let letter = CELLS_ARR[y][x]
+            if (letter !== '') {
+                let cell = getCellCoordsAndWidth(x, y)
+                await putLetter(cell.x, cell.y, letter, tileCanvas)
+            }
+        }
+    }
+}
+
+function clearCanvas(canvas) {
+    canvas.getContext("2d").clearRect(0, 0, canvas.width, canvas.height)
+}
+
+async function interpretKeyCode(e) {
+    // TODO: this is ugly and hacky (every input I add in the future will have to satisfy a similar condition), fix later
+    if (e.target === document.getElementById("rack")) {
+        return
+    }
+
+    const INPUT_CANVAS = document.getElementById("input-canvas")
+    const MAIN_CANVAS = document.getElementById("main-canvas")
+    const TILES_CANVAS = document.getElementById("tiles-canvas")
+
+    let keyCode = e.key
+
+    let modeSwitched = await checkForModeSwitch(keyCode)
+    await highlightLetter(currentCell.x, currentCell.y, VI_COLORS[viMode], INPUT_CANVAS, true)
+    if (modeSwitched) {
+        return
+    }
+
+    switch (viMode) {
+        case "NORMAL":
+            await handleNormalMode(keyCode, TILES_CANVAS, INPUT_CANVAS)
+            break
+        case "INSERT":
+            await handleInsertMode(keyCode, TILES_CANVAS, INPUT_CANVAS)
+            break
+        case "VERTICAL_INSERT":
+            await handleVerticalInsertMode(keyCode, TILES_CANVAS, INPUT_CANVAS)
+
+    }
+}
+
+async function checkForModeSwitch(key) {
+    switch (key) {
+        case 'i':
+            if (viMode === "NORMAL") {
+                viMode = "INSERT"
+                return true
+            }
+            return false
+        case 'I':
+            if (viMode === "NORMAL") {
+                viMode = "VERTICAL_INSERT"
+                return true
+            }
+            return false
+        case 'Escape':
+            if (viMode === "INSERT" || viMode === "VERTICAL_INSERT") {
+                viMode = "NORMAL"
+                return true
+            }
+            return false
+        default:
+            return false
+    }
+}
+
+async function handleNormalMode(key, tilesCanvas, inputCanvas) {
+    switch (key) {
+        case 'j':
+            await moveCursor(currentCell.x, currentCell.y + 1, VI_COLORS["NORMAL"], inputCanvas)
+            break
+        case 'k':
+            await moveCursor(currentCell.x, currentCell.y - 1, VI_COLORS["NORMAL"], inputCanvas)
+            break
+        case 'h':
+            await moveCursor(currentCell.x - 1, currentCell.y, VI_COLORS["NORMAL"], inputCanvas)
+            break
+        case 'l':
+            await moveCursor(currentCell.x + 1, currentCell.y, VI_COLORS["NORMAL"], inputCanvas)
+            break
+        case 'i':
+            await moveCursor(currentCell.x + 1, currentCell.y, VI_COLORS["NORMAL"], inputCanvas)
+            break
+        case 'x':
+            await removeLetter(currentCell.x, currentCell.y, tilesCanvas)
+            break
+    }
+}
+
+async function handleInsertMode(key, tilesCanvas, inputCanvas) {
+    if (key === "Enter") {
+        blankMode = true
+    }
+    if (key === "Backspace") {
+        await removeLetter(currentCell.x, currentCell.y, tilesCanvas)
+        await moveCursor(currentCell.x - 1, currentCell.y, VI_COLORS["INSERT"], inputCanvas)
+    } else if (ALPHABET.has(key) || key === "blank") {
+        await putLetter(currentCell.x, currentCell.y, key, tilesCanvas, blankMode)
+        await moveCursor(currentCell.x + 1, currentCell.y, VI_COLORS["INSERT"], inputCanvas)
+    }
+}
+
+async function handleVerticalInsertMode(key, tilesCanvas, inputCanvas) {
+    if (key === "Enter") {
+        blankMode = true
+        return
+    }
+    if (key === "Backspace") {
+        await removeLetter(currentCell.x, currentCell.y, tilesCanvas)
+        await moveCursor(currentCell.x, currentCell.y - 1, VI_COLORS["VERTICAL_INSERT"], inputCanvas)
+    } else if (ALPHABET.has(key) || key === "blank") {
+        console.log(key)
+        await putLetter(currentCell.x, currentCell.y, key, tilesCanvas)
+        await moveCursor(currentCell.x, currentCell.y + 1, VI_COLORS["VERTICAL_INSERT"], inputCanvas)
+    }
+    blankMode = false
+}
+
+async function moveCursor(x, y, color, canvas) {
+    if (x < 0 || y < 0 || x >= BOARD_LENGTH || y >= BOARD_LENGTH) {
+        return
+    }
+    currentCell = {x: x, y: y}
+    await highlightLetter(x, y, color, canvas, true)
 }
 
 function putHorizontalCoords(canvas) {
@@ -66,7 +262,7 @@ function putHorizontalCoords(canvas) {
     ctx.textAlign = "left"
     ctx.textBaseline = "bottom"
     const beginning = 'A'.charCodeAt(0)
-    for (let i = 0; i < 15; i++) {
+    for (let i = 0; i < BOARD_LENGTH; i++) {
         let letter = String.fromCharCode(beginning + i)
         let cell = getCellCoordsAndWidth(i, 0)
         let text = ctx.measureText(letter);
@@ -80,7 +276,7 @@ function putVerticalCoords(canvas) {
     ctx.fillStyle = COLORS["coords"]
     ctx.textAlign = "left"
     ctx.textBaseline = "top"
-    for (let i = 0; i < 15; i++) {
+    for (let i = 0; i < BOARD_LENGTH; i++) {
         let letter = (i + 1) + ''
         let cell = getCellCoordsAndWidth(0, i)
         let text = ctx.measureText(letter);
@@ -88,14 +284,52 @@ function putVerticalCoords(canvas) {
     }
 }
 
+function getBoardNotation() {
+    let notation = ''
+    for (let row of CELLS_ARR) {
+        let counter = 0
+        let rowNotation = ''
+        for (let col of row) {
+            if (col === '') {
+                counter++
+            } else {
+                if (counter !== 0) {
+                    rowNotation += counter
+                }
+                rowNotation += col
+                counter = 0
+            }
+        }
+        if (counter !== 0) {
+            rowNotation += counter
+        }
+        notation += `${rowNotation}/`
+    }
+    // trim trailing "/"
+    notation = notation.substring(0, notation.length - 1)
+
+    if (BLANKS.size > 0) {
+        notation += " b:"
+    }
+    for (let blank of BLANKS) {
+        const coords = JSON.parse(blank)
+        notation += `${coords.col};${coords.row},`
+    }
+    // trim trailing ","
+    notation = notation.substring(0, notation.length - 1)
+    return notation
+}
+
 window.onload = async function() {
-    const CANVAS = document.getElementById("scrabble-canvas")
+    const MAIN_CANVAS = document.getElementById("main-canvas")
+    const INPUT_CANVAS = document.getElementById("input-canvas")
+    const TILES_CANVAS = document.getElementById("tiles-canvas")
 
     let specialFields = await fetch('./assets/specialFields.json')
         .then(response => response.json())
 
     // board padding
-    let ctx = CANVAS.getContext("2d")
+    let ctx = MAIN_CANVAS.getContext("2d")
     ctx.fillStyle = COLORS["board"]
     ctx.fillRect(0, 0, BOARD_SIZE_PX + 2 * BOARD_PADDING_PX, BOARD_SIZE_PX + 2 * BOARD_PADDING_PX)
 
@@ -103,44 +337,34 @@ window.onload = async function() {
 
     for (const key of Object.keys(specialFields)) {
         for (let field of specialFields[key]) {
-            await fillCell(field[0], field[1], COLORS[key], CANVAS)
-            specialFieldsPopulated.add(`${field[0]}, ${field[1]}`)
+            await fillCell(field[0], field[1], COLORS[key], MAIN_CANVAS)
+            specialFieldsPopulated.add(`${field[0]},${field[1]}`)
         }
     }
 
     for (let i = 0; i < BOARD_LENGTH; i++) {
         for (let j = 0; j < BOARD_LENGTH; j++) {
-            if (!(specialFieldsPopulated.has(`${i}, ${j}`))) {
-                await fillCell(i, j, COLORS["empty"], CANVAS)
+            if (!(specialFieldsPopulated.has(`${i},${j}`))) {
+                await fillCell(i, j, COLORS["empty"], MAIN_CANVAS)
             }
         }
     }
 
-    putHorizontalCoords(CANVAS)
-    putVerticalCoords(CANVAS)
+    putHorizontalCoords(MAIN_CANVAS)
+    putVerticalCoords(MAIN_CANVAS)
 
-    await putLetter(8, 7, 'e', CANVAS)
-    await putLetter(7, 7, 'w', CANVAS)
-    await putLetter(9, 7, 'ź', CANVAS)
-    await putLetter(10, 7, 'blank', CANVAS)
-    await putLetter(11, 7, 'e', CANVAS)
+    await moveCursor(7, 7, VI_COLORS["NORMAL"], INPUT_CANVAS)
+    await putLetter(7, 7, 'w', TILES_CANVAS)
+    await putLetter(8, 7, 'e', TILES_CANVAS)
+    await putLetter(9, 7, 'ź', TILES_CANVAS)
+    await putLetter(10, 7, 'ż', TILES_CANVAS, true)
+    await putLetter(11, 7, 'e', TILES_CANVAS)
 
-    await putLetter(7, 8, 'e', CANVAS)
-    await putLetter(7, 9, 's', CANVAS)
-    await putLetter(7, 10, 'z', CANVAS)
-    await putLetter(7, 11, 'ł', CANVAS)
-    await putLetter(7, 12, 'o', CANVAS)
+    await putLetter(7, 8, 'e', TILES_CANVAS)
+    await putLetter(7, 9, 's', TILES_CANVAS)
+    await putLetter(7, 10, 'z', TILES_CANVAS)
+    await putLetter(7, 11, 'ł', TILES_CANVAS)
+    await putLetter(7, 12, 'o', TILES_CANVAS)
 
-    function readFile(file) {
-        let reader = new FileReader();
-        reader.onload = readSuccess;
-        function readSuccess(evt) {
-            document.getElementById("cameraInput").src = evt.target.result
-        }
-        reader.readAsDataURL(file);
-    }
-
-    document.getElementById('cameraInput').onchange = function(e) {
-        readFile(e.target.files[0]);
-    };
+    window.addEventListener('keydown', interpretKeyCode, false);
 }
