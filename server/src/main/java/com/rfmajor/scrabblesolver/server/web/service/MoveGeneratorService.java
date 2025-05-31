@@ -22,4 +22,5 @@ import java.util.List;
 
 public interface MoveGeneratorService {
     List<MoveGroup> generateMoves(GenerateMovesRequest request);
+    List<MoveGroup> generateMoves(String boardNotation, String rack);
 }

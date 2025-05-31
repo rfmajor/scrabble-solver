@@ -13,6 +13,7 @@ let utf8Decoder = new TextDecoder()
 //     alert("closed");
 // };
 
+const MAX_MOVES = 8
 class Message {
     constructor(type, data) {
         this.type = type
@@ -40,13 +41,68 @@ function joinRoom(id) {
 
 function submitBoard() {
     let rack = encodeURIComponent(document.getElementsByName("rack")[0].value)
-    const req = new XMLHttpRequest()
     const boardNotation = encodeURIComponent(getBoardNotation())
     const url = `http://localhost:8025/api/v1/moves?board=${boardNotation}&rack=${rack}`
-    console.log(url)
-    req.onload = (e) => {
-        const response = req.response
-        console.log(response)
+
+    fetch(url)
+        .then(response => response.json())
+        .then(response => {
+            const resultsList = document.getElementById("resultsList")
+            resultsList.textContent = ''
+            MOVES = []
+            let i = 0
+            for (const group of response) {
+                const word = group['word']
+                const points = group['points']
+                const movePossibilities = group['movePossibilities']
+                for (const move of movePossibilities) {
+                    if (i >= MAX_MOVES) {
+                        break
+                    }
+
+                    const moveObj = {
+                        word: word,
+                        x: move['x'],
+                        y: move['y'],
+                        direction: move['direction'],
+                        points: points
+                    }
+
+                    MOVES.push(moveObj)
+
+                    const moveText = `${word}, ${getHumanReadableCoords(move.x, move.y)} ${move.direction}, +${points}`
+                    const li = document.createElement("li")
+                    const textNode = document.createTextNode(moveText)
+                    li.dataset.index = '' + i
+                    li.onclick = async function (e) {
+                        const id = li.dataset.index
+                        await makeMove(MOVES[id])
+                        document.getElementById("resultsList").innerText = ''
+                        MOVES = []
+                    }
+                    li.appendChild(textNode)
+                    resultsList.appendChild(li)
+                    i++
+                }
+            }
+        })
+}
+
+function getHumanReadableCoords(x, y) {
+    return `${String.fromCharCode('A'.charCodeAt(0) + y)}${x + 1}`
+}
+
+async function makeMove(move) {
+    let x = move.x
+    let y = move.y
+    console.log(move)
+    for (let i = 0; i < move.word.length; i++) {
+        let c = move.word.charAt(i)
+        await putLetter(y, x, c, document.getElementById("tiles-canvas"))
+        if (move.direction === "ACROSS") {
+            y++
+        } else {
+            x++
+        }
     }
-    req.open("GET", url);
 }

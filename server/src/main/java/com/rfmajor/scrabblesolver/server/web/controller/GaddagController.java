@@ -5,14 +5,17 @@ import com.rfmajor.scrabblesolver.server.web.service.BoardDto;
 import com.rfmajor.scrabblesolver.server.web.service.GenerateMovesRequest;
 import com.rfmajor.scrabblesolver.server.web.service.MoveGeneratorService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
-//@RestController
+@RestController
+@RequestMapping("/api/v1")
 @RequiredArgsConstructor
 public class GaddagController {
     private final MoveGeneratorService moveGeneratorService;
@@ -25,5 +28,12 @@ public class GaddagController {
     @GetMapping("/board")
     public BoardDto getBoard() {
         return new BoardDto();
+    }
+
+    // TODO: Implement CORS on the whole server
+    @CrossOrigin(origins = "http://localhost:3000")
+    @GetMapping("/moves")
+    public List<MoveGroup> generate(String board, String rack) {
+        return moveGeneratorService.generateMoves(board, rack);
     }
 }

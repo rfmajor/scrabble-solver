@@ -20,6 +20,7 @@ const BOARD_PADDING_PX = 40
 const BOARD_SIZE_PX = 16 * BORDER_SIZE_PX + 15 * CELL_SIZE_PX
 let CELLS = new Map()
 let CELLS_ARR = Array(BOARD_LENGTH).fill(0).map(_row => Array(BOARD_LENGTH).fill(''))
+let MOVES = []
 let BLANKS = new Set()
 const CELLS_SNAPSHOTS = []
 const ALPHABET = new Set("aąbcćdeęfghijklłmnńoóprsśtuwyzźż".split(""))
