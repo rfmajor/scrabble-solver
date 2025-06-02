@@ -61,6 +61,15 @@ async function fillCell(x, y, color, canvas) {
     ctx.fillRect(cell.x, cell.y, cell.w, cell.h)
 }
 
+function isEmpty(x, y) {
+    if (x < 0 || y < 0 || x >= BOARD_LENGTH || y >= BOARD_LENGTH) {
+        return true
+    }
+    let cell = getCellCoordsAndWidth(x, y)
+    
+    // JS Canvas API coordinate system is transposed in relation to the scrabble coordinate system
+    return CELLS_ARR[y][x] === ''
+}
 async function putLetter(x, y, letter, canvas, blank) {
     if (x < 0 || y < 0 || x >= BOARD_LENGTH || y >= BOARD_LENGTH) {
         return
@@ -68,15 +77,13 @@ async function putLetter(x, y, letter, canvas, blank) {
     let ctx = canvas.getContext("2d")
     let cell = getCellCoordsAndWidth(x, y)
 
-    let imgName
+    let imgName = letter.toLowerCase()
     if (blank) {
-        imgName = 'blank'
+        imgName += '_blank'
         BLANKS.add(JSON.stringify({row: y, col: x}))
-    } else {
-        imgName = letter.toLowerCase()
-    }
+    } 
     let img = new Image()
-    img.src = `./assets/letters/${imgName}.gif`
+    img.src = `./assets/letters/${imgName}.png`
     img.onload = async function () {
         ctx.drawImage(img, cell.x, cell.y, cell.w, cell.h)
     }
@@ -151,6 +158,7 @@ async function interpretKeyCode(e) {
     const TILES_CANVAS = document.getElementById("tiles-canvas")
 
     let keyCode = e.key
+    console.log(keyCode)
 
     let modeSwitched = await checkForModeSwitch(keyCode)
     await highlightLetter(currentCell.x, currentCell.y, VI_COLORS[viMode], INPUT_CANVAS, true)
@@ -167,7 +175,7 @@ async function interpretKeyCode(e) {
             break
         case "VERTICAL_INSERT":
             await handleVerticalInsertMode(keyCode, TILES_CANVAS, INPUT_CANVAS)
-
+            break
     }
 }
 
@@ -222,6 +230,7 @@ async function handleNormalMode(key, tilesCanvas, inputCanvas) {
 async function handleInsertMode(key, tilesCanvas, inputCanvas) {
     if (key === "Enter") {
         blankMode = true
+        return
     }
     if (key === "Backspace") {
         await removeLetter(currentCell.x, currentCell.y, tilesCanvas)
@@ -229,6 +238,9 @@ async function handleInsertMode(key, tilesCanvas, inputCanvas) {
     } else if (ALPHABET.has(key) || key === "blank") {
         await putLetter(currentCell.x, currentCell.y, key, tilesCanvas, blankMode)
         await moveCursor(currentCell.x + 1, currentCell.y, VI_COLORS["INSERT"], inputCanvas)
+    }
+    if (key !== "AltGraph") {
+        blankMode = false
     }
 }
 
@@ -241,11 +253,12 @@ async function handleVerticalInsertMode(key, tilesCanvas, inputCanvas) {
         await removeLetter(currentCell.x, currentCell.y, tilesCanvas)
         await moveCursor(currentCell.x, currentCell.y - 1, VI_COLORS["VERTICAL_INSERT"], inputCanvas)
     } else if (ALPHABET.has(key) || key === "blank") {
-        console.log(key)
-        await putLetter(currentCell.x, currentCell.y, key, tilesCanvas)
+        await putLetter(currentCell.x, currentCell.y, key, tilesCanvas, blankMode)
         await moveCursor(currentCell.x, currentCell.y + 1, VI_COLORS["VERTICAL_INSERT"], inputCanvas)
     }
-    blankMode = false
+    if (key !== "AltGraph") {
+        blankMode = false
+    }
 }
 
 async function moveCursor(x, y, color, canvas) {
@@ -353,19 +366,6 @@ window.onload = async function() {
 
     putHorizontalCoords(MAIN_CANVAS)
     putVerticalCoords(MAIN_CANVAS)
-
-    await moveCursor(7, 7, VI_COLORS["NORMAL"], INPUT_CANVAS)
-    await putLetter(7, 7, 'w', TILES_CANVAS)
-    await putLetter(8, 7, 'e', TILES_CANVAS)
-    await putLetter(9, 7, 'ź', TILES_CANVAS)
-    await putLetter(10, 7, 'ż', TILES_CANVAS, true)
-    await putLetter(11, 7, 'e', TILES_CANVAS)
-
-    await putLetter(7, 8, 'e', TILES_CANVAS)
-    await putLetter(7, 9, 's', TILES_CANVAS)
-    await putLetter(7, 10, 'z', TILES_CANVAS)
-    await putLetter(7, 11, 'ł', TILES_CANVAS)
-    await putLetter(7, 12, 'o', TILES_CANVAS)
 
     window.addEventListener('keydown', interpretKeyCode, false);
 }

@@ -96,9 +96,12 @@ async function makeMove(move) {
     let x = move.x
     let y = move.y
     console.log(move)
+    const canvas = document.getElementById("tiles-canvas")
     for (let i = 0; i < move.word.length; i++) {
         let c = move.word.charAt(i)
-        await putLetter(y, x, c, document.getElementById("tiles-canvas"))
+        if (isEmpty(y, x)) {
+            await putLetter(y, x, c, canvas)
+        }
         if (move.direction === "ACROSS") {
             y++
         } else {
