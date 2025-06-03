@@ -8,7 +8,7 @@ const COLORS = {
     "board": "#043608",
     "coords": "#ffffff",
 }
-const VI_COLORS = {
+const INPUT_COLORS = {
     "INSERT": "#da2b2b",
     "VERTICAL_INSERT": "#193bf3",
     "NORMAL": "#ecdada"
@@ -18,16 +18,16 @@ const CELL_SIZE_PX = 40
 const BORDER_SIZE_PX = 1
 const BOARD_PADDING_PX = 40
 const BOARD_SIZE_PX = 16 * BORDER_SIZE_PX + 15 * CELL_SIZE_PX
-let CELLS = new Map()
-let CELLS_ARR = Array(BOARD_LENGTH).fill(0).map(_row => Array(BOARD_LENGTH).fill(''))
+let MAIN_CANVAS, INPUT_CANVAS, TILES_CANVAS
+let CELLS = Array(BOARD_LENGTH).fill(0).map(_row => Array(BOARD_LENGTH).fill(''))
+let CELLS_STACK = []
 let MOVES = []
 let BLANKS = new Set()
-const CELLS_SNAPSHOTS = []
 const ALPHABET = new Set("aąbcćdeęfghijklłmnńoóprsśtuwyzźż".split(""))
+const U_ALPHABET = new Set("AĄBCĆDEĘFGHIJKLŁMNŃOÓPRSŚTUWYZŹŻ".split(""))
 
 let currentCell = {x: 7, y: 7}
-let viMode = "NORMAL"
-let blankMode = false
+let inputMode = "INSERT"
 
 function getCellCoordsAndWidth(x, y) {
     // needs to include the border size:
@@ -39,6 +39,13 @@ function getCellCoordsAndWidth(x, y) {
     let cell_w = CELL_SIZE_PX
     let cell_h = CELL_SIZE_PX
     return {x: cell_x, y: cell_y, w: cell_w, h: cell_h}
+}
+
+function getCell(x, y) {
+    let cellX = Math.floor(((x - BOARD_PADDING_PX) / BOARD_SIZE_PX) * BOARD_LENGTH)
+    let cellY = Math.floor(((y - BOARD_PADDING_PX) / BOARD_SIZE_PX) * BOARD_LENGTH)
+
+    return {x: cellX, y: cellY}
 }
 
 async function fillCell(x, y, color, canvas) {
@@ -65,16 +72,16 @@ function isEmpty(x, y) {
     if (x < 0 || y < 0 || x >= BOARD_LENGTH || y >= BOARD_LENGTH) {
         return true
     }
-    let cell = getCellCoordsAndWidth(x, y)
-    
+
     // JS Canvas API coordinate system is transposed in relation to the scrabble coordinate system
-    return CELLS_ARR[y][x] === ''
+    return CELLS[y][x] === ''
 }
-async function putLetter(x, y, letter, canvas, blank) {
+
+async function putLetter(x, y, letter, blank) {
     if (x < 0 || y < 0 || x >= BOARD_LENGTH || y >= BOARD_LENGTH) {
         return
     }
-    let ctx = canvas.getContext("2d")
+    let ctx = TILES_CANVAS.getContext("2d")
     let cell = getCellCoordsAndWidth(x, y)
 
     let imgName = letter.toLowerCase()
@@ -89,58 +96,36 @@ async function putLetter(x, y, letter, canvas, blank) {
     }
 
     // JS Canvas API coordinate system is transposed in relation to the scrabble coordinate system
-    CELLS_ARR[y][x] = letter
+    CELLS[y][x] = letter
+    CELLS_STACK.push({x: x, y: y})
 }
 
-async function removeLetter(x, y, canvas) {
-    let ctx = canvas.getContext("2d")
-    let cell = getCellCoordsAndWidth(x, y)
-
-    ctx.clearRect(cell.x, cell.y, cell.w, cell.h)
-
-    BLANKS.delete(JSON.stringify({row: y, col: x}))
-    CELLS_ARR[y][x] = ''
-}
-
-async function highlightLetter(x, y, color, canvas, clearFirst) {
-    let ctx = canvas.getContext("2d")
-    let cell = getCellCoordsAndWidth(x, y)
-
-    if (clearFirst) {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
+async function removeStackLetter() {
+    if (CELLS_STACK.length === 0) {
+        return
     }
+    let ctx = TILES_CANVAS.getContext("2d")
+    let cell = CELLS_STACK.pop()
+    let actualCell = getCellCoordsAndWidth(cell.x, cell.y)
 
-    ctx.shadowColor = "#000000";
-    ctx.shadowBlur = 100;
+    ctx.clearRect(actualCell.x, actualCell.y, actualCell.w, actualCell.h)
+
+    BLANKS.delete(JSON.stringify({row: cell.y, col: cell.x}))
+    CELLS[cell.y][cell.x] = ''
+    await moveCursor(cell.x, cell.y)
+}
+
+async function highlightLetter(x, y) {
+    let ctx = INPUT_CANVAS.getContext("2d")
+    let cell = getCellCoordsAndWidth(x, y)
+
+    clearCanvas(INPUT_CANVAS)
+
     ctx.lineJoin = "bevel";
     ctx.lineWidth = 5;
-    ctx.strokeStyle = color
+    ctx.strokeStyle = INPUT_COLORS[inputMode]
 
     ctx.strokeRect(cell.x, cell.y, cell.w, cell.h)
-}
-
-function recordSnapshot() {
-    CELLS_SNAPSHOTS.push(new Map(CELLS))
-}
-
-async function restoreSnapshot() {
-    if (CELLS_SNAPSHOTS.length > 0) {
-        CELLS = CELLS_SNAPSHOTS.pop()
-        await redrawFromCells(document.getElementById("tiles-canvas"))
-    }
-}
-
-async function redrawFromCells(tileCanvas) {
-    clearCanvas(tileCanvas)
-    for (let x = 0; x < BOARD_LENGTH; x++) {
-        for (let y = 0; y < BOARD_LENGTH; y++) {
-            let letter = CELLS_ARR[y][x]
-            if (letter !== '') {
-                let cell = getCellCoordsAndWidth(x, y)
-                await putLetter(cell.x, cell.y, letter, tileCanvas)
-            }
-        }
-    }
 }
 
 function clearCanvas(canvas) {
@@ -153,120 +138,140 @@ async function interpretKeyCode(e) {
         return
     }
 
-    const INPUT_CANVAS = document.getElementById("input-canvas")
-    const MAIN_CANVAS = document.getElementById("main-canvas")
-    const TILES_CANVAS = document.getElementById("tiles-canvas")
-
     let keyCode = e.key
     console.log(keyCode)
+    await handleKeycode(keyCode)
+}
 
-    let modeSwitched = await checkForModeSwitch(keyCode)
-    await highlightLetter(currentCell.x, currentCell.y, VI_COLORS[viMode], INPUT_CANVAS, true)
-    if (modeSwitched) {
-        return
+async function interpretClick(e, canvas) {
+    const rect = canvas.getBoundingClientRect()
+    const x = e.clientX - rect.left
+    const y = e.clientY - rect.top
+    let cell = getCell(x, y)
+    if (currentCell && currentCell.x === cell.x && currentCell.y === cell.y) {
+        await changeInputDirection()
     }
-
-    switch (viMode) {
-        case "NORMAL":
-            await handleNormalMode(keyCode, TILES_CANVAS, INPUT_CANVAS)
-            break
-        case "INSERT":
-            await handleInsertMode(keyCode, TILES_CANVAS, INPUT_CANVAS)
-            break
-        case "VERTICAL_INSERT":
-            await handleVerticalInsertMode(keyCode, TILES_CANVAS, INPUT_CANVAS)
-            break
+    if (CELLS[cell.y][cell.x] === '') {
+        await moveCursor(cell.x, cell.y)
     }
 }
 
-async function checkForModeSwitch(key) {
+async function handleKeycode(key) {
     switch (key) {
-        case 'i':
-            if (viMode === "NORMAL") {
-                viMode = "INSERT"
-                return true
-            }
-            return false
-        case 'I':
-            if (viMode === "NORMAL") {
-                viMode = "VERTICAL_INSERT"
-                return true
-            }
-            return false
+        case 'ArrowDown':
+            await moveCursorOneField("DOWN", true)
+            break
+        case 'ArrowUp':
+            await moveCursorOneField("UP", true)
+            break
+        case 'ArrowLeft':
+            await moveCursorOneField("LEFT", true)
+            break
+        case 'ArrowRight':
+            await moveCursorOneField("RIGHT", true)
+            break
+        case 'Backspace':
+            await removeStackLetter()
+            break
         case 'Escape':
-            if (viMode === "INSERT" || viMode === "VERTICAL_INSERT") {
-                viMode = "NORMAL"
-                return true
-            }
-            return false
+            await changeInputDirection()
+            break
+        case 'AltGraph':
+            break
         default:
-            return false
+            if (ALPHABET.has(key) || U_ALPHABET.has(key)) {
+                let blank = false
+                if (U_ALPHABET.has(key)) {
+                    key = key.toLowerCase()
+                    blank = true
+                }
+                await handleLetter(key, blank)
+            }
     }
 }
 
-async function handleNormalMode(key, tilesCanvas, inputCanvas) {
-    switch (key) {
-        case 'j':
-            await moveCursor(currentCell.x, currentCell.y + 1, VI_COLORS["NORMAL"], inputCanvas)
-            break
-        case 'k':
-            await moveCursor(currentCell.x, currentCell.y - 1, VI_COLORS["NORMAL"], inputCanvas)
-            break
-        case 'h':
-            await moveCursor(currentCell.x - 1, currentCell.y, VI_COLORS["NORMAL"], inputCanvas)
-            break
-        case 'l':
-            await moveCursor(currentCell.x + 1, currentCell.y, VI_COLORS["NORMAL"], inputCanvas)
-            break
-        case 'i':
-            await moveCursor(currentCell.x + 1, currentCell.y, VI_COLORS["NORMAL"], inputCanvas)
-            break
-        case 'x':
-            await removeLetter(currentCell.x, currentCell.y, tilesCanvas)
-            break
+async function changeInputDirection() {
+    if (inputMode === "VERTICAL_INSERT") {
+        inputMode = "INSERT"
+    } else if (inputMode === "INSERT") {
+        inputMode = "VERTICAL_INSERT"
+    }
+    if (currentCell) {
+        await highlightLetter(currentCell.x, currentCell.y)
     }
 }
 
-async function handleInsertMode(key, tilesCanvas, inputCanvas) {
-    if (key === "Enter") {
-        blankMode = true
+async function handleLetter(key, blank) {
+    if (!currentCell) {
         return
     }
-    if (key === "Backspace") {
-        await removeLetter(currentCell.x, currentCell.y, tilesCanvas)
-        await moveCursor(currentCell.x - 1, currentCell.y, VI_COLORS["INSERT"], inputCanvas)
-    } else if (ALPHABET.has(key) || key === "blank") {
-        await putLetter(currentCell.x, currentCell.y, key, tilesCanvas, blankMode)
-        await moveCursor(currentCell.x + 1, currentCell.y, VI_COLORS["INSERT"], inputCanvas)
-    }
-    if (key !== "AltGraph") {
-        blankMode = false
+    await putLetter(currentCell.x, currentCell.y, key, blank)
+    if (inputMode === "INSERT") {
+        await moveCursorOneField("RIGHT")
+    } else if (inputMode === "VERTICAL_INSERT") {
+        await moveCursorOneField("DOWN")
     }
 }
 
-async function handleVerticalInsertMode(key, tilesCanvas, inputCanvas) {
-    if (key === "Enter") {
-        blankMode = true
+function findNextEmptyCell(direction) {
+    if (!currentCell) {
         return
     }
-    if (key === "Backspace") {
-        await removeLetter(currentCell.x, currentCell.y, tilesCanvas)
-        await moveCursor(currentCell.x, currentCell.y - 1, VI_COLORS["VERTICAL_INSERT"], inputCanvas)
-    } else if (ALPHABET.has(key) || key === "blank") {
-        await putLetter(currentCell.x, currentCell.y, key, tilesCanvas, blankMode)
-        await moveCursor(currentCell.x, currentCell.y + 1, VI_COLORS["VERTICAL_INSERT"], inputCanvas)
+    let move = moveTowardsDirection(currentCell.x, currentCell.y, direction)
+    while (move.x >= 0 && move.y >= 0 && move.x < BOARD_LENGTH && move.y < BOARD_LENGTH) {
+        if (CELLS[move.y][move.x] === '')  {
+            return move
+        }
+        move = moveTowardsDirection(move.x, move.y, direction)
     }
-    if (key !== "AltGraph") {
-        blankMode = false
-    }
+    return null
 }
 
-async function moveCursor(x, y, color, canvas) {
+function moveTowardsDirection(x, y, direction) {
+    switch (direction) {
+        case 'UP':
+            y--
+            break
+        case 'DOWN':
+            y++
+            break
+        case 'LEFT':
+            x--
+            break
+        case 'RIGHT':
+            x++
+            break
+    }
+    return {x: x, y: y}
+}
+
+async function moveCursor(x, y) {
     if (x < 0 || y < 0 || x >= BOARD_LENGTH || y >= BOARD_LENGTH) {
         return
     }
     currentCell = {x: x, y: y}
-    await highlightLetter(x, y, color, canvas, true)
+    await highlightLetter(x, y)
+}
+
+async function moveCursorOneField(direction, bounded) {
+    if (!currentCell) {
+        return
+    }
+    let x = currentCell.x
+    let y = currentCell.y
+    if (x < 0 || y < 0 || x >= BOARD_LENGTH || y >= BOARD_LENGTH) {
+        return
+    }
+    let nextEmptyCell = findNextEmptyCell(direction)
+    if (nextEmptyCell === null) {
+        if (!bounded) {
+            currentCell = null
+            clearCanvas(INPUT_CANVAS)
+        }
+        return
+    }
+    currentCell = {x: nextEmptyCell.x, y: nextEmptyCell.y}
+    await highlightLetter(currentCell.x, currentCell.y)
 }
 
 function putHorizontalCoords(canvas) {
@@ -300,7 +305,7 @@ function putVerticalCoords(canvas) {
 
 function getBoardNotation() {
     let notation = ''
-    for (let row of CELLS_ARR) {
+    for (let row of CELLS) {
         let counter = 0
         let rowNotation = ''
         for (let col of row) {
@@ -335,9 +340,9 @@ function getBoardNotation() {
 }
 
 window.onload = async function() {
-    const MAIN_CANVAS = document.getElementById("main-canvas")
-    const INPUT_CANVAS = document.getElementById("input-canvas")
-    const TILES_CANVAS = document.getElementById("tiles-canvas")
+    MAIN_CANVAS = document.getElementById("main-canvas")
+    INPUT_CANVAS = document.getElementById("input-canvas")
+    TILES_CANVAS = document.getElementById("tiles-canvas")
 
     let specialFields = await fetch('./assets/specialFields.json')
         .then(response => response.json())
@@ -368,4 +373,7 @@ window.onload = async function() {
     putVerticalCoords(MAIN_CANVAS)
 
     window.addEventListener('keydown', interpretKeyCode, false);
+    INPUT_CANVAS.addEventListener('mousedown', function (e) {
+        interpretClick(e, INPUT_CANVAS)
+    })
 }
