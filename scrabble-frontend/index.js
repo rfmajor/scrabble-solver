@@ -48,7 +48,7 @@ function getCell(x, y) {
     return {x: cellX, y: cellY}
 }
 
-async function fillCell(x, y, color, canvas) {
+function fillCell(x, y, color, canvas) {
     let ctx = canvas.getContext("2d")
 
     let cell = getCellCoordsAndWidth(x, y)
@@ -77,7 +77,7 @@ function isEmpty(x, y) {
     return CELLS[y][x] === ''
 }
 
-async function putLetter(x, y, letter, blank) {
+function putLetter(x, y, letter, blank) {
     if (x < 0 || y < 0 || x >= BOARD_LENGTH || y >= BOARD_LENGTH) {
         return
     }
@@ -100,7 +100,7 @@ async function putLetter(x, y, letter, blank) {
     CELLS_STACK.push({x: x, y: y})
 }
 
-async function removeStackLetter() {
+function removeStackLetter() {
     if (CELLS_STACK.length === 0) {
         return
     }
@@ -112,27 +112,34 @@ async function removeStackLetter() {
 
     BLANKS.delete(JSON.stringify({row: cell.y, col: cell.x}))
     CELLS[cell.y][cell.x] = ''
-    await moveCursor(cell.x, cell.y)
+    moveCursor(cell.x, cell.y)
 }
 
-async function highlightLetter(x, y) {
+function highlightLetter(x, y) {
     let ctx = INPUT_CANVAS.getContext("2d")
     let cell = getCellCoordsAndWidth(x, y)
 
     clearCanvas(INPUT_CANVAS)
 
-    ctx.lineJoin = "bevel";
-    ctx.lineWidth = 5;
-    ctx.strokeStyle = INPUT_COLORS[inputMode]
-
-    ctx.strokeRect(cell.x, cell.y, cell.w, cell.h)
+    let arrow = ""
+    if (inputMode === "INSERT") {
+        arrow = "right"
+    }
+    if (inputMode === "VERTICAL_INSERT") {
+        arrow = "down"
+    }
+    let img = new Image()
+    img.src = `./assets/arrows/${arrow}.png`
+    img.onload = async function () {
+        ctx.drawImage(img, cell.x, cell.y, cell.w, cell.h)
+    }
 }
 
 function clearCanvas(canvas) {
     canvas.getContext("2d").clearRect(0, 0, canvas.width, canvas.height)
 }
 
-async function interpretKeyCode(e) {
+function interpretKeyCode(e) {
     // TODO: this is ugly and hacky (every input I add in the future will have to satisfy a similar condition), fix later
     if (e.target === document.getElementById("rack")) {
         return
@@ -140,41 +147,41 @@ async function interpretKeyCode(e) {
 
     let keyCode = e.key
     console.log(keyCode)
-    await handleKeycode(keyCode)
+    handleKeycode(keyCode)
 }
 
-async function interpretClick(e, canvas) {
+function interpretClick(e, canvas) {
     const rect = canvas.getBoundingClientRect()
     const x = e.clientX - rect.left
     const y = e.clientY - rect.top
     let cell = getCell(x, y)
     if (currentCell && currentCell.x === cell.x && currentCell.y === cell.y) {
-        await changeInputDirection()
+        changeInputDirection()
     }
     if (CELLS[cell.y][cell.x] === '') {
-        await moveCursor(cell.x, cell.y)
+        moveCursor(cell.x, cell.y)
     }
 }
 
-async function handleKeycode(key) {
+function handleKeycode(key) {
     switch (key) {
         case 'ArrowDown':
-            await moveCursorOneField("DOWN", true)
+            moveCursorOneField("DOWN", true)
             break
         case 'ArrowUp':
-            await moveCursorOneField("UP", true)
+            moveCursorOneField("UP", true)
             break
         case 'ArrowLeft':
-            await moveCursorOneField("LEFT", true)
+            moveCursorOneField("LEFT", true)
             break
         case 'ArrowRight':
-            await moveCursorOneField("RIGHT", true)
+            moveCursorOneField("RIGHT", true)
             break
         case 'Backspace':
-            await removeStackLetter()
+            removeStackLetter()
             break
         case 'Escape':
-            await changeInputDirection()
+            changeInputDirection()
             break
         case 'AltGraph':
             break
@@ -185,31 +192,31 @@ async function handleKeycode(key) {
                     key = key.toLowerCase()
                     blank = true
                 }
-                await handleLetter(key, blank)
+                handleLetter(key, blank)
             }
     }
 }
 
-async function changeInputDirection() {
+function changeInputDirection() {
     if (inputMode === "VERTICAL_INSERT") {
         inputMode = "INSERT"
     } else if (inputMode === "INSERT") {
         inputMode = "VERTICAL_INSERT"
     }
     if (currentCell) {
-        await highlightLetter(currentCell.x, currentCell.y)
+        highlightLetter(currentCell.x, currentCell.y)
     }
 }
 
-async function handleLetter(key, blank) {
+function handleLetter(key, blank) {
     if (!currentCell) {
         return
     }
-    await putLetter(currentCell.x, currentCell.y, key, blank)
+    putLetter(currentCell.x, currentCell.y, key, blank)
     if (inputMode === "INSERT") {
-        await moveCursorOneField("RIGHT")
+        moveCursorOneField("RIGHT")
     } else if (inputMode === "VERTICAL_INSERT") {
-        await moveCursorOneField("DOWN")
+        moveCursorOneField("DOWN")
     }
 }
 
@@ -245,15 +252,15 @@ function moveTowardsDirection(x, y, direction) {
     return {x: x, y: y}
 }
 
-async function moveCursor(x, y) {
+function moveCursor(x, y) {
     if (x < 0 || y < 0 || x >= BOARD_LENGTH || y >= BOARD_LENGTH) {
         return
     }
     currentCell = {x: x, y: y}
-    await highlightLetter(x, y)
+    highlightLetter(x, y)
 }
 
-async function moveCursorOneField(direction, bounded) {
+function moveCursorOneField(direction, bounded) {
     if (!currentCell) {
         return
     }
@@ -271,7 +278,7 @@ async function moveCursorOneField(direction, bounded) {
         return
     }
     currentCell = {x: nextEmptyCell.x, y: nextEmptyCell.y}
-    await highlightLetter(currentCell.x, currentCell.y)
+    highlightLetter(currentCell.x, currentCell.y)
 }
 
 function putHorizontalCoords(canvas) {
@@ -356,7 +363,7 @@ window.onload = async function() {
 
     for (const key of Object.keys(specialFields)) {
         for (let field of specialFields[key]) {
-            await fillCell(field[0], field[1], COLORS[key], MAIN_CANVAS)
+            fillCell(field[0], field[1], COLORS[key], MAIN_CANVAS)
             specialFieldsPopulated.add(`${field[0]},${field[1]}`)
         }
     }
@@ -364,7 +371,7 @@ window.onload = async function() {
     for (let i = 0; i < BOARD_LENGTH; i++) {
         for (let j = 0; j < BOARD_LENGTH; j++) {
             if (!(specialFieldsPopulated.has(`${i},${j}`))) {
-                await fillCell(i, j, COLORS["empty"], MAIN_CANVAS)
+                fillCell(i, j, COLORS["empty"], MAIN_CANVAS)
             }
         }
     }

@@ -79,6 +79,7 @@ function submitBoard() {
                         await makeMove(MOVES[id])
                         document.getElementById("resultsList").innerText = ''
                         MOVES = []
+                        CELLS_STACK = []
                     }
                     li.appendChild(textNode)
                     resultsList.appendChild(li)
@@ -99,7 +100,7 @@ async function makeMove(move) {
     for (let i = 0; i < move.word.length; i++) {
         let c = move.word.charAt(i)
         if (isEmpty(y, x)) {
-            await putLetter(y, x, c)
+            putLetter(y, x, c)
         }
         if (move.direction === "ACROSS") {
             y++
