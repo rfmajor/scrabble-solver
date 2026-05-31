@@ -45,3 +45,6 @@ __pycache__
 *.joblib
 test-report/
 venv/
+
+### C ###
+.clangd
