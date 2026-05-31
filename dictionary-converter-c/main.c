@@ -1,7 +1,12 @@
 #include <stdio.h>
 #include <argp.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
 
-const char *HELP_JSON = "{\n"
+static char* SUPPORTED_DATA_STRUCTURES[] = { "gaddag", 0 };
+
+static char *HELP_JSON = "{\n"
 "  \"delimiter\": {\n"
 "    \"char\": \"-\",\n"
 "    \"index\": 0\n"
@@ -55,8 +60,7 @@ static error_t parse_opt (int key, char *arg, struct argp_state *state) {
 
     case ARGP_KEY_ARG:
       if (state->arg_num > 0)
-        /* Too many arguments. */
-        argp_usage (state);
+        argp_usage(state);
 
       arguments->args[state->arg_num] = arg;
 
@@ -64,8 +68,7 @@ static error_t parse_opt (int key, char *arg, struct argp_state *state) {
 
     case ARGP_KEY_END:
       if (state->arg_num < 1)
-        /* Not enough arguments. */
-        argp_usage (state);
+        argp_usage(state);
       break;
 
     default:
@@ -92,6 +95,34 @@ void print_usage(char *name) {
     printf("%s\n", HELP_JSON);
 }
 
+int validate_args(struct arguments *arguments) {
+    size_t i = 0;
+    char *data_struct;
+    int data_struct_valid = 0;
+
+    while ((data_struct = SUPPORTED_DATA_STRUCTURES[i++])) {
+        if (!strcmp(arguments->data_structure, data_struct)) {
+            data_struct_valid = 1;
+        }
+    }
+    if (!data_struct_valid) {
+        printf("Data structure not supported: %s\n", arguments->data_structure);
+        return 1;
+    }
+
+    if (!arguments->output) {
+        printf("Output file argument is mandatory\n");
+        return 1;
+    }
+
+    if (access(arguments->alphabet_config, F_OK) != 0) {
+        printf("Alphabet config file not found under path: %s\n", arguments->alphabet_config);
+        return 1;
+    }
+
+    return 0;
+}
+
 int main(int argc, char *argv[]) {
     struct arguments arguments;
 
@@ -103,4 +134,7 @@ int main(int argc, char *argv[]) {
 
     argp_parse(&argp, argc, argv, 0, 0, &arguments);
     printf("data_structure=%s, gzip=%d, output=%s, alphabet_config=%s, max_word_length=%d\n", arguments.data_structure, arguments.gzip, arguments.output, arguments.alphabet_config, arguments.max_word_length);
+    if (validate_args(&arguments) != 0) {
+        return EXIT_FAILURE;
+    }
 }
