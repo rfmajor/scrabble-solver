@@ -11,9 +11,9 @@ typedef struct {
 typedef struct {
     Letter delimiter;
     Letter *letters;
-} Alphabet;
+} AlphabetConfig;
 
-Alphabet* read_alphabet_config(const char *config_f);
+AlphabetConfig* read_alphabet_config(const char *config_f);
 
 #endif // !ALPHABET
 

@@ -1,3 +1,4 @@
+#include "alphabet.h"
 #include <argp.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -56,7 +57,7 @@ static error_t parse_opt(int key, char *arg, struct argp_state *state) {
 
     case ARGP_KEY_ARG:
         if (state->arg_num > 1) {
-            printf("Too many arguments provided, expected: 2\n");
+            fprintf(stderr, "Too many arguments provided, expected: 2\n");
             argp_usage(state);
         }
         arguments->args[state->arg_num] = arg;
@@ -64,7 +65,7 @@ static error_t parse_opt(int key, char *arg, struct argp_state *state) {
 
     case ARGP_KEY_END:
         if (state->arg_num < 2) {
-            printf("Too few arguments provided, expected: 2\n");
+            fprintf(stderr, "Too few arguments provided, expected: 2\n");
             argp_usage(state);
         }
         break;
@@ -89,17 +90,17 @@ int validate_args(struct arguments *arguments) {
         }
     }
     if (!data_struct_valid) {
-        printf("Data structure not supported: %s\n", arguments->data_structure);
+        fprintf(stderr, "Data structure not supported: %s\n", arguments->data_structure);
         return 1;
     }
 
     if (access(arguments->alphabet_config, F_OK) != 0) {
-        printf("%s: file not found\n", arguments->alphabet_config);
+        fprintf(stderr, "%s: file not found\n", arguments->alphabet_config);
         return 1;
     }
 
     if (access(arguments->args[0], F_OK) != 0) {
-        printf("%s: file not found\n", arguments->args[0]);
+        fprintf(stderr, "%s: file not found\n", arguments->args[0]);
         return 1;
     }
 
@@ -120,4 +121,5 @@ int main(int argc, char *argv[]) {
     if (validate_args(&arguments) != 0) {
         return EXIT_FAILURE;
     }
+    read_alphabet_config(arguments.alphabet_config);
 }

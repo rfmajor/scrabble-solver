@@ -1,0 +1,11 @@
+{
+    "delimiter": {
+        "char": "-",
+        "index": "0"
+    },
+    "alphabet": [
+        { "char": "A", "index": "1", "quantity": 9, "value": 1 },
+        { "char": "B", "index": "2", "quantity": 2, "value": 3 },
+        { "char": "C", "index": "3", "quantity": 2, "value": 3 }
+    ]
+}
