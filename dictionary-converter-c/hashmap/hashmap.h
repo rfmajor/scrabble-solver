@@ -21,6 +21,8 @@ typedef struct hashmap_t {
 
 hashmap_t *hashmap_init(int cap);
 
-int hashmap_add(uint32_t key, uint8_t val, hashmap_t *hashmap);
+int hashmap_put(uint32_t key, uint8_t val, hashmap_t *hashmap);
+
+uint8_t hashmap_get(uint32_t key, hashmap_t *hashmap);
 
 #endif // !HASHMAP
