@@ -48,3 +48,6 @@ venv/
 
 ### C ###
 .clangd
+a.out
+dictionary.txt
+convertDictionary
