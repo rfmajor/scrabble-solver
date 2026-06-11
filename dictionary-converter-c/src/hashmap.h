@@ -7,6 +7,9 @@
 #define _UNDEFINED_KEY (0)
 #define _FNV_32bit_offset_basis (2166136261)
 #define _FNV_32bit_prime (16777619)
+#define _PUT_SUCCESS (1)
+#define _PUT_FAILURE (-1)
+#define _GET_FAILURE() ((uint8_t)-1)
 
 typedef struct node {
     uint32_t key;

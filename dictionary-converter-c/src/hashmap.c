@@ -3,7 +3,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-static int num_of_leading_zeros(int num) { return __builtin_clz(num); }
+static int num_of_leading_zeros(int num) {
+    return __builtin_clz(num);
+}
 
 static int get_table_size(int cap) {
     unsigned int n = ((unsigned)-1) >> num_of_leading_zeros(cap - 1);
@@ -40,6 +42,9 @@ hashmap_t *hashmap_init(int cap) {
 }
 
 int hashmap_put(uint32_t key, uint8_t val, hashmap_t *hashmap) {
+    if (key == _UNDEFINED_KEY) {
+        return _PUT_FAILURE;
+    }
     uint32_t hash = fnv_32_hash(&key, sizeof(key), _FNV_32bit_offset_basis);
     printf("[PUT] hash of %u: %u\n", key, hash);
     int bucket_num = hash % hashmap->cap;
@@ -52,19 +57,24 @@ int hashmap_put(uint32_t key, uint8_t val, hashmap_t *hashmap) {
         if (bucket->next == NULL) {
             bucket->next = malloc(sizeof(struct node));
             if (bucket->next == NULL) {
-                return 0;
+                return _PUT_FAILURE;
             }
         }
         bucket = bucket->next;
     }
+    if (bucket->key != key) {
+        hashmap->size++;
+    }
     bucket->key = key;
     bucket->val = val;
-    hashmap->size++;
 
-    return 1;
+    return _PUT_SUCCESS;
 }
 
 uint8_t hashmap_get(uint32_t key, hashmap_t *hashmap) {
+    if (key == _UNDEFINED_KEY) {
+        return _PUT_FAILURE;
+    }
     uint32_t hash = fnv_32_hash(&key, sizeof(key), _FNV_32bit_offset_basis);
     printf("[GET] hash of %u: %u\n", key, hash);
     int bucket_num = hash % hashmap->cap;
@@ -80,40 +90,40 @@ uint8_t hashmap_get(uint32_t key, hashmap_t *hashmap) {
                bucket->val, bucket->next);
     }
     if (bucket->key == _UNDEFINED_KEY || bucket->key != key) {
-        return 0;
+        return _GET_FAILURE();
     }
     return bucket->val;
 }
 
-int main(int argc, char *argv[]) {
-    int cap = 100;
-    hashmap_t *hashmap = hashmap_init(cap);
-    if (hashmap == NULL) {
-        fprintf(stderr, "Failed to allocate hashmap\n");
-        return EXIT_FAILURE;
-    }
-
-    uint32_t record[1000];
-
-    for (int i = 1; i < cap * 10; i++) {
-        uint32_t key = rand() % 1000;
-        uint8_t val = rand() % 100;
-        record[key] = val;
-        hashmap_put(key, val, hashmap);
-    }
-
-    int err_count = 0, success_count = 0;
-    for (int i = 1; i < cap * 10; i++) {
-        uint8_t val = hashmap_get(i, hashmap);
-        if (record[i] == val) {
-            success_count++;
-        } else {
-            err_count++;
-        }
-    }
-
-    printf("Success count: %d\n", success_count);
-    printf("Err count: %d\n", err_count);
-
-    return EXIT_SUCCESS;
-}
+// int main(int argc, char *argv[]) {
+//     int cap = 100;
+//     hashmap_t *hashmap = hashmap_init(cap);
+//     if (hashmap == NULL) {
+//         fprintf(stderr, "Failed to allocate hashmap\n");
+//         return EXIT_FAILURE;
+//     }
+//
+//     uint32_t record[1000];
+//
+//     for (int i = 1; i < cap * 10; i++) {
+//         uint32_t key = rand() % 1000;
+//         uint8_t val = rand() % 100;
+//         record[key] = val;
+//         hashmap_put(key, val, hashmap);
+//     }
+//
+//     int err_count = 0, success_count = 0;
+//     for (int i = 1; i < cap * 10; i++) {
+//         uint8_t val = hashmap_get(i, hashmap);
+//         if (record[i] == val) {
+//             success_count++;
+//         } else {
+//             err_count++;
+//         }
+//     }
+//
+//     printf("Success count: %d\n", success_count);
+//     printf("Err count: %d\n", err_count);
+//
+//     return EXIT_SUCCESS;
+// }
