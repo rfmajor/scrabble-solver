@@ -15,6 +15,7 @@ typedef struct node {
 } node;
 
 typedef struct hashmap_t {
+    int cap;
     int size;
     node *buckets;
 } hashmap_t;

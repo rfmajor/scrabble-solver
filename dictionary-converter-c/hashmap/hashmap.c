@@ -15,12 +15,7 @@ static uint32_t fnv_32_hash(void *buf, size_t len, uint32_t hval) {
     unsigned char *be = bp + len;
 
     while (bp < be) {
-
-#if defined(NO_FNV_GCC_OPTIMIZATION)
         hval *= _FNV_32bit_prime;
-#else
-        hval += (hval << 1) + (hval << 4) + (hval << 7) + (hval << 8) + (hval << 24);
-#endif
         hval ^= (uint32_t)*bp++;
     }
 
@@ -40,20 +35,21 @@ hashmap_t *hashmap_init(int cap) {
         return NULL;
     }
     hashmap->buckets = node_p;
-    hashmap->size = table_size;
+    hashmap->cap = table_size;
+    hashmap->size = 0;
 
     return hashmap;
 }
 
 int hashmap_put(uint32_t key, uint8_t val, hashmap_t *hashmap) {
-    uint32_t hash = fnv_32_hash(&key, sizeof(key), 0);
+    uint32_t hash = fnv_32_hash(&key, sizeof(key), _FNV_32bit_offset_basis);
     printf("[PUT] hash of %u: %u\n", key, hash);
-    int bucket_num = hash % hashmap->size;
+    int bucket_num = hash % hashmap->cap;
     printf("[PUT] bucket num for %u: %d\n", key, bucket_num);
     node *bucket = hashmap->buckets + bucket_num;
     printf("[PUT] bucket for %u: %p\n", key, bucket);
 
-    while (bucket->key != _UNDEFINED_KEY) {
+    while (bucket->key != _UNDEFINED_KEY && bucket->key != key) {
         printf("[PUT] node is occupied\n");
         if (bucket->next == NULL) {
             bucket->next = malloc(sizeof(struct node));
@@ -66,15 +62,15 @@ int hashmap_put(uint32_t key, uint8_t val, hashmap_t *hashmap) {
     }
     bucket->key = key;
     bucket->val = val;
-    bucket->next = NULL;
+    hashmap->size++;
 
     return 1;
 }
 
 uint8_t hashmap_get(uint32_t key, hashmap_t *hashmap) {
-    uint32_t hash = fnv_32_hash(&key, sizeof(key), 0);
+    uint32_t hash = fnv_32_hash(&key, sizeof(key), _FNV_32bit_offset_basis);
     printf("[GET] hash of %u: %u\n", key, hash);
-    int bucket_num = hash % hashmap->size;
+    int bucket_num = hash % hashmap->cap;
     printf("[GET] bucket num for %u: %d\n", key, bucket_num);
     node *bucket = hashmap->buckets + bucket_num;
     printf("[GET] bucket for %u: %p\n", key, bucket);
@@ -102,7 +98,7 @@ int main(int argc, char *argv[]) {
     uint32_t record[1000];
 
     for (int i = 1; i < cap * 10; i++) {
-        uint32_t key = i;
+        uint32_t key = rand() % 1000;
         uint8_t val = rand() % 100;
         record[key] = val;
         hashmap_put(key, val, hashmap);
