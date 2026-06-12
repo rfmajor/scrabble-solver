@@ -71,47 +71,46 @@ void test_getnum_should_returnCorrectNum() {
 
 void test_utf8split_should_returnCorrectValuesForAscii() {
     uint32_t expected[] = {A_CHAR, B_CHAR, C_CHAR};
-    uint32_t *split = utf8_split("abc\n", 15);
+    split = utf8_split("abc\n", 15);
     TEST_ASSERT_EQUAL_UINT_ARRAY(expected, split, 3);
 }
 
 void test_utf8split_should_returnCorrectValuesForUtf8() {
     uint32_t expected[] = {A_TAIL_UINT, C_TAIL_UINT};
-    uint32_t *split =
-        utf8_split((char[]){A_TAIL_CHAR_LEAD, A_TAIL_CHAR_CONT, C_TAIL_CHAR_LEAD, C_TAIL_CHAR_CONT, '\n'}, 15);
+    split = utf8_split((char[]){A_TAIL_CHAR_LEAD, A_TAIL_CHAR_CONT, C_TAIL_CHAR_LEAD, C_TAIL_CHAR_CONT, '\n'}, 15);
     TEST_ASSERT_EQUAL_UINT_ARRAY(expected, split, 2);
 }
 
 void test_utf8split_should_returnCorrectValuesForMixed() {
     uint32_t expected[] = {A_TAIL_UINT, A_CHAR, C_TAIL_UINT, B_CHAR};
-    uint32_t *split = utf8_split(
+    split = utf8_split(
         (char[]){A_TAIL_CHAR_LEAD, A_TAIL_CHAR_CONT, A_CHAR, C_TAIL_CHAR_LEAD, C_TAIL_CHAR_CONT, B_CHAR, '\n'}, 15);
     TEST_ASSERT_EQUAL_UINT_ARRAY(expected, split, 4);
 }
 
 void test_utf8split_should_skipCharsWhenLengthIsReached_1() {
     uint32_t expected[] = {A_TAIL_UINT, A_CHAR, 0};
-    uint32_t *split = utf8_split(
+    split = utf8_split(
         (char[]){A_TAIL_CHAR_LEAD, A_TAIL_CHAR_CONT, A_CHAR, C_TAIL_CHAR_LEAD, C_TAIL_CHAR_CONT, B_CHAR, '\n'}, 2);
     TEST_ASSERT_EQUAL_UINT_ARRAY(expected, split, 3);
 }
 
 void test_utf8split_should_skipCharsWhenLengthIsReached_2() {
     uint32_t expected[] = {A_TAIL_UINT, A_CHAR, C_TAIL_UINT, 0};
-    uint32_t *split = utf8_split(
+    split = utf8_split(
         (char[]){A_TAIL_CHAR_LEAD, A_TAIL_CHAR_CONT, A_CHAR, C_TAIL_CHAR_LEAD, C_TAIL_CHAR_CONT, B_CHAR, '\n'}, 3);
     TEST_ASSERT_EQUAL_UINT_ARRAY(expected, split, 4);
 }
 
 void test_utf8split_should_skipLeadByteAtTheEnd() {
     uint32_t expected[] = {A_TAIL_UINT, A_CHAR, 0};
-    uint32_t *split = utf8_split((char[]){A_TAIL_CHAR_LEAD, A_TAIL_CHAR_CONT, A_CHAR, C_TAIL_CHAR_LEAD, '\n'}, 4);
+    split = utf8_split((char[]){A_TAIL_CHAR_LEAD, A_TAIL_CHAR_CONT, A_CHAR, C_TAIL_CHAR_LEAD, '\n'}, 4);
     TEST_ASSERT_EQUAL_UINT_ARRAY(expected, split, 3);
 }
 
 void test_utf8split_should_skipLeadByteInTheMiddle() {
     uint32_t expected[] = {A_TAIL_UINT, A_CHAR, 0};
-    uint32_t *split = utf8_split((char[]){A_TAIL_CHAR_LEAD, A_TAIL_CHAR_CONT, A_CHAR, C_TAIL_CHAR_LEAD, '\n'}, 4);
+    split = utf8_split((char[]){A_TAIL_CHAR_LEAD, A_TAIL_CHAR_CONT, A_CHAR, C_TAIL_CHAR_LEAD, '\n'}, 4);
     TEST_ASSERT_EQUAL_UINT_ARRAY(expected, split, 3);
 }
 

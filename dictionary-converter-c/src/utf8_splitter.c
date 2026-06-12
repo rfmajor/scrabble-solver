@@ -42,13 +42,15 @@ uint32_t *utf8_split(char *line, int max_chars) {
     while ((c = *line++) != '\n' && i < max_chars) {
         if (!(type = __utf8_is_lead(c))) {
             if (__utf8_is_cont(c)) {
+                if (last_lead == 0) {
+                    // continuation bit without leading bit -> save char as is
+                    *split_i++ = c;
+                    i++;
+                    continue;
+                }
                 wc[wc_i++] = c;
                 if (wc_i > last_lead) {
                     uint32_t num = get_num_and_reset_widechar_context(wc, &wc_i, &type);
-                    // wc[wc_i] = 0;
-                    // wc_i = 0;
-                    // type = 0;
-                    // uint32_t num = __utf8_get_num(wc);
                     *split_i++ = num;
                     i++;
                 }
@@ -60,10 +62,6 @@ uint32_t *utf8_split(char *line, int max_chars) {
             if (wc_i > 0) {
                 // last sequence has not been processed fully so the char is malformed -> just keep it as is
                 wc[wc_i++] = c;
-                // wc[wc_i] = 0;
-                // wc_i = 0;
-                // type = 0;
-                // uint32_t num = __utf8_get_num(wc);
                 uint32_t num = get_num_and_reset_widechar_context(wc, &wc_i, &type);
                 *split_i++ = num;
                 i++;
