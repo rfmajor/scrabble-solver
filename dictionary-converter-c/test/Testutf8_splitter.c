@@ -102,15 +102,27 @@ void test_utf8split_should_skipCharsWhenLengthIsReached_2() {
     TEST_ASSERT_EQUAL_UINT_ARRAY(expected, split, 4);
 }
 
-void test_utf8split_should_skipLeadByteAtTheEnd() {
-    uint32_t expected[] = {A_TAIL_UINT, A_CHAR, 0};
+void test_utf8split_should_keepLeadByteAtTheEndWithNoContinuation() {
+    uint32_t expected[] = {A_TAIL_UINT, A_CHAR, C_TAIL_CHAR_LEAD, 0};
     split = utf8_split((char[]){A_TAIL_CHAR_LEAD, A_TAIL_CHAR_CONT, A_CHAR, C_TAIL_CHAR_LEAD, '\n'}, 4);
     TEST_ASSERT_EQUAL_UINT_ARRAY(expected, split, 3);
 }
 
-void test_utf8split_should_skipLeadByteInTheMiddle() {
-    uint32_t expected[] = {A_TAIL_UINT, A_CHAR, 0};
-    split = utf8_split((char[]){A_TAIL_CHAR_LEAD, A_TAIL_CHAR_CONT, A_CHAR, C_TAIL_CHAR_LEAD, '\n'}, 4);
+void test_utf8split_should_keepLeadByteInTheMiddleWithNoContinuationAndLeadByteAfter() {
+    uint32_t expected[] = {A_CHAR, A_TAIL_CHAR_LEAD, C_TAIL_UINT, 0};
+    split = utf8_split((char[]){A_CHAR, A_TAIL_CHAR_LEAD, C_TAIL_CHAR_LEAD, C_TAIL_CHAR_CONT, '\n'}, 4);
+    TEST_ASSERT_EQUAL_UINT_ARRAY(expected, split, 4);
+}
+
+void test_utf8split_should_keepLeadByteInTheMiddleWithNoContinuationAndAsciiAfter() {
+    uint32_t expected[] = {A_CHAR, A_TAIL_CHAR_LEAD, B_CHAR, 0};
+    split = utf8_split((char[]){A_CHAR, A_TAIL_CHAR_LEAD, B_CHAR, '\n'}, 3);
+    TEST_ASSERT_EQUAL_UINT_ARRAY(expected, split, 4);
+}
+
+void test_utf8split_should_keepContByteInTheMiddleWithNoLeadBefore() {
+    uint32_t expected[] = {A_CHAR, A_TAIL_CHAR_CONT, B_CHAR, 0};
+    split = utf8_split((char[]){A_CHAR, A_TAIL_CHAR_CONT, B_CHAR, '\n'}, 3);
     TEST_ASSERT_EQUAL_UINT_ARRAY(expected, split, 3);
 }
 
@@ -128,7 +140,10 @@ int main(void) {
     RUN_TEST(test_utf8split_should_returnCorrectValuesForMixed);
     RUN_TEST(test_utf8split_should_skipCharsWhenLengthIsReached_1);
     RUN_TEST(test_utf8split_should_skipCharsWhenLengthIsReached_2);
-    RUN_TEST(test_utf8split_should_skipLeadByteAtTheEnd);
+    RUN_TEST(test_utf8split_should_keepLeadByteAtTheEndWithNoContinuation);
+    RUN_TEST(test_utf8split_should_keepLeadByteInTheMiddleWithNoContinuationAndLeadByteAfter);
+    RUN_TEST(test_utf8split_should_keepLeadByteInTheMiddleWithNoContinuationAndAsciiAfter);
+    RUN_TEST(test_utf8split_should_keepContByteInTheMiddleWithNoLeadBefore);
     printf("exit: %d\n", UNITY_END());
 
     return 0;

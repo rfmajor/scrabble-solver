@@ -16,7 +16,6 @@ int __utf8_is_lead(char c) {
 uint32_t __utf8_get_num(char *wc) {
     uint32_t result = 0;
     while (*wc) {
-        printf("loop\n");
         result <<= sizeof(char) * 8;
         result |= ((unsigned char)*wc++);
     }
@@ -43,6 +42,7 @@ uint32_t *utf8_split(char *line, int max_chars) {
         if (!(type = __utf8_is_lead(c))) {
             if (__utf8_is_cont(c)) {
                 if (last_lead == 0) {
+                    printf("cont byte without lead, saving %u\n", c);
                     // continuation bit without leading bit -> save char as is
                     *split_i++ = c;
                     i++;
@@ -55,14 +55,19 @@ uint32_t *utf8_split(char *line, int max_chars) {
                     i++;
                 }
             } else {
-                *split_i++ = c;
+                if (wc_i > last_lead) {
+                    uint32_t num = get_num_and_reset_widechar_context(wc, &wc_i, &type);
+                    *split_i++ = num;
+                } else {
+                    *split_i++ = c;
+                }
                 i++;
             }
         } else {
             if (wc_i > 0) {
                 // last sequence has not been processed fully so the char is malformed -> just keep it as is
-                wc[wc_i++] = c;
                 uint32_t num = get_num_and_reset_widechar_context(wc, &wc_i, &type);
+                printf("malformed char, saving %u\n", num);
                 *split_i++ = num;
                 i++;
             }
