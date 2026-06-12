@@ -84,5 +84,6 @@ int main(int argc, char *argv[]) {
             wc[wc_i++] = c;
         }
     }
+    fclose(fp);
     return EXIT_SUCCESS;
 }
