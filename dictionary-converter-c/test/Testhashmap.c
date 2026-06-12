@@ -17,7 +17,7 @@ int __get_cap_and_destroy(int cap) {
     return actual_cap;
 }
 
-void setUp() {
+void setUp(void) {
     hashmap = hashmap_init(4);
 }
 
