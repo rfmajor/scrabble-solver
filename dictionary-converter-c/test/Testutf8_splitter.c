@@ -126,6 +126,12 @@ void test_utf8split_should_keepContByteInTheMiddleWithNoLeadBefore() {
     TEST_ASSERT_EQUAL_UINT_ARRAY(expected, split, 3);
 }
 
+void test_utf8split_should_processCorrectNumberOfContinuationBytes() {
+    uint32_t expected[] = {A_TAIL_UINT, Z_DOT_CHAR_CONT, B_CHAR, 0};
+    split = utf8_split((char[]){A_TAIL_CHAR_LEAD, A_TAIL_CHAR_CONT, Z_DOT_CHAR_CONT, B_CHAR, '\n'}, 3);
+    TEST_ASSERT_EQUAL_UINT_ARRAY(expected, split, 4);
+}
+
 int main(void) {
     UNITY_BEGIN();
     RUN_TEST(test_islead_should_returnTrueForLead);
@@ -144,6 +150,7 @@ int main(void) {
     RUN_TEST(test_utf8split_should_keepLeadByteInTheMiddleWithNoContinuationAndLeadByteAfter);
     RUN_TEST(test_utf8split_should_keepLeadByteInTheMiddleWithNoContinuationAndAsciiAfter);
     RUN_TEST(test_utf8split_should_keepContByteInTheMiddleWithNoLeadBefore);
+    RUN_TEST(test_utf8split_should_processCorrectNumberOfContinuationBytes);
     UNITY_END();
 
     return 0;
