@@ -22,58 +22,63 @@ uint32_t __utf8_get_num(char *wc) {
     return result;
 }
 
-static uint32_t get_num_and_reset_widechar_context(char *wc, int *wc_i, int *type) {
-    wc[*wc_i] = 0;
-    *wc_i = 0;
-    *type = 0;
-    return __utf8_get_num(wc);
+static uint32_t __dump_wc_context(struct wc_context *ctx) {
+    uint32_t num = __utf8_get_num(ctx->wc);
+    ctx->i = 0;
+    ctx->end_i = 0;
+    for (size_t i = 0; i < WC_CONTEXT_SIZE; i++) {
+        ctx->wc[i] = 0;
+    }
+
+    return num;
 }
 
 uint32_t *utf8_split(char *line, int max_chars) {
     char c;
-    char wc[4];
-    int type, wc_i = 0, last_lead = 0, i = 0;
+    int cont_bytes_num;
+    int i = 0;
+    struct wc_context wc_ctx = {};
     uint32_t *split = malloc(sizeof(uint32_t) * max_chars);
     if (split == NULL) {
         return NULL;
     }
-    uint32_t *split_i = split;
+    uint32_t *result = split;
     while ((c = *line++) != '\n' && i < max_chars) {
-        if (!(type = __utf8_is_lead(c))) {
-            if (__utf8_is_cont(c)) {
-                if (last_lead == 0) {
-                    printf("cont byte without lead, saving %u\n", c);
-                    // continuation bit without leading bit -> save char as is
-                    *split_i++ = c;
-                    i++;
-                    continue;
-                }
-                wc[wc_i++] = c;
-                if (wc_i > last_lead) {
-                    uint32_t num = get_num_and_reset_widechar_context(wc, &wc_i, &type);
-                    *split_i++ = num;
-                    i++;
+        int is_context_nonempty = wc_ctx.i > 0;
+        if ((__utf8_is_ascii(c) || __utf8_is_lead(c)) && is_context_nonempty) {
+            // lead/ascii byte received and previous context is not empty -> dump context and retry
+            *result++ = __dump_wc_context(&wc_ctx);
+            --line;
+            ++i;
+            continue;
+        }
+        if (__utf8_is_ascii(c)) {
+            *result++ = c;
+            ++i;
+            continue;
+        }
+        if ((cont_bytes_num = __utf8_is_lead(c))) {
+            wc_ctx.end_i = cont_bytes_num;
+            wc_ctx.wc[wc_ctx.i++] = c;
+            continue;
+        }
+        if (__utf8_is_cont(c)) {
+            if (is_context_nonempty) {
+                wc_ctx.wc[wc_ctx.i++] = c;
+                if (wc_ctx.i >= wc_ctx.end_i) {
+                    *result++ = __dump_wc_context(&wc_ctx);
+                    ++i;
                 }
             } else {
-                if (wc_i > last_lead) {
-                    uint32_t num = get_num_and_reset_widechar_context(wc, &wc_i, &type);
-                    *split_i++ = num;
-                } else {
-                    *split_i++ = c;
-                }
-                i++;
+                // continuation byte without leading byte -> dump char as is
+                *result++ = (unsigned char)c;
+                ++i;
             }
-        } else {
-            if (wc_i > 0) {
-                // last sequence has not been processed fully so the char is malformed -> just keep it as is
-                uint32_t num = get_num_and_reset_widechar_context(wc, &wc_i, &type);
-                printf("malformed char, saving %u\n", num);
-                *split_i++ = num;
-                i++;
-            }
-            last_lead = type;
-            wc[wc_i++] = c;
         }
+    }
+    if (wc_ctx.i > 0 && i < max_chars) {
+        // context is not empty after finishing -> dump context
+        *result++ = __dump_wc_context(&wc_ctx);
     }
     return split;
 }

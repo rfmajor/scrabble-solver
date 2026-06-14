@@ -8,10 +8,10 @@
 #define C_CHAR (0x63)
 #define A_TAIL_CHAR_LEAD (0xC4)
 #define A_TAIL_CHAR_CONT (0x85)
-#define C_TAIL_CHAR_LEAD (0xC4)
-#define C_TAIL_CHAR_CONT (0x87)
+#define Z_DOT_CHAR_LEAD (0xC5)
+#define Z_DOT_CHAR_CONT (0xBC)
 #define A_TAIL_UINT (0xC485)
-#define C_TAIL_UINT (0xC487)
+#define Z_DOT_UINT (0xC5BC)
 
 uint32_t *split;
 
@@ -76,41 +76,41 @@ void test_utf8split_should_returnCorrectValuesForAscii() {
 }
 
 void test_utf8split_should_returnCorrectValuesForUtf8() {
-    uint32_t expected[] = {A_TAIL_UINT, C_TAIL_UINT};
-    split = utf8_split((char[]){A_TAIL_CHAR_LEAD, A_TAIL_CHAR_CONT, C_TAIL_CHAR_LEAD, C_TAIL_CHAR_CONT, '\n'}, 15);
+    uint32_t expected[] = {A_TAIL_UINT, Z_DOT_UINT};
+    split = utf8_split((char[]){A_TAIL_CHAR_LEAD, A_TAIL_CHAR_CONT, Z_DOT_CHAR_LEAD, Z_DOT_CHAR_CONT, '\n'}, 15);
     TEST_ASSERT_EQUAL_UINT_ARRAY(expected, split, 2);
 }
 
 void test_utf8split_should_returnCorrectValuesForMixed() {
-    uint32_t expected[] = {A_TAIL_UINT, A_CHAR, C_TAIL_UINT, B_CHAR};
+    uint32_t expected[] = {A_TAIL_UINT, A_CHAR, Z_DOT_UINT, B_CHAR};
     split = utf8_split(
-        (char[]){A_TAIL_CHAR_LEAD, A_TAIL_CHAR_CONT, A_CHAR, C_TAIL_CHAR_LEAD, C_TAIL_CHAR_CONT, B_CHAR, '\n'}, 15);
+        (char[]){A_TAIL_CHAR_LEAD, A_TAIL_CHAR_CONT, A_CHAR, Z_DOT_CHAR_LEAD, Z_DOT_CHAR_CONT, B_CHAR, '\n'}, 15);
     TEST_ASSERT_EQUAL_UINT_ARRAY(expected, split, 4);
 }
 
 void test_utf8split_should_skipCharsWhenLengthIsReached_1() {
     uint32_t expected[] = {A_TAIL_UINT, A_CHAR, 0};
     split = utf8_split(
-        (char[]){A_TAIL_CHAR_LEAD, A_TAIL_CHAR_CONT, A_CHAR, C_TAIL_CHAR_LEAD, C_TAIL_CHAR_CONT, B_CHAR, '\n'}, 2);
+        (char[]){A_TAIL_CHAR_LEAD, A_TAIL_CHAR_CONT, A_CHAR, Z_DOT_CHAR_LEAD, Z_DOT_CHAR_CONT, B_CHAR, '\n'}, 2);
     TEST_ASSERT_EQUAL_UINT_ARRAY(expected, split, 3);
 }
 
 void test_utf8split_should_skipCharsWhenLengthIsReached_2() {
-    uint32_t expected[] = {A_TAIL_UINT, A_CHAR, C_TAIL_UINT, 0};
+    uint32_t expected[] = {A_TAIL_UINT, A_CHAR, Z_DOT_UINT, 0};
     split = utf8_split(
-        (char[]){A_TAIL_CHAR_LEAD, A_TAIL_CHAR_CONT, A_CHAR, C_TAIL_CHAR_LEAD, C_TAIL_CHAR_CONT, B_CHAR, '\n'}, 3);
+        (char[]){A_TAIL_CHAR_LEAD, A_TAIL_CHAR_CONT, A_CHAR, Z_DOT_CHAR_LEAD, Z_DOT_CHAR_CONT, B_CHAR, '\n'}, 3);
     TEST_ASSERT_EQUAL_UINT_ARRAY(expected, split, 4);
 }
 
 void test_utf8split_should_keepLeadByteAtTheEndWithNoContinuation() {
-    uint32_t expected[] = {A_TAIL_UINT, A_CHAR, C_TAIL_CHAR_LEAD, 0};
-    split = utf8_split((char[]){A_TAIL_CHAR_LEAD, A_TAIL_CHAR_CONT, A_CHAR, C_TAIL_CHAR_LEAD, '\n'}, 4);
-    TEST_ASSERT_EQUAL_UINT_ARRAY(expected, split, 3);
+    uint32_t expected[] = {A_TAIL_UINT, A_CHAR, Z_DOT_CHAR_LEAD, 0};
+    split = utf8_split((char[]){A_TAIL_CHAR_LEAD, A_TAIL_CHAR_CONT, A_CHAR, Z_DOT_CHAR_LEAD, '\n'}, 4);
+    TEST_ASSERT_EQUAL_UINT_ARRAY(expected, split, 4);
 }
 
 void test_utf8split_should_keepLeadByteInTheMiddleWithNoContinuationAndLeadByteAfter() {
-    uint32_t expected[] = {A_CHAR, A_TAIL_CHAR_LEAD, C_TAIL_UINT, 0};
-    split = utf8_split((char[]){A_CHAR, A_TAIL_CHAR_LEAD, C_TAIL_CHAR_LEAD, C_TAIL_CHAR_CONT, '\n'}, 4);
+    uint32_t expected[] = {A_CHAR, A_TAIL_CHAR_LEAD, Z_DOT_UINT, 0};
+    split = utf8_split((char[]){A_CHAR, A_TAIL_CHAR_LEAD, Z_DOT_CHAR_LEAD, Z_DOT_CHAR_CONT, '\n'}, 4);
     TEST_ASSERT_EQUAL_UINT_ARRAY(expected, split, 4);
 }
 
@@ -144,7 +144,7 @@ int main(void) {
     RUN_TEST(test_utf8split_should_keepLeadByteInTheMiddleWithNoContinuationAndLeadByteAfter);
     RUN_TEST(test_utf8split_should_keepLeadByteInTheMiddleWithNoContinuationAndAsciiAfter);
     RUN_TEST(test_utf8split_should_keepContByteInTheMiddleWithNoLeadBefore);
-    printf("exit: %d\n", UNITY_END());
+    UNITY_END();
 
     return 0;
 }
