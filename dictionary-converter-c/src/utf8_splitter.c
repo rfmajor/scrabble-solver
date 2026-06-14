@@ -38,7 +38,7 @@ uint32_t *utf8_split(char *line, int max_chars) {
     int cont_bytes_num;
     int i = 0;
     struct widechar_buffer wc_buf = {};
-    uint32_t *split = malloc(sizeof(uint32_t) * max_chars);
+    uint32_t *split = malloc(sizeof(uint32_t) * max_chars + 1);
     if (split == NULL) {
         return NULL;
     }
