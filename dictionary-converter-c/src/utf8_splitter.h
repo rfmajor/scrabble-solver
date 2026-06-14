@@ -8,15 +8,15 @@
 #define HIGH_2ND_BIT_F (0b1 << 6)
 #define LEAD_BIT_FLAG (0b11 << 6)
 
-#define WC_CONTEXT_SIZE (5)
+#define WC_BUFFER_SIZE (5)
 
 #define __utf8_is_cont(c) ((c) & HIGH_BIT_FLAG) && (((c) & HIGH_2ND_BIT_F) == 0)
 #define __utf8_is_ascii(c) (((c) & HIGH_BIT_FLAG) == 0)
 
-struct wc_context {
+struct widechar_buffer {
     int i;
     int end_i;
-    char wc[WC_CONTEXT_SIZE];
+    char buffer[WC_BUFFER_SIZE];
 };
 
 int __utf8_is_lead(char c);
