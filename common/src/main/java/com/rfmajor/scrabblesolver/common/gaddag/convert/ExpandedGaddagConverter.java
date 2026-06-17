@@ -25,7 +25,7 @@ import static com.rfmajor.scrabblesolver.common.gaddag.utils.ExpandedGaddagUtils
 @Slf4j
 public class ExpandedGaddagConverter implements GaddagConverter<Long> {
     @Setter
-    private int initialStates = 1_048_576;
+    private int initialStates = 256;
 
     @Override
     public Gaddag<Long> convert(Iterable<String> wordIterable, Alphabet alphabet) {
@@ -49,7 +49,6 @@ public class ExpandedGaddagConverter implements GaddagConverter<Long> {
         private int nextLetterSetId;
         private int lastLetterSetId;
         private int forceLetterSetId;
-        private final Set<Integer> initializedStates;
 
         public Converter(Alphabet alphabet) {
             this.nextStateId = 2;
@@ -59,7 +58,6 @@ public class ExpandedGaddagConverter implements GaddagConverter<Long> {
             this.nextLetterSetId = 1;
             this.lastLetterSetId = 0;
             this.forceLetterSetId = 0;
-            this.initializedStates = new HashSet<>(Set.of(1));
         }
 
         public Gaddag<Long> convert(Iterable<String> wordIterable, Predicate<String> wordPredicate) {
@@ -113,13 +111,9 @@ public class ExpandedGaddagConverter implements GaddagConverter<Long> {
 
         private void addFinalArcIfNoneExists(final int letterId, int letterIdToAdd) {
             if (arcs[currentStateId][letterId] == 0L) {
-                boolean incrementNextStateId = !isStateInitialized(nextStateId);
                 setDestinationStateId(currentStateId, letterId, nextStateId, arcs);
-                initializedStates.add(nextStateId);
 
-                if (incrementNextStateId) {
-                    incrementStateId();
-                }
+                incrementStateId();
             }
             addLetterToSet(currentStateId, letterId, letterIdToAdd);
             lastLetterSetId = getLetterBitMapId(arcs[currentStateId][letterId]);
@@ -128,13 +122,9 @@ public class ExpandedGaddagConverter implements GaddagConverter<Long> {
 
         private void addArcIfNoneExists(final int letterId) {
             if (arcs[currentStateId][letterId] == 0L) {
-                boolean incrementNextStateId = !isStateInitialized(nextStateId);
                 setDestinationStateId(currentStateId, letterId, nextStateId, arcs);
-                initializedStates.add(nextStateId);
 
-                if (incrementNextStateId) {
-                    incrementStateId();
-                }
+                incrementStateId();
             }
             lastLetterSetId = getLetterBitMapId(arcs[currentStateId][letterId]);
             currentStateId = getDestinationStateId(arcs[currentStateId][letterId]);
@@ -160,10 +150,6 @@ public class ExpandedGaddagConverter implements GaddagConverter<Long> {
                     arcs[i] = new long[alphabet.size()];
                 }
             }
-        }
-
-        private boolean isStateInitialized(int stateId) {
-            return initializedStates.contains(stateId);
         }
 
         private void addLetterToSet(final int stateId, final int letterId, int letterIdToAdd) {
