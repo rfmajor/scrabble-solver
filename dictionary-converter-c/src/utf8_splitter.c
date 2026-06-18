@@ -33,16 +33,18 @@ static uint32_t __dump_widechar_buffer(struct widechar_buffer *wc_buffer) {
     return num;
 }
 
-uint32_t *utf8_split(char *line, int max_chars) {
+size_t utf8_split(uint32_t **buf_p, char *line, int max_chars) {
     char c;
     int cont_bytes_num;
     int i = 0;
     struct widechar_buffer wc_buf = {};
-    uint32_t *split = malloc(sizeof(uint32_t) * max_chars + 1);
-    if (split == NULL) {
-        return NULL;
+    if (*buf_p == NULL) {
+        *buf_p = malloc(sizeof(uint32_t) * max_chars + 1);
     }
-    uint32_t *result = split;
+    if (*buf_p == NULL) {
+        return 0;
+    }
+    uint32_t *result = *buf_p;
     while ((c = *line++) != '\n' && i < max_chars) {
         int is_context_nonempty = wc_buf.i > 0;
         if ((__utf8_is_ascii(c) || __utf8_is_lead(c)) && is_context_nonempty) {
@@ -79,6 +81,7 @@ uint32_t *utf8_split(char *line, int max_chars) {
     if (wc_buf.i > 0 && i < max_chars) {
         // context is not empty after finishing -> dump context
         *result++ = __dump_widechar_buffer(&wc_buf);
+        ++i;
     }
-    return split;
+    return i;
 }

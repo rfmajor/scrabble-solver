@@ -23,6 +23,6 @@ int __utf8_is_lead(char c);
 
 uint32_t __utf8_get_num(char *wc);
 
-uint32_t *utf8_split(char *line, int max_bytes);
+size_t utf8_split(uint32_t **buf, char *line, int max_chars);
 
 #endif // !UTF8_SPLITTER

@@ -1,9 +1,13 @@
-#include "alphabet.h"
+#include "hashmap.h"
+#include "utf8_splitter.h"
 #include <argp.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+
+#define MAX_ALPHABET_SIZE (256)
 
 static char *SUPPORTED_DATA_STRUCTURES[] = {"gaddag", 0};
 
@@ -107,12 +111,36 @@ int validate_args(struct arguments *arguments) {
     return 0;
 }
 
+static uint32_t *read_alphabet(char *alphabet_file) {
+    FILE *fp = fopen(alphabet_file, "rb");
+    char *line = NULL;
+    size_t linecap = 0;
+    if (getline(&line, &linecap, fp) == 0) {
+        return NULL;
+    }
+    fclose(fp);
+    return utf8_split(line, MAX_ALPHABET_SIZE);
+}
+
+static hashmap_t *map_alphabet_letters(uint32_t *alphabet_p) {
+    hashmap_t *hashmap = hashmap_init(MAX_ALPHABET_SIZE);
+    int i = 0;
+    int fail = 0;
+    while (alphabet_p) {
+        fail = !hashmap_put(*alphabet_p++, i++, hashmap);
+        if (fail) {
+            fprintf(stderr, "Failed to put %u\n", *(alphabet_p - 1));
+        }
+    }
+    return hashmap;
+}
+
 int main(int argc, char *argv[]) {
     struct arguments arguments;
 
     arguments.data_structure = "gaddag";
     arguments.gzip = 0;
-    arguments.alphabet_config = "./alphabet.json";
+    arguments.alphabet_config = "./alphabet.txt";
     arguments.max_word_length = 100000;
 
     argp_parse(&argp, argc, argv, 0, 0, &arguments);
@@ -121,5 +149,6 @@ int main(int argc, char *argv[]) {
     if (validate_args(&arguments) != 0) {
         return EXIT_FAILURE;
     }
-    read_alphabet_config(arguments.alphabet_config);
+    uint32_t *alphabet_chars = read_alphabet(arguments.alphabet_config);
+    hashmap_t *mapped_alphabet = map_alphabet_letters(alphabet_chars);
 }
