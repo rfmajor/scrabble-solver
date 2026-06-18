@@ -14,7 +14,7 @@
 #define ARCS(A, CTX) (CTX->arcs[(CTX->current_state_idx) * (CTX->states_cap) + (A)])
 // #define SET_ZEROS(START, END, TARGET) (&(TARGET) = )
 
-struct char_bitmap_storage {
+struct chars_storage {
     uint32_t *idx_to_bitmap;
     hashmap_t *bitmap_to_idx;
 };
@@ -30,7 +30,7 @@ struct gaddag_context {
     uint32_t states_cap;
     hashmap_t *mapped_alphabet;
     uint8_t delimiter_idx;
-    struct char_bitmap_storage *cbs;
+    struct chars_storage *chars;
 };
 
 static uint64_t get_bit_value(int start, int end, uint64_t *bit_set) {
@@ -154,7 +154,7 @@ void mem_init(uint32_t initial_states, uint32_t alphabet_size, hashmap_t *mapped
     ctx->next_char_bitmap_idx = 1;
     ctx->delimiter_idx = mapped_alphabet->size - 1;
     ctx->states_cap = initial_states;
-    ctx->cbs = malloc(sizeof(struct char_bitmap_storage));
+    ctx->cbs = malloc(sizeof(struct chars_storage));
     ctx->cbs->bitmap_to_idx = malloc(sizeof(hashmap_t));
     ctx->cbs->idx_to_bitmap = malloc(sizeof(uint32_t) * 512);
     ctx->arcs = malloc(sizeof(uint64_t) * initial_states * alphabet_size);
