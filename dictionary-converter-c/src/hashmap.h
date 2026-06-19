@@ -17,16 +17,16 @@ typedef struct node {
     struct node *next;
 } node;
 
-typedef struct hashmap_t {
+typedef struct hashmap {
     int cap;
     int size;
     node *buckets;
-} hashmap_t;
+} hashmap;
 
-hashmap_t *hashmap_init(int cap);
+hashmap *hashmap_init(int cap);
 
-int hashmap_put(uint32_t key, uint8_t val, hashmap_t *hashmap);
+int hashmap_put(uint32_t key, uint8_t val, hashmap *hashmap);
 
-uint8_t hashmap_get(uint32_t key, hashmap_t *hashmap);
+uint8_t hashmap_get(uint32_t key, hashmap *hashmap);
 
 #endif // !HASHMAP

@@ -24,8 +24,8 @@ static uint32_t fnv_32_hash(void *buf, size_t len, uint32_t hval) {
     return hval;
 }
 
-hashmap_t *hashmap_init(int cap) {
-    hashmap_t *hashmap = malloc(sizeof(struct hashmap_t));
+hashmap *hashmap_init(int cap) {
+    hashmap *hashmap = malloc(sizeof(struct hashmap));
     if (hashmap == NULL) {
         return NULL;
     }
@@ -41,7 +41,7 @@ hashmap_t *hashmap_init(int cap) {
     return hashmap;
 }
 
-int hashmap_put(uint32_t key, uint8_t val, hashmap_t *hashmap) {
+int hashmap_put(uint32_t key, uint8_t val, hashmap *hashmap) {
     if (key == _UNDEFINED_KEY) {
         return _PUT_FAILURE;
     }
@@ -67,7 +67,7 @@ int hashmap_put(uint32_t key, uint8_t val, hashmap_t *hashmap) {
     return _PUT_SUCCESS;
 }
 
-uint8_t hashmap_get(uint32_t key, hashmap_t *hashmap) {
+uint8_t hashmap_get(uint32_t key, hashmap *hashmap) {
     if (key == _UNDEFINED_KEY) {
         return _PUT_FAILURE;
     }
