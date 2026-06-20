@@ -41,45 +41,40 @@ hashmap *hashmap_init(int cap) {
     return hashmap;
 }
 
-int hashmap_put(uint32_t key, uint8_t val, hashmap *hashmap) {
-    if (key == _UNDEFINED_KEY) {
-        return _PUT_FAILURE;
-    }
+void *hashmap_put(uint32_t key, void *val, hashmap *hashmap) {
     uint32_t hash = fnv_32_hash(&key, sizeof(key), _FNV_32bit_offset_basis);
     int bucket_num = hash % hashmap->cap;
     node *bucket = hashmap->buckets + bucket_num;
 
-    while (bucket->key != _UNDEFINED_KEY && bucket->key != key) {
+    while (bucket->key != NULL && *bucket->key != key) {
         if (bucket->next == NULL) {
             bucket->next = malloc(sizeof(struct node));
             if (bucket->next == NULL) {
-                return _PUT_FAILURE;
+                return NULL;
             }
         }
         bucket = bucket->next;
     }
-    if (bucket->key != key) {
+    if (bucket->key == NULL || *bucket->key != key) {
         hashmap->size++;
     }
-    bucket->key = key;
+    bucket->key = malloc(sizeof(uint32_t));
+    *bucket->key = key;
     bucket->val = val;
 
-    return _PUT_SUCCESS;
+    return bucket->val;
 }
 
-uint8_t hashmap_get(uint32_t key, hashmap *hashmap) {
-    if (key == _UNDEFINED_KEY) {
-        return _PUT_FAILURE;
-    }
+void *hashmap_get(uint32_t key, hashmap *hashmap) {
     uint32_t hash = fnv_32_hash(&key, sizeof(key), _FNV_32bit_offset_basis);
     int bucket_num = hash % hashmap->cap;
     node *bucket = hashmap->buckets + bucket_num;
 
-    while (bucket->key != key && bucket->key != _UNDEFINED_KEY && bucket->next != NULL) {
+    while (bucket->key != NULL && *bucket->key != key && bucket->next != NULL) {
         bucket = bucket->next;
     }
-    if (bucket->key == _UNDEFINED_KEY || bucket->key != key) {
-        return _GET_FAILURE();
+    if (bucket->key == NULL || *bucket->key != key) {
+        return NULL;
     }
     return bucket->val;
 }

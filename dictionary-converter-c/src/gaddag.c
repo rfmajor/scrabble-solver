@@ -16,7 +16,7 @@
 
 struct chars_storage {
     uint32_t *idx_to_bitmap;
-    hashmap_t *bitmap_to_idx;
+    hashmap *bitmap_to_idx;
 };
 
 struct gaddag_context {
@@ -28,7 +28,7 @@ struct gaddag_context {
     uint32_t last_char_bitmap_idx;
     uint32_t force_char_bitmap_idx;
     uint32_t states_cap;
-    hashmap_t *mapped_alphabet;
+    hashmap *mapped_alphabet;
     uint8_t delimiter_idx;
     struct chars_storage *chars;
 };
@@ -46,10 +46,10 @@ static void set_bit_value(int start, int end, uint64_t value, uint64_t *target) 
 
 static void add_final_char(uint8_t final_char, uint64_t *arc, struct gaddag_context *ctx) {
     uint64_t char_bitmap_idx = get_bit_value(CHAR_BITMAP_ID_START, CHAR_BITMAP_ID_END, arc);
-    uint32_t char_bitmap = ctx->cbs->idx_to_bitmap[char_bitmap_idx];
+    uint32_t char_bitmap = ctx->chars->idx_to_bitmap[char_bitmap_idx];
     uint32_t new_char_bitmap = add_to_bitmap(char_bitmap, final_char);
     uint8_t new_char_bitmap_idx;
-    if ((new_char_bitmap_idx = hashmap_get(new_char_bitmap, ctx->cbs->bitmap_to_idx)) != ((uint8_t)-1)) {
+    if ((new_char_bitmap_idx = *(uint8_t *)hashmap_get(new_char_bitmap, ctx->chars->bitmap_to_idx)) != ((uint8_t)-1)) {
         char_bitmap_idx = new_char_bitmap_idx;
     } else {
         char_bitmap_idx = ctx->next_char_bitmap_idx;
@@ -108,12 +108,12 @@ static void ensure_arc(uint8_t arc_char, struct gaddag_context *ctx) {
     ctx->current_state_idx = get_bit_value(DEST_ID_START, DEST_ID_END, &arc);
 }
 
-static size_t translate(uint8_t **tokens, char *word, hashmap_t *alphabet) {
+static size_t translate(uint8_t **tokens, char *word, hashmap *alphabet) {
     uint32_t *split = NULL;
     size_t len = utf8_split(&split, word, MAX_CHARS);
     *tokens = malloc(sizeof(uint8_t) * len + 1);
     for (size_t i = 0; i < len; i++) {
-        *tokens[i] = hashmap_get(split[i], alphabet);
+        *tokens[i] = *(uint8_t *)hashmap_get(split[i], alphabet);
     }
     free(split);
     return len;
@@ -148,19 +148,19 @@ static uint32_t *process_word(char *word, struct gaddag_context *ctx) {
     int max_bitmap_id = (int)pow(2, CHAR_BITMAP_ID_END - CHAR_BITMAP_ID_START - 1);
 }
 
-void mem_init(uint32_t initial_states, uint32_t alphabet_size, hashmap_t *mapped_alphabet, struct gaddag_context *ctx) {
+void mem_init(uint32_t initial_states, uint32_t alphabet_size, hashmap *mapped_alphabet, struct gaddag_context *ctx) {
     ctx = malloc(sizeof(struct gaddag_context));
     ctx->next_state_idx = 2;
     ctx->next_char_bitmap_idx = 1;
     ctx->delimiter_idx = mapped_alphabet->size - 1;
     ctx->states_cap = initial_states;
-    ctx->cbs = malloc(sizeof(struct chars_storage));
-    ctx->cbs->bitmap_to_idx = malloc(sizeof(hashmap_t));
-    ctx->cbs->idx_to_bitmap = malloc(sizeof(uint32_t) * 512);
+    ctx->chars = malloc(sizeof(struct chars_storage));
+    ctx->chars->bitmap_to_idx = malloc(sizeof(hashmap));
+    ctx->chars->idx_to_bitmap = malloc(sizeof(uint32_t) * 512);
     ctx->arcs = malloc(sizeof(uint64_t) * initial_states * alphabet_size);
 }
 
-void gaddag_convert(const char *dictionary_f, const char *output_f, hashmap_t *mapped_alphabet, const int max_word,
+void gaddag_convert(const char *dictionary_f, const char *output_f, hashmap *mapped_alphabet, const int max_word,
                     const int gzip) {
     FILE *fp = fopen(dictionary_f, "rb");
     char *line = NULL;
