@@ -2,6 +2,7 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 static int num_of_leading_zeros(int num) {
     return __builtin_clz(num);
@@ -24,24 +25,61 @@ static uint32_t fnv_32_hash(void *buf, size_t len, uint32_t hval) {
     return hval;
 }
 
-hashmap *hashmap_init(int cap) {
+static void re_hash(hashmap *map) {
+    int previous_cap = map->cap;
+    map->cap *= 2;
+    int table_size = get_table_size(map->cap);
+    node *buckets_src = map->buckets;
+    map->buckets = malloc(sizeof(node) * table_size);
+    for (size_t i = 0; i < previous_cap; i++) {
+        node *bucket_src = buckets_src + i;
+        if (bucket_src->key != NULL) {
+            hashmap_put(*bucket_src->key, bucket_src->val, map);
+        }
+        free(bucket_src->key);
+        free(bucket_src->val);
+        bucket_src = bucket_src->next;
+        while (bucket_src != NULL) {
+            node *bucket_tmp = bucket_src;
+            bucket_src = bucket_src->next;
+            if (bucket_src->key != NULL) {
+                hashmap_put(*bucket_src->key, bucket_src->val, map);
+            }
+            free(bucket_tmp->key);
+            free(bucket_tmp->val);
+            free(bucket_tmp);
+        }
+    }
+}
+
+static void ensure_space(hashmap *map) {
+    double load = (double)map->size / map->cap;
+    if (load >= map->load_factor) {
+        re_hash(map);
+    }
+}
+
+hashmap *hashmap_init(int cap, size_t sizeof_val) {
     hashmap *hashmap = malloc(sizeof(struct hashmap));
     if (hashmap == NULL) {
         return NULL;
     }
     int table_size = get_table_size(cap);
-    node *node_p = malloc(sizeof(struct node) * table_size);
-    if (node_p == NULL) {
+
+    hashmap->buckets = malloc(sizeof(struct node) * table_size);
+    if (hashmap->buckets == NULL) {
         return NULL;
     }
-    hashmap->buckets = node_p;
     hashmap->cap = table_size;
+    hashmap->load_factor = 0.75;
     hashmap->size = 0;
+    hashmap->sizeof_val = sizeof_val;
 
     return hashmap;
 }
 
 void *hashmap_put(uint32_t key, void *val, hashmap *hashmap) {
+    ensure_space(hashmap);
     uint32_t hash = fnv_32_hash(&key, sizeof(key), _FNV_32bit_offset_basis);
     int bucket_num = hash % hashmap->cap;
     node *bucket = hashmap->buckets + bucket_num;
@@ -59,8 +97,9 @@ void *hashmap_put(uint32_t key, void *val, hashmap *hashmap) {
         hashmap->size++;
     }
     bucket->key = malloc(sizeof(uint32_t));
+    bucket->val = malloc(sizeof(hashmap->sizeof_val));
     *bucket->key = key;
-    bucket->val = val;
+    memcpy(bucket->val, val, hashmap->sizeof_val);
 
     return bucket->val;
 }
@@ -77,4 +116,22 @@ void *hashmap_get(uint32_t key, hashmap *hashmap) {
         return NULL;
     }
     return bucket->val;
+}
+
+void hashmap_destroy(hashmap *map) {
+    for (size_t i = 0; i < map->cap; i++) {
+        node *bucket = map->buckets + i;
+        free(bucket->key);
+        free(bucket->val);
+        bucket = bucket->next;
+        while (bucket != NULL) {
+            node *bucket_tmp = bucket;
+            bucket = bucket->next;
+            free(bucket_tmp->key);
+            free(bucket_tmp->val);
+            free(bucket_tmp);
+        }
+    }
+    free(map->buckets);
+    free(map);
 }

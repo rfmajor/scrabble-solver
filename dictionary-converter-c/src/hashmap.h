@@ -1,3 +1,4 @@
+#include <stddef.h>
 #include <stdint.h>
 
 #ifndef HASHMAP
@@ -14,15 +15,19 @@ typedef struct node {
 } node;
 
 typedef struct hashmap {
+    size_t sizeof_val;
     int cap;
     int size;
+    double load_factor;
     node *buckets;
 } hashmap;
 
-hashmap *hashmap_init(int cap);
+hashmap *hashmap_init(int cap, size_t sizeof_val);
 
-void *hashmap_put(uint32_t key, void *val, hashmap *hashmap);
+void *hashmap_put(uint32_t key, void *val, hashmap *map);
 
-void *hashmap_get(uint32_t key, hashmap *hashmap);
+void *hashmap_get(uint32_t key, hashmap *map);
+
+void hashmap_destroy(hashmap *map);
 
 #endif // !HASHMAP
