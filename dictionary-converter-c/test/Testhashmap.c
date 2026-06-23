@@ -68,12 +68,24 @@ void test_put_should_rehashWhenLoadFactorExceeded(void) {
     TEST_ASSERT_EQUAL(8, map->cap);
 }
 
+void test_put_should_trim_value_of_larger_type(void) {
+    uint16_t val1 = 0xDEAD;
+    TEST_ASSERT_NOT_NULL(hashmap_put(13, &val1, map));
+    TEST_ASSERT_EQUAL(val1, *(uint16_t *)hashmap_get(13, map));
+    TEST_ASSERT_EQUAL(1, map->size);
+    uint64_t val2 = 0xDEADBEEFDEADCAFE;
+    TEST_ASSERT_NOT_NULL(hashmap_put(3, &val2, map));
+    TEST_ASSERT_EQUAL(0xCAFE, *(uint64_t *)hashmap_get(3, map));
+    TEST_ASSERT_EQUAL(2, map->size);
+}
+
 int main(void) {
     UNITY_BEGIN();
     RUN_TEST(test_cap_should_beAlignedToNearestPowerOfTwo);
     RUN_TEST(test_put_should_succeed);
     RUN_TEST(test_put_should_overwrite);
     RUN_TEST(test_put_should_rehashWhenLoadFactorExceeded);
+    RUN_TEST(test_put_should_trim_value_of_larger_type);
     UNITY_END();
 
     return 0;
