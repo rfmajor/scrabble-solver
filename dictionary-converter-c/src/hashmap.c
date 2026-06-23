@@ -28,6 +28,7 @@ static uint32_t fnv_32_hash(void *buf, size_t len, uint32_t hval) {
 static void re_hash(hashmap *map) {
     int previous_cap = map->cap;
     map->cap *= 2;
+    map->size = 0;
     int table_size = get_table_size(map->cap);
     node *buckets_src = map->buckets;
     map->buckets = malloc(sizeof(node) * table_size);

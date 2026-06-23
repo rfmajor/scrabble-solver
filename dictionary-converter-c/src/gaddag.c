@@ -55,7 +55,7 @@ static void add_final_char(uint8_t final_char, uint64_t *arc, struct gaddag_cont
         char_bitmap_idx = ctx->next_char_bitmap_idx;
         ++ctx->next_char_bitmap_idx;
         // todo: realloc if idx_to_bitmap runs out of space
-        ctx->cbs->idx_to_bitmap[char_bitmap_idx] = new_char_bitmap;
+        ctx->chars->idx_to_bitmap[char_bitmap_idx] = new_char_bitmap;
     }
     set_bit_value(CHAR_BITMAP_ID_START, CHAR_BITMAP_ID_END, char_bitmap_idx, arc);
 }

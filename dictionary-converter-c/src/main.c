@@ -123,10 +123,10 @@ static size_t read_alphabet(uint32_t **chars_p, char *alphabet_file) {
 }
 
 static hashmap *map_alphabet_letters(uint32_t *alphabet_p) {
-    hashmap *hashmap = hashmap_init(MAX_ALPHABET_SIZE, sizeof(uint32_t));
-    uint32_t i = 0;
+    hashmap *hashmap = hashmap_init(MAX_ALPHABET_SIZE, sizeof(uint8_t));
+    uint8_t i = 0;
     while (alphabet_p) {
-        uint32_t *i_p = &i;
+        uint8_t *i_p = &i;
         if (hashmap_put(*alphabet_p++, i_p, hashmap) == NULL) {
             fprintf(stderr, "Failed to put %u\n", *(alphabet_p - 1));
         }

@@ -66,6 +66,11 @@ void test_put_should_rehashWhenLoadFactorExceeded(void) {
     uint16_t val = 46;
     hashmap_put(3, &val, map);
     TEST_ASSERT_EQUAL(8, map->cap);
+    TEST_ASSERT_EQUAL(2, *(uint16_t *)hashmap_get(0, map));
+    TEST_ASSERT_EQUAL(4, *(uint16_t *)hashmap_get(1, map));
+    TEST_ASSERT_EQUAL(6, *(uint16_t *)hashmap_get(2, map));
+    TEST_ASSERT_EQUAL(46, *(uint16_t *)hashmap_get(3, map));
+    TEST_ASSERT_EQUAL(4, map->size);
 }
 
 void test_put_should_trim_value_of_larger_type(void) {
