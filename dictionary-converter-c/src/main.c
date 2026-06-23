@@ -111,7 +111,7 @@ int validate_args(struct arguments *arguments) {
     return 0;
 }
 
-static uint32_t *read_alphabet(char *alphabet_file) {
+static size_t read_alphabet(uint32_t **chars_p, char *alphabet_file) {
     FILE *fp = fopen(alphabet_file, "rb");
     char *line = NULL;
     size_t linecap = 0;
@@ -119,16 +119,15 @@ static uint32_t *read_alphabet(char *alphabet_file) {
         return NULL;
     }
     fclose(fp);
-    return utf8_split(line, MAX_ALPHABET_SIZE);
+    return utf8_split(chars_p, line, MAX_ALPHABET_SIZE);
 }
 
-static hashmap_t *map_alphabet_letters(uint32_t *alphabet_p) {
-    hashmap_t *hashmap = hashmap_init(MAX_ALPHABET_SIZE);
-    int i = 0;
-    int fail = 0;
+static hashmap *map_alphabet_letters(uint32_t *alphabet_p) {
+    hashmap *hashmap = hashmap_init(MAX_ALPHABET_SIZE, sizeof(uint32_t));
+    uint32_t i = 0;
     while (alphabet_p) {
-        fail = !hashmap_put(*alphabet_p++, i++, hashmap);
-        if (fail) {
+        uint32_t *i_p = &i;
+        if (hashmap_put(*alphabet_p++, i_p, hashmap) == NULL) {
             fprintf(stderr, "Failed to put %u\n", *(alphabet_p - 1));
         }
     }
@@ -149,6 +148,7 @@ int main(int argc, char *argv[]) {
     if (validate_args(&arguments) != 0) {
         return EXIT_FAILURE;
     }
-    uint32_t *alphabet_chars = read_alphabet(arguments.alphabet_config);
-    hashmap_t *mapped_alphabet = map_alphabet_letters(alphabet_chars);
+    uint32_t *alphabet_chars = NULL;
+    size_t chars_num = read_alphabet(&alphabet_chars, arguments.alphabet_config);
+    hashmap *mapped_alphabet = map_alphabet_letters(alphabet_chars);
 }
