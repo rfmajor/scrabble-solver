@@ -1,3 +1,4 @@
+#include "gaddag.h"
 #include "hashmap.h"
 #include "utf8_splitter.h"
 #include <argp.h>
@@ -116,17 +117,17 @@ static size_t read_alphabet(uint32_t **chars_p, char *alphabet_file) {
     char *line = NULL;
     size_t linecap = 0;
     if (getline(&line, &linecap, fp) == 0) {
-        return NULL;
+        return -1;
     }
     fclose(fp);
     return utf8_split(chars_p, line, MAX_ALPHABET_SIZE);
 }
 
-static hashmap *map_alphabet_letters(uint32_t *alphabet_p) {
+static hashmap *map_alphabet_letters(uint32_t *alphabet_p, size_t chars_num) {
     hashmap *hashmap = hashmap_init(MAX_ALPHABET_SIZE, sizeof(uint8_t));
-    uint8_t i = 0;
-    while (alphabet_p) {
-        uint8_t *i_p = &i;
+    for (uint8_t i = 0; i < chars_num; i++) {
+        uint8_t *i_p = malloc(sizeof(uint8_t));
+        memcpy(i_p, &i, sizeof(uint8_t));
         if (hashmap_put(*alphabet_p++, i_p, hashmap) == NULL) {
             fprintf(stderr, "Failed to put %u\n", *(alphabet_p - 1));
         }
@@ -150,5 +151,11 @@ int main(int argc, char *argv[]) {
     }
     uint32_t *alphabet_chars = NULL;
     size_t chars_num = read_alphabet(&alphabet_chars, arguments.alphabet_config);
-    hashmap *mapped_alphabet = map_alphabet_letters(alphabet_chars);
+    printf("Alphabet read, chars: %zu\n", chars_num);
+    for (size_t i = 0; i < chars_num; i++) {
+        printf("%u ", *(alphabet_chars + i));
+    }
+    hashmap *mapped_alphabet = map_alphabet_letters(alphabet_chars, chars_num);
+    printf("Alphabet mapped, letters:\n");
+    gaddag_convert(arguments.args[0], arguments.args[1], mapped_alphabet, 15, 0);
 }

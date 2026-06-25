@@ -1,6 +1,5 @@
 #include "gaddag.h"
 #include "utf8_splitter.h"
-#include <math.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -44,20 +43,32 @@ static void set_bit_value(int start, int end, uint64_t value, uint64_t *target) 
     *target |= (value << start);
 }
 
+static void set_dest_state(uint64_t value, uint64_t *target) {
+    set_bit_value(DEST_ID_START, DEST_ID_END, value, target);
+}
+
+static void set_char_bitmap(uint64_t value, uint64_t *target) {
+    set_bit_value(CHAR_BITMAP_ID_START, CHAR_BITMAP_ID_END, value, target);
+}
+
+static uint32_t add_to_bitmap(uint32_t bitmap, uint8_t index) {
+    return bitmap | (1 << index);
+}
+
 static void add_final_char(uint8_t final_char, uint64_t *arc, struct gaddag_context *ctx) {
     uint64_t char_bitmap_idx = get_bit_value(CHAR_BITMAP_ID_START, CHAR_BITMAP_ID_END, arc);
     uint32_t char_bitmap = ctx->chars->idx_to_bitmap[char_bitmap_idx];
     uint32_t new_char_bitmap = add_to_bitmap(char_bitmap, final_char);
-    uint8_t new_char_bitmap_idx;
-    if ((new_char_bitmap_idx = *(uint8_t *)hashmap_get(new_char_bitmap, ctx->chars->bitmap_to_idx)) != ((uint8_t)-1)) {
-        char_bitmap_idx = new_char_bitmap_idx;
+    uint8_t *new_char_bitmap_idx;
+    if ((new_char_bitmap_idx = (uint8_t *)hashmap_get(new_char_bitmap, ctx->chars->bitmap_to_idx)) != NULL) {
+        char_bitmap_idx = *new_char_bitmap_idx;
     } else {
         char_bitmap_idx = ctx->next_char_bitmap_idx;
         ++ctx->next_char_bitmap_idx;
         // todo: realloc if idx_to_bitmap runs out of space
         ctx->chars->idx_to_bitmap[char_bitmap_idx] = new_char_bitmap;
     }
-    set_bit_value(CHAR_BITMAP_ID_START, CHAR_BITMAP_ID_END, char_bitmap_idx, arc);
+    set_char_bitmap(char_bitmap_idx, arc);
 }
 
 static int realloc_states(struct gaddag_context *ctx) {
@@ -72,7 +83,13 @@ static int realloc_states(struct gaddag_context *ctx) {
 }
 
 // add final arc
-static void force_arc(uint8_t arc_c, struct gaddag_context *ctx) {
+static void force_arc(uint8_t arc_char, struct gaddag_context *ctx) {
+    uint64_t arc = ARCS(arc_char, ctx);
+    int curr_dest_state_idx = get_bit_value(DEST_ID_START, DEST_ID_END, &arc);
+    if (curr_dest_state_idx == 0) {
+        set_dest_state(ctx->force_state_idx, &arc);
+    }
+    set_char_bitmap(ctx->force_char_bitmap_idx, &arc);
 }
 
 // add final arc if one does not exist yet
@@ -84,7 +101,7 @@ static void ensure_final_arc(uint8_t arc_char, uint8_t final_char, struct gaddag
                 return;
             }
         }
-        set_bit_value(DEST_ID_START, DEST_ID_END, ctx->next_state_idx, &arc);
+        set_dest_state(ctx->next_state_idx, &arc);
         ++ctx->next_state_idx;
     }
     add_final_char(final_char, &arc, ctx);
@@ -101,7 +118,7 @@ static void ensure_arc(uint8_t arc_char, struct gaddag_context *ctx) {
                 return;
             }
         }
-        set_bit_value(DEST_ID_START, DEST_ID_END, ctx->next_state_idx, &arc);
+        set_dest_state(ctx->next_state_idx, &arc);
         ++ctx->next_state_idx;
     }
     ctx->last_char_bitmap_idx = get_bit_value(CHAR_BITMAP_ID_START, CHAR_BITMAP_ID_END, &arc);
@@ -109,19 +126,27 @@ static void ensure_arc(uint8_t arc_char, struct gaddag_context *ctx) {
 }
 
 static size_t translate(uint8_t **tokens, char *word, hashmap *alphabet) {
+    printf("Received word: %s\n", word);
     uint32_t *split = NULL;
     size_t len = utf8_split(&split, word, MAX_CHARS);
+    printf("len of split: %zu\n", len);
     *tokens = malloc(sizeof(uint8_t) * len + 1);
     for (size_t i = 0; i < len; i++) {
         *tokens[i] = *(uint8_t *)hashmap_get(split[i], alphabet);
+        printf("[%zu] char %d mapped to %d\n", i, split[i], *tokens[i]);
     }
     free(split);
     return len;
 }
 
-static uint32_t *process_word(char *word, struct gaddag_context *ctx) {
+static void process_word(char *word, struct gaddag_context *ctx) {
     uint8_t *t_word = NULL;
     size_t len = translate(&t_word, word, ctx->mapped_alphabet);
+    printf("Translated from (%s): ", word);
+    for (size_t i = 0; i < len; i++) {
+        printf("%d ", *(t_word + i));
+    }
+    printf("\n");
 
     ctx->current_state_idx = 1;
     for (size_t i = len - 1; i >= 2; i--) {
@@ -145,19 +170,20 @@ static uint32_t *process_word(char *word, struct gaddag_context *ctx) {
         ensure_arc(ctx->delimiter_idx, ctx);
         force_arc(t_word[m + 1], ctx);
     }
-    int max_bitmap_id = (int)pow(2, CHAR_BITMAP_ID_END - CHAR_BITMAP_ID_START - 1);
 }
 
-void mem_init(uint32_t initial_states, uint32_t alphabet_size, hashmap *mapped_alphabet, struct gaddag_context *ctx) {
-    ctx = malloc(sizeof(struct gaddag_context));
+struct gaddag_context *mem_init(uint32_t initial_states, uint32_t alphabet_size, hashmap *mapped_alphabet) {
+    struct gaddag_context *ctx = malloc(sizeof(struct gaddag_context));
     ctx->next_state_idx = 2;
     ctx->next_char_bitmap_idx = 1;
     ctx->delimiter_idx = mapped_alphabet->size - 1;
     ctx->states_cap = initial_states;
     ctx->chars = malloc(sizeof(struct chars_storage));
-    ctx->chars->bitmap_to_idx = malloc(sizeof(hashmap));
+    ctx->chars->bitmap_to_idx = hashmap_init(512, sizeof(uint8_t));
     ctx->chars->idx_to_bitmap = malloc(sizeof(uint32_t) * 512);
     ctx->arcs = malloc(sizeof(uint64_t) * initial_states * alphabet_size);
+    ctx->mapped_alphabet = mapped_alphabet;
+    return ctx;
 }
 
 void gaddag_convert(const char *dictionary_f, const char *output_f, hashmap *mapped_alphabet, const int max_word,
@@ -167,12 +193,23 @@ void gaddag_convert(const char *dictionary_f, const char *output_f, hashmap *map
     size_t linecap = 0;
     ssize_t linelen = 0;
 
-    struct gaddag_context *ctx = NULL;
-    mem_init(512, 33, mapped_alphabet, ctx);
+    struct gaddag_context *ctx = mem_init(512, 33, mapped_alphabet);
 
     while ((linelen = getline(&line, &linecap, fp)) > 0) {
+        printf("Processing %s\n", line);
         process_word(line, ctx);
     }
+    uint64_t root_arc = 0;
+    // any value for char bitmap for the first arc
+    set_char_bitmap(123, &root_arc);
+    set_dest_state(1, &root_arc);
 
     fclose(fp);
+
+    // FILE *dest_fp = fopen(output_f, "wb");
+    // if (dest_fp == NULL) {
+    //     fprintf(stderr, "Failed to open file for writing\n");
+    //     return;
+    // }
+    // fclose(dest_fp);
 }

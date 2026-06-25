@@ -31,7 +31,7 @@ static void re_hash(hashmap *map) {
     map->size = 0;
     int table_size = get_table_size(map->cap);
     node *buckets_src = map->buckets;
-    map->buckets = malloc(sizeof(node) * table_size);
+    map->buckets = calloc(sizeof(node), table_size);
     for (size_t i = 0; i < previous_cap; i++) {
         node *bucket_src = buckets_src + i;
         if (bucket_src->key != NULL) {
@@ -67,7 +67,7 @@ hashmap *hashmap_init(int cap, size_t sizeof_val) {
     }
     int table_size = get_table_size(cap);
 
-    hashmap->buckets = malloc(sizeof(struct node) * table_size);
+    hashmap->buckets = calloc(sizeof(struct node), table_size);
     if (hashmap->buckets == NULL) {
         return NULL;
     }
@@ -87,7 +87,7 @@ void *hashmap_put(uint32_t key, void *val, hashmap *hashmap) {
 
     while (bucket->key != NULL && *bucket->key != key) {
         if (bucket->next == NULL) {
-            bucket->next = malloc(sizeof(struct node));
+            bucket->next = calloc(sizeof(struct node), 1);
             if (bucket->next == NULL) {
                 return NULL;
             }

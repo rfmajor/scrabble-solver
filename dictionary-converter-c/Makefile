@@ -15,6 +15,7 @@ endif
 
 .PHONY: clean
 .PHONY: test
+.PHONY: converter
 
 PATHU = unity/src/
 PATHS = src/
@@ -23,13 +24,16 @@ PATHB = build/
 PATHD = build/depends/
 PATHO = build/objs/
 PATHR = build/results/
+PATHARGPI = /opt/homebrew/Cellar/argp-standalone/1.5.0/include/
+PATHARGPL = /opt/homebrew/Cellar/argp-standalone/1.5.0/lib/
 
 BUILD_PATHS = $(PATHB) $(PATHD) $(PATHO) $(PATHR)
 
 SRCT = $(wildcard $(PATHT)*.c)
 
 COMPILE=gcc -c
-DEBUG=gcc -fsanitize=address -g -O0
+COMPILE_T=gcc
+DEBUG=gcc -fsanitize=address -g -O0 -fsanitize=address -g -O0
 LINK=gcc
 DEPEND=gcc -MM -MG -MF
 CFLAGS=-I. -I$(PATHU) -I$(PATHS) -DTEST
@@ -78,6 +82,9 @@ $(PATHO):
 
 $(PATHR):
 	$(MKDIR) $(PATHR)
+
+converter: $(PATHO)*.o $(PATHS)*.c $(PATHS)*.h
+	$(COMPILE_T) $(PATHS)main.c $(PATHO)hashmap.o $(PATHO)utf8_splitter.o $(PATHS)gaddag.c -I$(PATHARGPI) -largp -L$(PATHARGPL) -o main
 
 clean:
 	$(CLEANUP) $(PATHO)*.o
