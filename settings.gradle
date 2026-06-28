@@ -1,3 +1,10 @@
+pluginManagement {
+    repositories {
+        mavenCentral()
+        gradlePluginPortal()
+    }
+}
+
 rootProject.name = 'scrabble-solver'
 
 include 'gaddag-converter'
@@ -5,4 +12,3 @@ include 'server'
 include 'detection'
 include 'common'
 include 'scrabble-frontend'
-

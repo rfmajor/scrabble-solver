@@ -153,6 +153,7 @@ public class ExpandedGaddagConverter implements GaddagConverter<Long> {
         }
 
         private void addLetterToSet(final int stateId, final int letterId, int letterIdToAdd) {
+            // if existing arc has a letter set, retrieve its id
             int letterSetId = getLetterBitMapId(arcs[stateId][letterId]);
             int letterSet = letterSets.getOrDefault(letterSetId, 0);
             letterSet = BitSetUtils.addToSet(letterSet, letterIdToAdd);

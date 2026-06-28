@@ -72,6 +72,12 @@ public final class BitSetUtils {
         return bitSet | (Byte.toUnsignedLong(value) << startIndex);
     }
 
+    // Example on 8-bit integer when startIndex = 2, endIndex = 5
+    // 0. Length = 5 - 2 = 3
+    // 1. 1 << 3 == 00001000
+    // 2. 00001000 - 1 == 00000111
+    // 3. 00000111 << 2 == 00011100
+    // 4. ~00011100 == 11100011
     public static long setZerosInRange(long bitSet, int startIndex, int endIndex) {
         int length = endIndex - startIndex;
         return bitSet &  ~(((1L << length) - 1) << startIndex);
