@@ -59,6 +59,9 @@ $(PATHR)%.txt: $(PATHB)%.$(TARGET_EXTENSION)
 $(PATHB)Test%.$(TARGET_EXTENSION): $(PATHO)Test%.o $(PATHO)%.o $(PATHO)unity.o #$(PATHD)Test%.d
 	$(LINK) -o $@ $^
 
+$(PATHB)Testgaddag.$(TARGET_EXTENSION): $(PATHO)Testgaddag.o $(PATHO)gaddag.o $(PATHO)hashmap.o $(PATHO)utf8_splitter.o $(PATHO)unity.o #$(PATHD)Test%.d
+	$(LINK) -o $@ $(PATHO)Testgaddag.o $(PATHO)gaddag.o $(PATHO)hashmap.o $(PATHO)utf8_splitter.o $(PATHO)unity.o
+
 $(PATHO)%.o:: $(PATHT)%.c
 	$(COMPILE) $(CFLAGS) $< -o $@
 
@@ -84,7 +87,7 @@ $(PATHR):
 	$(MKDIR) $(PATHR)
 
 converter: $(PATHO)*.o $(PATHS)*.c $(PATHS)*.h
-	$(COMPILE_T) $(PATHS)main.c $(PATHO)hashmap.o $(PATHO)utf8_splitter.o $(PATHS)gaddag.c -I$(PATHARGPI) -largp -L$(PATHARGPL) -o g_converter
+	$(COMPILE_T) $(PATHS)main.c $(PATHO)hashmap.o $(PATHO)gaddag.o $(PATHO)utf8_splitter.o -I$(PATHARGPI) -largp -L$(PATHARGPL) -o g_converter
 
 clean:
 	$(CLEANUP) $(PATHO)*.o
