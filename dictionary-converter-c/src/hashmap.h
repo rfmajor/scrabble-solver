@@ -30,4 +30,6 @@ void *hashmap_get(uint32_t key, hashmap *map);
 
 void hashmap_destroy(hashmap *map);
 
+hashmap *hashmap_of(uint32_t *keys, void *vals, size_t size, size_t val_size);
+
 #endif // !HASHMAP

@@ -1,4 +1,5 @@
 #include "hashmap.h"
+#include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -135,4 +136,13 @@ void hashmap_destroy(hashmap *map) {
     }
     free(map->buckets);
     free(map);
+}
+
+hashmap *hashmap_of(uint32_t *keys, void *vals, size_t size, size_t val_size) {
+    hashmap *map = hashmap_init(16, val_size);
+    for (size_t i = 0; i < size; i++) {
+        printf("[%zu] \n", i);
+        hashmap_put(*keys++, (vals + i * val_size), map);
+    }
+    return map;
 }

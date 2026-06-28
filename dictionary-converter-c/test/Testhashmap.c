@@ -1,10 +1,10 @@
 #include "hashmap.h"
 #include "unity.h"
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 
 hashmap *map;
-uint16_t *val;
 
 int __get_cap_and_destroy(int cap) {
     hashmap *map = hashmap_init(cap, sizeof(uint16_t));
@@ -15,12 +15,10 @@ int __get_cap_and_destroy(int cap) {
 
 void setUp(void) {
     map = hashmap_init(4, sizeof(uint16_t));
-    val = malloc(sizeof(uint16_t));
 }
 
 void tearDown(void) {
     hashmap_destroy(map);
-    free(val);
 }
 
 void test_cap_should_beAlignedToNearestPowerOfTwo(void) {
@@ -84,6 +82,16 @@ void test_put_should_trim_value_of_larger_type(void) {
     TEST_ASSERT_EQUAL(2, map->size);
 }
 
+void test_of_should_return_hashmap_with_values(void) {
+    uint32_t keys[] = {1, 2, 3};
+    uint16_t vals[] = {10, 20, 30};
+    hashmap *map = hashmap_of(keys, vals, 3, sizeof(uint16_t));
+    TEST_ASSERT_EQUAL(10, *(uint16_t *)hashmap_get(1, map));
+    TEST_ASSERT_EQUAL(20, *(uint16_t *)hashmap_get(2, map));
+    TEST_ASSERT_EQUAL(30, *(uint16_t *)hashmap_get(3, map));
+    free(map);
+}
+
 int main(void) {
     UNITY_BEGIN();
     RUN_TEST(test_cap_should_beAlignedToNearestPowerOfTwo);
@@ -91,6 +99,7 @@ int main(void) {
     RUN_TEST(test_put_should_overwrite);
     RUN_TEST(test_put_should_rehashWhenLoadFactorExceeded);
     RUN_TEST(test_put_should_trim_value_of_larger_type);
+    RUN_TEST(test_of_should_return_hashmap_with_values);
     UNITY_END();
 
     return 0;
