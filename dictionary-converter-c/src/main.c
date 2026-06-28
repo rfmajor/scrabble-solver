@@ -157,5 +157,7 @@ int main(int argc, char *argv[]) {
     }
     hashmap *mapped_alphabet = map_alphabet_letters(alphabet_chars, chars_num);
     printf("Alphabet mapped, letters:\n");
-    gaddag_convert(arguments.args[0], arguments.args[1], mapped_alphabet, 15, 0);
+    FILE *dictionary_f = fopen(arguments.args[0], "rb");
+    FILE *output_f = fopen(arguments.args[1], "wb");
+    gaddag_convert(dictionary_f, output_f, mapped_alphabet, 15, 0);
 }

@@ -19,7 +19,7 @@ typedef struct {
     char *ENDC;
 } colors;
 
-const colors COLORS = {.RED = "\033[1;91m", .GREEN = "\033[1;92m", .ENDC = "\033[0;22m"};
+static const colors COLORS = {.RED = "\033[1;91m", .GREEN = "\033[1;92m", .ENDC = "\033[0;22m"};
 
 struct chars_storage {
     uint32_t *idx_to_bitmap;
@@ -224,16 +224,14 @@ struct gaddag_context *mem_init(uint32_t initial_states, uint32_t alphabet_size,
     return ctx;
 }
 
-void gaddag_convert(const char *dictionary_f, const char *output_f, hashmap *mapped_alphabet, const int max_word,
-                    const int gzip) {
-    FILE *fp = fopen(dictionary_f, "rb");
+void gaddag_convert(FILE *dictionary_f, FILE *output_f, hashmap *mapped_alphabet, const int max_word, const int gzip) {
     char *line = NULL;
     size_t linecap = 0;
     ssize_t linelen = 0;
 
     struct gaddag_context *ctx = mem_init(512, 33, mapped_alphabet);
 
-    while ((linelen = getline(&line, &linecap, fp)) > 0) {
+    while ((linelen = getline(&line, &linecap, dictionary_f)) > 0) {
         process_word(line, ctx);
     }
     uint64_t root_arc = 0;
@@ -241,7 +239,7 @@ void gaddag_convert(const char *dictionary_f, const char *output_f, hashmap *map
     set_char_bitmap(123, &root_arc);
     set_dest_state(1, &root_arc);
 
-    fclose(fp);
+    fclose(dictionary_f);
 
     // FILE *dest_fp = fopen(output_f, "wb");
     // if (dest_fp == NULL) {
