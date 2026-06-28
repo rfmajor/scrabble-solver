@@ -51,3 +51,4 @@ venv/
 a.out
 dictionary.txt
 convertDictionary
+dictionary-converter-c/main*/**

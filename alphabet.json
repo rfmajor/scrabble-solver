@@ -1,0 +1,40 @@
+{
+  "letters": [
+    { "letter": "a", "index": 0, "points": 0, "quantity": 0 },
+    { "letter": "ą", "index": 1, "points": 0, "quantity": 0 },
+    { "letter": "b", "index": 2, "points": 0, "quantity": 0 },
+    { "letter": "c", "index": 3, "points": 0, "quantity": 0 },
+    { "letter": "ć", "index": 4, "points": 0, "quantity": 0 },
+    { "letter": "d", "index": 5, "points": 0, "quantity": 0 },
+    { "letter": "e", "index": 6, "points": 0, "quantity": 0 },
+    { "letter": "ę", "index": 7, "points": 0, "quantity": 0 },
+    { "letter": "f", "index": 8, "points": 0, "quantity": 0 },
+    { "letter": "g", "index": 9, "points": 0, "quantity": 0 },
+    { "letter": "h", "index": 10, "points": 0, "quantity": 0 },
+    { "letter": "i", "index": 11, "points": 0, "quantity": 0 },
+    { "letter": "j", "index": 12, "points": 0, "quantity": 0 },
+    { "letter": "k", "index": 13, "points": 0, "quantity": 0 },
+    { "letter": "l", "index": 14, "points": 0, "quantity": 0 },
+    { "letter": "ł", "index": 15, "points": 0, "quantity": 0 },
+    { "letter": "m", "index": 16, "points": 0, "quantity": 0 },
+    { "letter": "n", "index": 17, "points": 0, "quantity": 0 },
+    { "letter": "ń", "index": 18, "points": 0, "quantity": 0 },
+    { "letter": "o", "index": 19, "points": 0, "quantity": 0 },
+    { "letter": "ó", "index": 20, "points": 0, "quantity": 0 },
+    { "letter": "p", "index": 21, "points": 0, "quantity": 0 },
+    { "letter": "r", "index": 22, "points": 0, "quantity": 0 },
+    { "letter": "s", "index": 23, "points": 0, "quantity": 0 },
+    { "letter": "ś", "index": 24, "points": 0, "quantity": 0 },
+    { "letter": "t", "index": 25, "points": 0, "quantity": 0 },
+    { "letter": "u", "index": 26, "points": 0, "quantity": 0 },
+    { "letter": "w", "index": 27, "points": 0, "quantity": 0 },
+    { "letter": "y", "index": 28, "points": 0, "quantity": 0 },
+    { "letter": "z", "index": 29, "points": 0, "quantity": 0 },
+    { "letter": "ź", "index": 30, "points": 0, "quantity": 0 },
+    { "letter": "ż", "index": 31, "points": 0, "quantity": 0 }
+  ],
+  "delimiter": {
+    "letter": "#",
+    "index": 32
+  }
+}
