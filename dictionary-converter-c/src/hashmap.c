@@ -27,15 +27,19 @@ static uint32_t fnv_32_hash(void *buf, size_t len, uint32_t hval) {
 }
 
 static void re_hash(hashmap *map) {
+    printf("REHASH\n");
     int previous_cap = map->cap;
     map->cap *= 2;
     map->size = 0;
     int table_size = get_table_size(map->cap);
+    printf("table size = %d\n", table_size);
     node *buckets_src = map->buckets;
     map->buckets = calloc(sizeof(node), table_size);
+    printf("calloc\n");
     for (size_t i = 0; i < previous_cap; i++) {
         node *bucket_src = buckets_src + i;
         if (bucket_src->key != NULL) {
+            printf("putting key: %u\n", *bucket_src->key);
             hashmap_put(*bucket_src->key, bucket_src->val, map);
         }
         free(bucket_src->key);
@@ -44,7 +48,7 @@ static void re_hash(hashmap *map) {
         while (bucket_src != NULL) {
             node *bucket_tmp = bucket_src;
             bucket_src = bucket_src->next;
-            if (bucket_src->key != NULL) {
+            if (bucket_src != NULL && bucket_src->key != NULL) {
                 hashmap_put(*bucket_src->key, bucket_src->val, map);
             }
             free(bucket_tmp->key);
