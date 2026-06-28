@@ -84,7 +84,7 @@ $(PATHR):
 	$(MKDIR) $(PATHR)
 
 converter: $(PATHO)*.o $(PATHS)*.c $(PATHS)*.h
-	$(COMPILE_T) $(PATHS)main.c $(PATHO)hashmap.o $(PATHO)utf8_splitter.o $(PATHS)gaddag.c -I$(PATHARGPI) -largp -L$(PATHARGPL) -o main
+	$(COMPILE_T) $(PATHS)main.c $(PATHO)hashmap.o $(PATHO)utf8_splitter.o $(PATHS)gaddag.c -I$(PATHARGPI) -largp -L$(PATHARGPL) -o g_converter
 
 clean:
 	$(CLEANUP) $(PATHO)*.o
